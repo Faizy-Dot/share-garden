@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
 import { Login } from './src/screens';
 import { NavigationService } from './src/config';
+import OnboardingScreen from './src/screens/OnBoarding/OnBoarding';
 
 
 const Stack = createNativeStackNavigator();
@@ -17,8 +18,9 @@ export default function App() {
 
   return (
     <NavigationContainer ref={ref => NavigationService.setTopLevelNavigator(ref)}>
-      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }} >
+      <Stack.Navigator initialRouteName="OnBoarding" screenOptions={{ headerShown: false }} >
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="OnBoarding" component={OnboardingScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
