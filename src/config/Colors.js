@@ -4,6 +4,8 @@ const colors = {
   secondary: '#E57C18',
   white: '#FFF',
   black: '#000',
+  onBoardColor : "#008675",
+  buttonColor : "#009D89"
 };
 
 export default colors;

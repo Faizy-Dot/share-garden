@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,39 +8,41 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import { Images } from '../../config';
+import { Images, Metrix } from '../../config';
+import colors from '../../config/Colors';
 
 const { width, height } = Dimensions.get('window');
 
 const onboardingData = [
   {
     id: '1',
-    title: 'Welcome to Our App',
-    description: 'Discover new features and exciting opportunities.',
-    image: Images.logo, // Replace with your image file
+    title: 'SIGN UP & GET POINTS',
+    description: 'Create an account and receive a bonus amount of points to start shopping!',
+    image: Images.onBoardFirst,
   },
   {
     id: '2',
-    title: 'Stay Connected',
-    description: 'Keep in touch with your friends and family anytime.',
-    image: Images.logo, // Replace with your image file
+    title: 'EXPLORE ITEMS AND ARTICLES',
+    description: 'Explore our marketplace, find great deals on used goods, and use your points to purchase items.',
+    image: Images.onBoardSecond,
   },
   {
     id: '3',
-    title: 'Achieve Your Goals',
-    description: 'Track your progress and achieve your dreams.',
-    image: Images.logo, // Replace with your image file
+    title: 'BUY AND SELL GOODS',
+    description: 'List your used goods, sell them to other users, and earn points to redeem more items.',
+    image: Images.onBoardThird,
   },
   {
     id: '4',
-    title: 'Get Started Now',
-    description: 'Sign up and enjoy our amazing services today.',
-    image: Images.logo, // Replace with your image file
+    title: 'EARN POINTS AND LEVEL UP',
+    description: 'Complete tasks, refer friends, and earn points to level up and unlock exclusive awards.',
+    image: Images.onBoardFourth,
   },
 ];
 
 const OnboardingScreen = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef(null); // Reference to FlatList
 
   const handleScroll = (event) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
@@ -55,9 +57,23 @@ const OnboardingScreen = ({ navigation }) => {
     </View>
   );
 
+  const handleSkip = () => {
+    if (currentIndex < onboardingData.length - 1) {
+      const nextIndex = currentIndex + 1;
+      flatListRef.current.scrollToOffset({
+        offset: width * nextIndex,
+        animated: true,
+      });
+      setCurrentIndex(nextIndex);
+    } else {
+      navigation.navigate('GetStarted');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
+        ref={flatListRef} // Attach ref to FlatList
         data={onboardingData}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
@@ -78,21 +94,16 @@ const OnboardingScreen = ({ navigation }) => {
           />
         ))}
       </View>
-      {/* Skip/Next Button */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          if (currentIndex < onboardingData.length - 1) {
-            setCurrentIndex(currentIndex + 1);
-          } else {
-            navigation.navigate('Login'); // Replace 'Home' with your target screen
-          }
-        }}
-      >
+      {/* Skip Button */}
+      <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={handleSkip}>
         <Text style={styles.buttonText}>
-          {currentIndex === onboardingData.length - 1 ? 'Get Started' : 'Next'}
+          Skip
         </Text>
       </TouchableOpacity>
+      <Image
+        source={Images.onBoardBottom}
+        style={{ width: '100%', height: Metrix.VerticalSize(270), position: 'absolute', bottom: 0 }}
+      />
     </View>
   );
 };
@@ -100,15 +111,15 @@ const OnboardingScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.onBoardColor,
   },
   slide: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   image: {
-    width: width * 0.8,
-    height: height * 0.5,
+    width: width * 0.3,
+    height: height * 0.4,
     resizeMode: 'contain',
     marginBottom: 20,
   },
@@ -116,43 +127,44 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#333',
+    color: colors.white,
     marginBottom: 10,
   },
   description: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#666',
+    color: colors.white,
     paddingHorizontal: 20,
+    width: 300,
   },
   pagination: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 20,
+    marginVertical: 10,
   },
   dot: {
     width: 10,
     height: 10,
     borderRadius: 5,
     marginHorizontal: 5,
+    borderWidth: 1,
   },
   activeDot: {
-    backgroundColor: '#007BFF',
+    backgroundColor: colors.onBoardColor,
+    borderColor: colors.black,
   },
   inactiveDot: {
-    backgroundColor: '#ccc',
+    backgroundColor: colors.black,
   },
   button: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    borderRadius: 5,
     alignSelf: 'center',
     marginBottom: 30,
+    zIndex: 1,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: colors.black,
+    fontSize: 20,
+    fontWeight: '500',
   },
 });
 
