@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { Colors, Metrix } from "../../../config";
+import colors from "../../../config/Colors";
 
 const styles = StyleSheet.create({
     container: {
@@ -7,10 +8,10 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: Metrix.HorizontalSize(20),
+        padding: Metrix.HorizontalSize(40),
     },
     logo: {
-        width: Metrix.HorizontalSize(250),
+        width: Metrix.HorizontalSize(150),
         height: Metrix.VerticalSize(150),
         resizeMode: 'contain',
         marginBottom: Metrix.VerticalSize(30),
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: '#F6F6F6',
         borderRadius: 8,
-        padding: 15,
+        padding: 10,
         marginBottom: 10,
         borderWidth: 1,
         borderColor: '#DDD',
@@ -31,11 +32,11 @@ const styles = StyleSheet.create({
         color: '#666',
         fontSize: 14,
         marginBottom: 20,
-        textAlign: 'right',
+        textAlign: 'center',
         width: '100%',
     },
     loginButton: {
-        backgroundColor: '#009688',
+        backgroundColor: colors.buttonColor,
         borderRadius: 8,
         padding: 15,
         alignItems: 'center',
@@ -44,6 +45,20 @@ const styles = StyleSheet.create({
     },
     loginButtonText: {
         color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    signupButton: {
+        backgroundColor: colors.buttonColor,
+        borderRadius: 8,
+        padding: 15,
+        alignItems: 'center',
+        marginBottom: 20,
+        width: '100%',
+        marginTop : Metrix.VerticalSize(30)
+    },
+    signupButtonText: {
+        color: colors.white,
         fontSize: 16,
         fontWeight: 'bold',
     },
@@ -57,7 +72,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 8,
-        padding: 15,
+        padding: 10,
         marginBottom: 10,
         width: '100%',
     },
@@ -77,7 +92,7 @@ const styles = StyleSheet.create({
     },
     socialButtonIcon: {
         fontSize: 25,
-        marginRight: 20
+        marginRight: Metrix.HorizontalSize(20)
     }
 });
 

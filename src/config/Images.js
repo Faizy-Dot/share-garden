@@ -6,7 +6,8 @@ const Images = {
     onBoardThird : require('../assets/images/onboard/third.png'),
     onBoardFourth : require('../assets/images/onboard/fourth.png'),
     onBoardBottom : require('../assets/images/onboard/bottom.png'),
-    descriptionLogo : require('../assets/images/description-logo.png')
+    descriptionLogo : require('../assets/images/description-logo.png'),
+    successLogo : require('../assets/images/success-logo.png')
 }
 
 export default Images;

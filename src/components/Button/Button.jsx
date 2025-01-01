@@ -4,9 +4,9 @@ import colors from "../../config/Colors";
 
 
 
-export default function CustomButton({ title }) {
+export default function CustomButton({ title,onPress }) {
     return (
-        <TouchableOpacity style={styles.customButton}>
+        <TouchableOpacity style={styles.customButton} activeOpacity={0.8} onPress={onPress}>
             <Text style={styles.text}>
                 {title}
             </Text>

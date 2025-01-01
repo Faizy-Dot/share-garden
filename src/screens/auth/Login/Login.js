@@ -3,8 +3,9 @@ import React from 'react'
 import styles from './styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Images from '../../../config/Images';
+import CustomButton from '../../../components/Button/Button';
 
-const Login = () => {
+const Login = ({navigation}) => {
     return (
         <View style={styles.container}>
             {/* Logo */}
@@ -28,7 +29,7 @@ const Login = () => {
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
 
             {/* Login Button */}
-            <TouchableOpacity style={styles.loginButton}>
+            <TouchableOpacity activeOpacity={0.8} style={styles.loginButton}>
                 <Text style={styles.loginButtonText}>LOGIN</Text>
             </TouchableOpacity>
 
@@ -36,28 +37,24 @@ const Login = () => {
             <Text style={styles.orText}>OR</Text>
 
             {/* Social Media Buttons with Icons */}
-            <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#1877F2' }]}>
+            <TouchableOpacity activeOpacity={0.8} style={[styles.socialButton, { backgroundColor: '#1877F2' }]}>
                 <FontAwesome name="facebook" size={20} color="#fff" style={styles.socialButtonIcon} />
                 <Text style={styles.socialButtonText}>Continue With Facebook</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#DB4437' }]}>
+            <TouchableOpacity activeOpacity={0.8} style={[styles.socialButton, { backgroundColor: '#DB4437' }]}>
                 <FontAwesome name="google" size={20} color="#fff" style={styles.socialButtonIcon} />
                 <Text style={styles.socialButtonText}>Continue With Google</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.socialButton, { backgroundColor: '#000000' }]}>
+            <TouchableOpacity activeOpacity={0.8} style={[styles.socialButton, { backgroundColor: '#000000' }]}>
                 <FontAwesome name="apple" size={20} color="#fff" style={styles.socialButtonIcon} />
                 <Text style={styles.socialButtonText}>Continue With Apple</Text>
             </TouchableOpacity>
 
-            {/* Sign Up Link */}
-            <Text style={styles.signUpText}>
-                Don’t have an account?{' '}
-                <Text style={styles.signUpLink} onPress={() => navigation.navigate('SignUp')}>
-                    Sign up Now
-                </Text>
-            </Text>
+            <TouchableOpacity activeOpacity={0.8} style={styles.signupButton} onPress={()=> navigation.navigate('Signup')}>
+                <Text style={styles.signupButtonText}>Don't have an account?Sign up Now</Text>
+            </TouchableOpacity>
         </View>
     )
 }
