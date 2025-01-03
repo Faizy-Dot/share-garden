@@ -1,9 +1,9 @@
 import { Image, StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import { Images, Metrix } from "../../config"; 
+import { Images, Metrix } from "../../config";
 import CustomButton from "../../components/Button/Button";
 import colors from "../../config/Colors";
 
-export default function GetStartedScreen({navigation}) {
+export default function GetStartedScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
@@ -16,10 +16,11 @@ export default function GetStartedScreen({navigation}) {
 
       <View style={styles.buttonContainer}>
         <CustomButton
-          title="GET STARTED"
-         onPress={()=> navigation.navigate('Login')}
+          title="GET  STARTED"
+          onPress={() => navigation.navigate('Login')}
+          height={Metrix.VerticalSize(68)}
         />
-   
+
       </View>
     </View>
   );
@@ -39,12 +40,12 @@ const styles = StyleSheet.create({
     marginTop: Metrix.VerticalSize(100),
   },
   logo: {
-    width: Metrix.HorizontalSize(250), 
+    width: Metrix.HorizontalSize(312),
+    height : Metrix.VerticalSize(140)
   },
 
   buttonContainer: {
     marginBottom: Metrix.VerticalSize(40),
-    width: "100%",
   },
 
 });

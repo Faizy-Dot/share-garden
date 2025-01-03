@@ -4,10 +4,30 @@ import colors from "../../config/Colors";
 
 
 
-export default function CustomButton({ title,onPress }) {
+export default function CustomButton({
+    title,
+    onPress,
+    width = Metrix.HorizontalSize(350),
+    backgroundColor = Colors.buttonColor,
+    color = Colors.white,
+    height = Metrix.VerticalSize(56),
+    fontSize = Metrix.FontMedium,
+    fontWeight = 500,
+    borderRadius = Metrix.HorizontalSize(8),
+    icon
+}) {
     return (
-        <TouchableOpacity style={styles.customButton} activeOpacity={0.8} onPress={onPress}>
-            <Text style={styles.text}>
+        <TouchableOpacity style={[styles.customButton, {
+            backgroundColor,
+            height,
+            width,
+            borderRadius
+        }]} activeOpacity={0.8} onPress={onPress}>
+            
+            {
+                icon && icon
+            }
+            <Text style={{ color, fontSize, fontWeight }}>
                 {title}
             </Text>
         </TouchableOpacity>
@@ -16,14 +36,9 @@ export default function CustomButton({ title,onPress }) {
 
 const styles = StyleSheet.create({
     customButton: {
-        backgroundColor: Colors.buttonColor,
-        marginHorizontal: Metrix.HorizontalSize(13),
-        borderRadius: Metrix.LightRadius,
-        padding: 20,
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row"
     },
-    text : {
-        textAlign: "center",
-        color : colors.white,
-        fontSize : Metrix.FontMedium
-    }
+
 })

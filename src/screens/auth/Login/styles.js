@@ -6,93 +6,59 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.white,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: Metrix.HorizontalSize(40),
+
     },
     logo: {
-        width: Metrix.HorizontalSize(150),
-        height: Metrix.VerticalSize(150),
+        width: Metrix.HorizontalSize(156),
+        height: Metrix.VerticalSize(96),
         resizeMode: 'contain',
-        marginBottom: Metrix.VerticalSize(30),
+        marginTop: Metrix.VerticalSize(65)
     },
     inputContainer: {
         width: '100%',
         marginBottom: 20,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: Metrix.VerticalSize(65)
     },
     input: {
-        backgroundColor: '#F6F6F6',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 10,
+        backgroundColor: '#FCFCFC',
+        borderRadius: Metrix.LightRadius,
+        width: Metrix.HorizontalSize(320),
+        height: Metrix.VerticalSize(40),
+        marginBottom: Metrix.VerticalSize(10),
         borderWidth: 1,
-        borderColor: '#DDD',
+        borderColor: '#EAEAEA',
     },
     forgotPassword: {
-        color: '#666',
-        fontSize: 14,
-        marginBottom: 20,
+        color: '#000000',
+        fontSize: Metrix.FontExtraSmall,
+        fontWeight: 500,
+        marginBottom: Metrix.VerticalSize(20),
         textAlign: 'center',
         width: '100%',
     },
-    loginButton: {
-        backgroundColor: colors.buttonColor,
-        borderRadius: 8,
-        padding: 15,
-        alignItems: 'center',
-        marginBottom: 20,
-        width: '100%',
-    },
-    loginButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    signupButton: {
-        backgroundColor: colors.buttonColor,
-        borderRadius: 8,
-        padding: 15,
-        alignItems: 'center',
-        marginBottom: 20,
-        width: '100%',
-        marginTop : Metrix.VerticalSize(30)
-    },
-    signupButtonText: {
-        color: colors.white,
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
     orText: {
-        color: '#999',
-        marginBottom: 20,
-        fontSize: 14,
+        color: '#000000',
+        fontSize: Metrix.FontSmall,
+        fontWeight: "500",
+        margin: Metrix.VerticalSize(16)
     },
-    socialButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 10,
-        width: '100%',
-    },
-    socialButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    signUpText: {
-        color: '#666',
-        marginTop: 20,
-        fontSize: 14,
-    },
-    signUpLink: {
-        color: '#009688',
-        fontWeight: 'bold',
-    },
+
     socialButtonIcon: {
-        fontSize: 25,
+        fontSize: Metrix.FontLarge,
         marginRight: Metrix.HorizontalSize(20)
+    },
+    skipText: {
+        fontWeight: "500",
+        fontSize: Metrix.FontRegular,
+        textAlign : "right"
+    },
+    skip: {
+        marginTop: Metrix.VerticalSize(50),
+        flex : 1,
+        width : "100%",
+        marginRight : Metrix.HorizontalSize(20)
     }
 });
 

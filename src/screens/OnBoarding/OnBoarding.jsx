@@ -2,14 +2,13 @@ import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   Image,
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import { Images, Metrix } from '../../config';
-import colors from '../../config/Colors';
+import { Images } from '../../config';
+import styles from './styles';
 
 const { width, height } = Dimensions.get('window');
 
@@ -52,8 +51,10 @@ const OnboardingScreen = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <View style={[styles.slide, { width }]}>
       <Image source={item.image} style={styles.image} />
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.description}>{item.description}</Text>
+      <View>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
     </View>
   );
 
@@ -102,70 +103,12 @@ const OnboardingScreen = ({ navigation }) => {
       </TouchableOpacity>
       <Image
         source={Images.onBoardBottom}
-        style={{ width: '100%', height: Metrix.VerticalSize(270), position: 'absolute', bottom: 0 }}
+style={styles.backgroundImage}
       />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.onBoardColor,
-  },
-  slide: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  image: {
-    width: width * 0.3,
-    height: height * 0.4,
-    resizeMode: 'contain',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: colors.white,
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: colors.white,
-    paddingHorizontal: 20,
-    width: 300,
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 10,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-    borderWidth: 1,
-  },
-  activeDot: {
-    backgroundColor: colors.onBoardColor,
-    borderColor: colors.black,
-  },
-  inactiveDot: {
-    backgroundColor: colors.black,
-  },
-  button: {
-    alignSelf: 'center',
-    marginBottom: 30,
-    zIndex: 1,
-  },
-  buttonText: {
-    color: colors.black,
-    fontSize: 20,
-    fontWeight: '500',
-  },
-});
+
 
 export default OnboardingScreen;

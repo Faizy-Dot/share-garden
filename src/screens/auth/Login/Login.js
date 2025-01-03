@@ -4,13 +4,18 @@ import styles from './styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Images from '../../../config/Images';
 import CustomButton from '../../../components/Button/Button';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Metrix } from '../../../config';
 
-const Login = ({navigation}) => {
+const Login = ({ navigation }) => {
     return (
-        <View style={styles.container}>
-            {/* Logo */}
+        <KeyboardAwareScrollView style={styles.container} contentContainerStyle={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingBottom: Metrix.VerticalSize(25)
+        }}>
             <Image
-                source={Images.logo} // Replace with your logo file
+                source={Images.logo}
                 style={styles.logo}
             />
 
@@ -29,33 +34,63 @@ const Login = ({navigation}) => {
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
 
             {/* Login Button */}
-            <TouchableOpacity activeOpacity={0.8} style={styles.loginButton}>
-                <Text style={styles.loginButtonText}>LOGIN</Text>
-            </TouchableOpacity>
+            <CustomButton
+                title={"Login"}
+                width={Metrix.HorizontalSize(300)}
+            />
 
             {/* OR Divider */}
             <Text style={styles.orText}>OR</Text>
 
             {/* Social Media Buttons with Icons */}
-            <TouchableOpacity activeOpacity={0.8} style={[styles.socialButton, { backgroundColor: '#1877F2' }]}>
-                <FontAwesome name="facebook" size={20} color="#fff" style={styles.socialButtonIcon} />
-                <Text style={styles.socialButtonText}>Continue With Facebook</Text>
-            </TouchableOpacity>
+            <View style={{ gap: 12 }}>
 
-            <TouchableOpacity activeOpacity={0.8} style={[styles.socialButton, { backgroundColor: '#DB4437' }]}>
-                <FontAwesome name="google" size={20} color="#fff" style={styles.socialButtonIcon} />
-                <Text style={styles.socialButtonText}>Continue With Google</Text>
-            </TouchableOpacity>
+                <CustomButton
+                    title={"Continue With Facebook"}
+                    icon={<FontAwesome name="facebook" color="#fff" style={styles.socialButtonIcon}
+                    />}
+                    backgroundColor='#1B70D4'
+                    width={Metrix.HorizontalSize(300)}
+                    height={Metrix.VerticalSize(40)}
+                />
 
-            <TouchableOpacity activeOpacity={0.8} style={[styles.socialButton, { backgroundColor: '#000000' }]}>
-                <FontAwesome name="apple" size={20} color="#fff" style={styles.socialButtonIcon} />
-                <Text style={styles.socialButtonText}>Continue With Apple</Text>
-            </TouchableOpacity>
+                <CustomButton
+                    title={"Continue With Facebook"}
+                    icon={<FontAwesome name="google" color="#fff" style={styles.socialButtonIcon}
+                    />}
+                    backgroundColor='#F8443E'
+                    width={Metrix.HorizontalSize(300)}
+                    height={Metrix.VerticalSize(40)}
+                />
 
-            <TouchableOpacity activeOpacity={0.8} style={styles.signupButton} onPress={()=> navigation.navigate('Signup')}>
-                <Text style={styles.signupButtonText}>Don't have an account?Sign up Now</Text>
-            </TouchableOpacity>
-        </View>
+                <CustomButton
+                    title={"Continue With Facebook"}
+                    icon={<FontAwesome name="apple" color="#fff" style={styles.socialButtonIcon}
+                    />}
+                    backgroundColor='#000000'
+                    width={Metrix.HorizontalSize(300)}
+                    height={Metrix.VerticalSize(40)}
+                />
+            </View>
+
+            <View style={{marginTop : Metrix.VerticalSize(30)}}>
+                <CustomButton
+                    title={"Don't have an account?Sign up Now"}
+                    width={Metrix.HorizontalSize(300)}
+                    fontSize={Metrix.FontSmall}
+                    onPress={()=> navigation.navigate("Signup")}
+                />
+            </View>
+
+            <View style = {styles.skip}>
+                <TouchableOpacity 
+                activeOpacity={0.8}
+                onPress={()=>navigation.navigate("Home")}
+                >
+                <Text style={styles.skipText}>{"Skip>>"}</Text>
+                </TouchableOpacity>
+            </View>
+        </KeyboardAwareScrollView>
     )
 }
 
