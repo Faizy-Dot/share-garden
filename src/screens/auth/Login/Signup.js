@@ -45,12 +45,11 @@ export default function SignUpScreen({ navigation }) {
                     />
                 </View>
                 <View style={styles.toggle}>
-                    <View style={{ marginLeft: Metrix.HorizontalSize(15) }}>
+                    <View style={styles.switchText}>
                         <Text style={styles.toggleLabel}>Merchant</Text>
-                        <Text style={styles.toggleLabel}>Name of the comapny</Text>
+                        <Text style={styles.toggleDesc}>Name of the comapany</Text>
                     </View>
                     <Switch
-                        style={{ marginLeft: Metrix.HorizontalSize(16) }}
                         value={isMerchant}
                         onValueChange={() => setIsMerchant(!isMerchant)}
                     />
@@ -144,15 +143,22 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         width: "90%",
-        marginTop: Metrix.VerticalSize(82)
+        marginTop: Metrix.VerticalSize(82),
     },
     toggle: {
         flexDirection: "row",
         alignItems: "center",
+        flex: 1,
+        justifyContent:'space-between'
+        
     },
     toggleLabel: {
         fontSize: Metrix.FontExtraSmall,
-        fontWeight: "500"
+        fontWeight: "500",
+    },
+    toggleDesc: {
+        fontSize: Metrix.normalize(9),
+        fontWeight: "500",
     },
     form: {
         width: "90%",
@@ -188,4 +194,7 @@ const styles = StyleSheet.create({
         color: colors.buttonColor,
         textDecorationLine: "underline",
     },
+    switchText: {
+        marginLeft: Metrix.HorizontalSize(10)
+    }
 });

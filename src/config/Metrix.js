@@ -32,4 +32,5 @@ export default {
   FontExtraLarge: normalize(24),
   VerticalSize,
   HorizontalSize,
+  normalize
 };

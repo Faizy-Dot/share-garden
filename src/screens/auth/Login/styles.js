@@ -1,12 +1,10 @@
 import { StyleSheet } from "react-native";
-import { Colors, Metrix } from "../../../config";
-import colors from "../../../config/Colors";
+import { Colors, Fonts, Metrix } from "../../../config";
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.white,
-
     },
     logo: {
         width: Metrix.HorizontalSize(156),
@@ -50,9 +48,10 @@ const styles = StyleSheet.create({
         marginRight: Metrix.HorizontalSize(20)
     },
     skipText: {
-        fontWeight: "500",
+        // fontWeight: "500",
         fontSize: Metrix.FontRegular,
-        textAlign : "right"
+        textAlign : "right",
+        fontFamily:Fonts.InterBold,
     },
     skip: {
         marginTop: Metrix.VerticalSize(50),

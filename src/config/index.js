@@ -1,6 +1,7 @@
 import Images from './Images'
 import Colors from './Colors'
 import Metrix from './Metrix';
+import Fonts from './Fonts';
 import NavigationService from './NavigationService';
 
 export {
@@ -8,4 +9,5 @@ export {
     Colors,
     Metrix,
     NavigationService,
+    Fonts
 }
