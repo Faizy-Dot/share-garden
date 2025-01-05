@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { Colors, Metrix } from "../../config";
+import { Colors, Fonts, Metrix } from "../../config";
 import colors from "../../config/Colors";
 
 
@@ -12,7 +12,7 @@ export default function CustomButton({
     color = Colors.white,
     height = Metrix.VerticalSize(56),
     fontSize = Metrix.FontMedium,
-    fontWeight = 500,
+    fontFamily = Fonts.InterSemiBold,
     borderRadius = Metrix.HorizontalSize(8),
     icon
 }) {
@@ -27,7 +27,7 @@ export default function CustomButton({
             {
                 icon && icon
             }
-            <Text style={{ color, fontSize, fontWeight }}>
+            <Text style={{ color, fontSize,fontFamily }}>
                 {title}
             </Text>
         </TouchableOpacity>

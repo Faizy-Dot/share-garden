@@ -175,7 +175,8 @@ const styles = StyleSheet.create({
         marginBottom: Metrix.VerticalSize(10),
         width: "48%",
         height: Metrix.VerticalSize(40),
-        padding : Metrix.HorizontalSize(10)
+        padding : Metrix.HorizontalSize(10),
+        fontSize:Metrix.FontExtraSmall
     },
     smallInput: {
         width: "20%",

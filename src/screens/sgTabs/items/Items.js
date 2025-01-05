@@ -4,6 +4,9 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { Fonts, Images, Metrix } from "../../../config";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import styles from "./styles";
+import CustomButton from "../../../components/Button/Button";
+import fonts from "../../../config/Fonts";
+import colors from "../../../config/Colors";
 
 const categories = [
     { id: "1", name: "Mobile", icon: Images.homeCategoryMobile },
@@ -22,8 +25,10 @@ const popularListings = [
 const ItemsTabScreen = () => {
 
     const renderCategory = ({ item }) => (
-        <TouchableOpacity style={styles.categoryContainer}>
+        <TouchableOpacity activeOpacity={0.8}>
+            <View style={styles.category}>
             <Image source={item.icon} style={styles.categoryIcon} />
+            </View>
             <Text style={styles.categoryText}>{item.name}</Text>
         </TouchableOpacity>
     );
@@ -53,9 +58,47 @@ const ItemsTabScreen = () => {
             </View>
 
             <View style={styles.inputContainer}>
-                <Image source={Images.homeSearch} style={styles.searchIcon}/>
-            <TextInput style={styles.input} placeholder="Search items near you" placeholderTextColor="#999" />
-            <Image source={Images.homeFilter} style={styles.filterLogo}/>
+                <Image source={Images.homeSearch} style={styles.searchIcon} />
+                <TextInput style={styles.input} placeholder="Search items near you" placeholderTextColor="#999" />
+                <Image source={Images.homeFilter} style={styles.filterLogo} />
+            </View>
+
+            <View style={styles.middle}>
+                <Image source={Images.homeBackground} style={styles.homeBackgroundImg} />
+                <View style={styles.middleShown}>
+                    <Image source={Images.homeLogo} style={styles.middleLogo} />
+                    <View >
+                        <Text style={{ fontSize: Metrix.normalize(19), fontFamily: Fonts.InterBold, textAlign: "center" }}>Empowering</Text>
+                        <Text style={{ fontSize: Metrix.normalize(19), fontFamily: Fonts.InterRegular, textAlign: "center", position: "relative", bottom: Metrix.VerticalSize(7) }}>Sustainable Exchanges</Text>
+                    </View>
+                    <CustomButton
+                        title={"GET STARTED"}
+                        width={Metrix.HorizontalSize(138)}
+                        height={Metrix.VerticalSize(42)}
+                        backgroundColor="#E35498"
+                        borderRadius={Metrix.HorizontalSize(4)}
+                        fontSize={Metrix.FontExtraSmall}
+                        fontFamily={fonts.InterLight}
+                    />
+                </View>
+
+                <View style={styles.categoryContainer}>
+                    <View style={{justifyContent : "space-between" ,flexDirection :"row",alignItems :"center"}}>
+                        <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Categories</Text>
+                        <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
+                    </View>
+
+                    <FlatList
+                        data={categories}
+                        renderItem={renderCategory}
+                        keyExtractor={(item) => item.id}
+                        horizontal 
+                        showsHorizontalScrollIndicator={false} 
+                        contentContainerStyle={styles.categoryList}
+                    />
+
+                </View>
+
             </View>
 
 
