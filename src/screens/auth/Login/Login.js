@@ -85,7 +85,7 @@ const Login = ({ navigation }) => {
             <View style = {styles.skip}>
                 <TouchableOpacity 
                 activeOpacity={0.8}
-                onPress={()=>navigation.navigate("Home")}
+                onPress={()=>navigation.navigate("SgTabs")}
                 >
                 <Text style={styles.skipText}>{"Skip>>"}</Text>
                 </TouchableOpacity>

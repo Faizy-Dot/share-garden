@@ -174,7 +174,8 @@ const styles = StyleSheet.create({
         borderRadius: Metrix.HorizontalSize(4),
         marginBottom: Metrix.VerticalSize(10),
         width: "48%",
-        height: Metrix.VerticalSize(40)
+        height: Metrix.VerticalSize(40),
+        padding : Metrix.HorizontalSize(10)
     },
     smallInput: {
         width: "20%",

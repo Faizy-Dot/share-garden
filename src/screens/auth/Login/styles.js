@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
         marginBottom: Metrix.VerticalSize(10),
         borderWidth: 1,
         borderColor: '#EAEAEA',
+        padding : Metrix.HorizontalSize(10)
     },
     forgotPassword: {
         color: '#000000',
