@@ -25,11 +25,13 @@ const Images = {
     homeCategoryFurniture : require('../assets/images/home/home-category-furniture.png'),
     homeCategoryMobile : require('../assets/images/home/home-category-mobile.png'),
     homeCategoryShoes : require('../assets/images/home/home-category-shoes.png'),
-    homeDummy : require('../assets/images/home/home-dummy.png'),
     homeFilter : require('../assets/images/home/home-filter.png'),
     homeSearch : require('../assets/images/home/home-search.png'),
-    homeShowcase : require('../assets/images/home/home-showcase.png'),
     homeLocation : require('../assets/images/home/home-location.png'),
+    homeBitLogo : require('../assets/images/home/home-bitLogo.png'),
+    homeMerchantShowcasetion : require('../assets/images/home/home-merchantShowcase.png'),
+    homePopularListing : require('../assets/images/home/home-popularListing.png'),
+    homePostVector : require('../assets/images/home/home-postVector.png'),
 
 
 }

@@ -45,8 +45,8 @@ export default function SgTabNavigator() {
               />
             );
           },
-          tabBarActiveTintColor: '#00A676',
-          tabBarInactiveTintColor: 'gray',
+          tabBarActiveTintColor: colors.buttonColor,
+          tabBarInactiveTintColor: colors.black,
           tabBarStyle: {
             height : Metrix.VerticalSize(60),    
             backgroundColor: colors.white,

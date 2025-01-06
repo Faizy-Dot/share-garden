@@ -17,29 +17,60 @@ const categories = [
 ];
 
 const popularListings = [
-    { id: "1", title: "Single Bed", location: "First Floor Maya Apartments", price: "$8.5", image: Images.logo },
-    { id: "2", title: "7 Seater Sofa Set", location: "7 seater sofa set 10/10", price: "$450", image: Images.logo },
-    { id: "3", title: "Audi A6", location: "4th (C7) Generation 2016 1.8 TFSI for Sale", price: "$1850", image: Images.logo },
+    { id: "1", title: "Single Bed", location: "First Floor Maya Apartments", price: "8.5", image: Images.homePopularListing, bit: true },
+    { id: "2", title: "7 Seater Sofa Set", location: "7 seater sofa set 10/10", price: "$ 450", image: Images.homePopularListing, bit: false },
+    { id: "3", title: "Audi A6", location: "4th (C7) Generation 2016 1.8 TFSI for Sale", price: "$ 1850", image: Images.homePopularListing, bit: false },
 ];
+
+const myPosts = [
+    {
+        id : 1,
+        post : "Single bed in Toronto"
+    },
+    {
+        id : 2,
+        post : "Audi A6 in Toronto"
+    },
+    {
+        id : 3,
+        post : "Sofa Set in Toronto"
+    }
+]
 
 const ItemsTabScreen = () => {
 
     const renderCategory = ({ item }) => (
-        <TouchableOpacity activeOpacity={0.8}>
+        <TouchableOpacity activeOpacity={0.8} >
             <View style={styles.category}>
-            <Image source={item.icon} style={styles.categoryIcon} />
+                <Image source={item.icon} />
             </View>
             <Text style={styles.categoryText}>{item.name}</Text>
         </TouchableOpacity>
     );
 
     const renderPopularListing = ({ item }) => (
-        <View style={styles.listingContainer}>
+        <TouchableOpacity activeOpacity={0.8} style={styles.listingContainer}>
             <Image source={item.image} style={styles.listingImage} />
             <Text style={styles.listingTitle}>{item.title}</Text>
             <Text style={styles.listingLocation}>{item.location}</Text>
-            <Text style={styles.listingPrice}>{item.price}</Text>
-        </View>
+            <View style={styles.priceContainer}>
+                {
+                    item.bit &&
+                    <Image source={Images.homeBitLogo} />
+                }
+                <Text style={styles.listingPrice}>{item.price}</Text>
+            </View>
+        </TouchableOpacity >
+    )
+
+    const renderMyPosts = ({ item }) => (
+        <TouchableOpacity activeOpacity={0.8} style={styles.postBox}>
+           <Image source={Images.homePostVector} style={{width:Metrix.VerticalSize(14) , height : Metrix.VerticalSize(14)}}/>
+           <Text style={{fontSize : Metrix.customFontSize(10) ,fontFamily :fonts.InterLight}}>{item.post}</Text>
+        </TouchableOpacity >
+
+
+
     );
 
     return (
@@ -83,7 +114,7 @@ const ItemsTabScreen = () => {
                 </View>
 
                 <View style={styles.categoryContainer}>
-                    <View style={{justifyContent : "space-between" ,flexDirection :"row",alignItems :"center"}}>
+                    <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
                         <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Categories</Text>
                         <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
                     </View>
@@ -92,8 +123,90 @@ const ItemsTabScreen = () => {
                         data={categories}
                         renderItem={renderCategory}
                         keyExtractor={(item) => item.id}
-                        horizontal 
-                        showsHorizontalScrollIndicator={false} 
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.categoryList}
+                    />
+
+                </View>
+
+                <View style={styles.popularListingsContainer}>
+                    <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
+                        <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Popular Listings</Text>
+                        <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
+                    </View>
+
+                    <FlatList
+                        data={popularListings}
+                        renderItem={renderPopularListing}
+                        keyExtractor={(item) => item.id}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.categoryList}
+                    />
+
+                </View>
+
+                <View style={styles.merchantShowcaseContainer}>
+                    <View>
+                        <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Merchants's Showcase</Text>
+                    </View>
+                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={
+                        { gap: Metrix.HorizontalSize(8) }
+                    }>
+                        <TouchableOpacity activeOpacity={0.8}>
+                            <Image source={Images.homeMerchantShowcasetion} style={styles.merchantImg}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity activeOpacity={0.8}>
+                            <Image source={Images.homeMerchantShowcasetion}  style={styles.merchantImg}/>
+                        </TouchableOpacity>
+                    </ScrollView>
+                </View>
+
+                <View style={styles.postContainer}>
+                    <View>
+                        <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>My Posts</Text>
+                    </View>
+                    <FlatList
+                        data={myPosts}
+                        renderItem={renderMyPosts}
+                        keyExtractor={(item) => item.id}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.myPost}
+                    />
+
+                </View>
+
+                <View style={styles.popularListingsContainer}>
+                    <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
+                        <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Toys</Text>
+                        <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
+                    </View>
+
+                    <FlatList
+                        data={popularListings}
+                        renderItem={renderPopularListing}
+                        keyExtractor={(item) => item.id}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.categoryList}
+                    />
+
+                </View>
+
+                <View style={styles.popularListingsContainer}>
+                    <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
+                        <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Books</Text>
+                        <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
+                    </View>
+
+                    <FlatList
+                        data={popularListings}
+                        renderItem={renderPopularListing}
+                        keyExtractor={(item) => item.id}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
                         contentContainerStyle={styles.categoryList}
                     />
 

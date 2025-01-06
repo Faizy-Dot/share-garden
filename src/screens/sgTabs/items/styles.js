@@ -1,13 +1,13 @@
 import { StyleSheet } from "react-native";
 import colors from "../../../config/Colors";
-import { Fonts, Metrix } from "../../../config";
+import { Colors, Fonts, Metrix } from "../../../config";
+import fonts from "../../../config/Fonts";
 
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.white,
-        // paddingHorizontal: Metrix.HorizontalSize(15),
     },
     contentContainer: {
         alignItems: 'center',
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         height: Metrix.VerticalSize(174),
     },
     middleLogo: {
-        width: Metrix.HorizontalSize(171),
+        width: Metrix.VerticalSize(171),
         height: Metrix.VerticalSize(43),
     },
     middleShown: {
@@ -97,15 +97,88 @@ const styles = StyleSheet.create({
     category : {
         backgroundColor : "#F3F3F3",
         width: Metrix.HorizontalSize(64),
-        height: Metrix.VerticalSize(64),
+        height: Metrix.HorizontalSize(64),
         justifyContent : "center",
         alignItems : "center",
-        borderRadius : Metrix.HorizontalSize(50)
+        borderRadius : 32
     },
   
     categoryText : {
         textAlign: "center",
         marginTop : Metrix.VerticalSize(10)
+    },
+    popularListingsContainer:{
+        paddingHorizontal: Metrix.HorizontalSize(15),
+        marginTop : Metrix.VerticalSize(15)
+    },
+    listingContainer:{
+        width : Metrix.HorizontalSize(130),
+        height : Metrix.VerticalSize(275),
+    },
+    listingImage : {
+        width : "100%",
+        height : Metrix.VerticalSize(167),
+        borderRadius : Metrix.LightRadius,
+        resizeMode : "contain"
+    },
+    listingTitle:{
+        fontSize : Metrix.FontSmall,
+        fontFamily : fonts.InterSemiBold,
+        marginTop : Metrix.VerticalSize(15),
+        height : Metrix.VerticalSize(21),
+        width : "100%",
+    },
+    listingLocation:{
+        fontSize : Metrix.FontExtraSmall,
+        fontFamily : fonts.InterRegular,
+        marginTop : Metrix.VerticalSize(4),
+        height : Metrix.VerticalSize(30), 
+        width : "100%",
+    },
+    listingPrice:{
+        fontSize : Metrix.FontSmall,
+        fontFamily : fonts.InterSemiBold,
+        color : colors.buttonColor,
+        height : Metrix.VerticalSize(22),
+        width : "100%",
+    },
+    
+    priceContainer : {
+        marginTop : Metrix.VerticalSize(10),
+        flexDirection : "row",
+        alignItems : "center",
+        gap : Metrix.HorizontalSize(5)
+    },
+    merchantShowcaseContainer : {
+        paddingHorizontal: Metrix.HorizontalSize(15),
+        marginTop : Metrix.VerticalSize(25),
+        gap : Metrix.VerticalSize(10)
+    },
+    merchantImg:{
+        width : Metrix.HorizontalSize(200),
+        height : Metrix.VerticalSize(96),
+        resizeMode : "contain"
+    },
+    postContainer : {
+        paddingHorizontal: Metrix.HorizontalSize(15),
+        marginTop : Metrix.VerticalSize(25),
+    },
+    myPost: {
+        gap: Metrix.HorizontalSize(10),
+        alignItems : "center",
+        marginTop : 15
+    },
+    postBox : {
+        flexDirection : "row", 
+        alignItems : "center",
+        gap : Metrix.HorizontalSize(12),
+        borderWidth : 1,
+        borderColor : "#E6E6E6",
+        borderRadius : Metrix.LightRadius,
+        width : Metrix.HorizontalSize(160),
+        height : Metrix.VerticalSize(48),
+        justifyContent : "center",
+        alignItems : "center"
     }
 
 })
