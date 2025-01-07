@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
-import { GetStarted, Login, Signup , OnboardingScreen , SuccessSignupScreen , HomeScreen, SgTabNavigator } from './src/screens';
+import { GetStarted, Login, Signup , OnboardingScreen , SuccessSignupScreen , SgTabNavigator } from './src/screens';
 import { NavigationService } from './src/config';
 
 
@@ -25,7 +25,6 @@ export default function App() {
         <Stack.Screen name="GetStarted" component={GetStarted} />
         <Stack.Screen name="Signup" component={Signup} />
         <Stack.Screen name="SuccessSignup" component={SuccessSignupScreen}/>
-        <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="SgTabs" component={SgTabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>

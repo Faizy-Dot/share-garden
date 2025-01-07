@@ -12,7 +12,7 @@ import colors from "../../config/Colors";
 
 const Tab = createBottomTabNavigator();
 
-export default function SgTabNavigator() {
+export default function SgTabNavigator({route}) {
   const navigation = useNavigation()
     return (
       <Tab.Navigator

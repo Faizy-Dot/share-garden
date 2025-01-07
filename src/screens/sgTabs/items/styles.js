@@ -81,105 +81,128 @@ const styles = StyleSheet.create({
     middleShown: {
         position: "absolute",
         gap: 10,
-        width : "100%",
-        alignItems : "center"
+        width: "100%",
+        alignItems: "center"
     },
     categoryContainer: {
         paddingHorizontal: Metrix.HorizontalSize(15),
-        marginTop : Metrix.VerticalSize(15)
+        marginTop: Metrix.VerticalSize(15)
     },
     categoryList: {
         flexDirection: "row",
         gap: Metrix.HorizontalSize(10),
-        alignItems : "center",
-        marginTop : 15
+        alignItems: "center",
+        marginTop: Metrix.VerticalSize(15)
     },
-    category : {
-        backgroundColor : "#F3F3F3",
+    category: {
+        backgroundColor: "#F3F3F3",
         width: Metrix.HorizontalSize(64),
         height: Metrix.HorizontalSize(64),
-        justifyContent : "center",
-        alignItems : "center",
-        borderRadius : 32
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 32
     },
-  
-    categoryText : {
+
+    categoryText: {
         textAlign: "center",
-        marginTop : Metrix.VerticalSize(10)
+        marginTop: Metrix.VerticalSize(10)
     },
-    popularListingsContainer:{
+    popularListingsContainer: {
         paddingHorizontal: Metrix.HorizontalSize(15),
-        marginTop : Metrix.VerticalSize(15)
+        // marginTop: Metrix.VerticalSize(15)
     },
-    listingContainer:{
-        width : Metrix.HorizontalSize(130),
-        height : Metrix.VerticalSize(275),
+    listingContainer: {
+        width: Metrix.HorizontalSize(130),
+        height: Metrix.VerticalSize(275),
     },
-    listingImage : {
-        width : "100%",
-        height : Metrix.VerticalSize(167),
-        borderRadius : Metrix.LightRadius,
-        resizeMode : "contain"
+    listingImage: {
+        width: "100%",
+        height: Metrix.VerticalSize(167),
+        borderRadius: Metrix.LightRadius,
+        resizeMode: "contain"
     },
-    listingTitle:{
-        fontSize : Metrix.FontSmall,
-        fontFamily : fonts.InterSemiBold,
-        marginTop : Metrix.VerticalSize(15),
-        height : Metrix.VerticalSize(21),
-        width : "100%",
+    listingTitle: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterSemiBold,
+        marginTop: Metrix.VerticalSize(15),
+        height: Metrix.VerticalSize(21),
+        width: "100%",
     },
-    listingLocation:{
-        fontSize : Metrix.FontExtraSmall,
-        fontFamily : fonts.InterRegular,
-        marginTop : Metrix.VerticalSize(4),
-        height : Metrix.VerticalSize(30), 
-        width : "100%",
+    listingLocation: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+        marginTop: Metrix.VerticalSize(4),
+        height: Metrix.VerticalSize(30),
+        width: "100%",
     },
-    listingPrice:{
-        fontSize : Metrix.FontSmall,
-        fontFamily : fonts.InterSemiBold,
-        color : colors.buttonColor,
-        height : Metrix.VerticalSize(22),
-        width : "100%",
+    listingPrice: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterSemiBold,
+        color: colors.buttonColor,
+        height: Metrix.VerticalSize(22),
+        width: "100%",
     },
-    
-    priceContainer : {
-        marginTop : Metrix.VerticalSize(10),
-        flexDirection : "row",
-        alignItems : "center",
-        gap : Metrix.HorizontalSize(5)
+
+    priceContainer: {
+        marginTop: Metrix.VerticalSize(10),
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(5)
     },
-    merchantShowcaseContainer : {
+    merchantShowcaseContainer: {
         paddingHorizontal: Metrix.HorizontalSize(15),
-        marginTop : Metrix.VerticalSize(25),
-        gap : Metrix.VerticalSize(10)
+        marginTop: Metrix.VerticalSize(25),
+        gap: Metrix.VerticalSize(10)
     },
-    merchantImg:{
-        width : Metrix.HorizontalSize(200),
-        height : Metrix.VerticalSize(96),
-        resizeMode : "contain"
+    merchantImg: {
+        width: Metrix.HorizontalSize(200),
+        height: Metrix.VerticalSize(96),
+        resizeMode: "contain"
     },
-    postContainer : {
+    postContainer: {
         paddingHorizontal: Metrix.HorizontalSize(15),
-        marginTop : Metrix.VerticalSize(25),
+        marginTop: Metrix.VerticalSize(25),
     },
     myPost: {
         gap: Metrix.HorizontalSize(10),
-        alignItems : "center",
-        marginTop : 15
+        alignItems: "center",
+        marginTop: 15
     },
-    postBox : {
-        flexDirection : "row", 
-        alignItems : "center",
-        gap : Metrix.HorizontalSize(12),
-        borderWidth : 1,
-        borderColor : "#E6E6E6",
-        borderRadius : Metrix.LightRadius,
-        width : Metrix.HorizontalSize(160),
-        height : Metrix.VerticalSize(48),
-        justifyContent : "center",
-        alignItems : "center"
-    }
+    postBox: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(12),
+        borderWidth: 1,
+        borderColor: "#E6E6E6",
+        borderRadius: Metrix.LightRadius,
+        width: Metrix.HorizontalSize(160),
+        height: Metrix.VerticalSize(48),
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    userDetail: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap : Metrix.HorizontalSize(18),
+        marginBottom : Metrix.VerticalSize(9)
+    },
+
+    profile: {
+        width: Metrix.HorizontalSize(32),
+        height: Metrix.HorizontalSize(32),
+    },
+    bellIcon: {
+        width: Metrix.HorizontalSize(18),
+        height: Metrix.HorizontalSize(18),
+    },
+    messageIcon: {
+        width: Metrix.HorizontalSize(18),
+        height: Metrix.HorizontalSize(18),
+    },
+    greenBit: {
+        width: Metrix.VerticalSize(24),
+        height: Metrix.VerticalSize(24),
+    },
 
 })
 

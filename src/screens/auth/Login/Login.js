@@ -37,6 +37,7 @@ const Login = ({ navigation }) => {
             <CustomButton
                 title={"Login"}
                 width={Metrix.HorizontalSize(300)}
+                onPress={()=>navigation.navigate("SgTabs", { screen: "Items", params: { user: true} })}
             />
 
             {/* OR Divider */}
@@ -85,7 +86,7 @@ const Login = ({ navigation }) => {
             <View style = {styles.skip}>
                 <TouchableOpacity 
                 activeOpacity={0.8}
-                onPress={()=>navigation.navigate("SgTabs")}
+                onPress={()=>navigation.navigate("SgTabs", { screen: "Items", params: { user: false} })}
                 >
                 <Text style={styles.skipText}>{"Skip>>"}</Text>
                 </TouchableOpacity>
