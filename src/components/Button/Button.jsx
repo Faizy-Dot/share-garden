@@ -17,7 +17,7 @@ export default function CustomButton({
     icon
 }) {
     return (
-        <TouchableOpacity style={[styles.customButton, {
+        <TouchableOpacity  style={[styles.customButton, {
             backgroundColor,
             height,
             width,

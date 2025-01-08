@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
 import { GetStarted, Login, Signup , OnboardingScreen , SuccessSignupScreen , SgTabNavigator } from './src/screens';
 import { NavigationService } from './src/config';
+import colors from './src/config/Colors';
+import { StatusBar } from 'react-native';
 
 
 const Stack = createNativeStackNavigator();
@@ -18,7 +20,21 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer ref={ref => NavigationService.setTopLevelNavigator(ref)}>
+    <NavigationContainer
+    ref={(ref) => NavigationService.setTopLevelNavigator(ref)}
+    onStateChange={() => {
+      // Example: Dynamically update StatusBar color based on active route
+      const currentRoute = NavigationService.getCurrentRoute();
+      // console.log(currentRoute.name)
+      if (currentRoute.name === 'Login') {
+        StatusBar.setBackgroundColor(colors.white);
+        StatusBar.setBarStyle('light-content');
+      } else {
+        StatusBar.setBackgroundColor(colors.white);
+        StatusBar.setBarStyle('dark-content');
+      }
+    }}
+  >
       <Stack.Navigator initialRouteName="OnBoarding" screenOptions={{ headerShown: false }} >
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="OnBoarding" component={OnboardingScreen} />

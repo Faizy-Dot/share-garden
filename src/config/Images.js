@@ -51,6 +51,8 @@ const Images = {
     homeMusic : require('../assets/images/home/home-music.png'),
     homeArt : require('../assets/images/home/home-art.png'),
     homeOthers : require('../assets/images/home/home-others.png'),
+    backArrowIcon : require('../assets/images/back-arrowIcon.png'),
+    uploadImageIcon : require('../assets/images/postTab/upload-image.png'),
 
 
 }

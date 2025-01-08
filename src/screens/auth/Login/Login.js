@@ -85,7 +85,9 @@ const Login = ({ navigation }) => {
 
             <View style = {styles.skip}>
                 <TouchableOpacity 
+                style={{width : Metrix.HorizontalSize(60) , height : Metrix.VerticalSize(30) }}
                 activeOpacity={0.8}
+                
                 onPress={()=>navigation.navigate("SgTabs", { screen: "Items", params: { user: false} })}
                 >
                 <Text style={styles.skipText}>{"Skip>>"}</Text>

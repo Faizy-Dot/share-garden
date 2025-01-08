@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Image, FlatList, TouchableOpacity, ScrollView } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { Fonts, Images, Metrix } from "../../../config";
@@ -7,6 +7,7 @@ import styles from "./styles";
 import CustomButton from "../../../components/Button/Button";
 import fonts from "../../../config/Fonts";
 import colors from "../../../config/Colors";
+import NavBar from "../../../components/navBar/NavBar";
 
 const categories = [
     { id: "1", name: "Mobile", icon: Images.homeCategoryMobile },
@@ -52,16 +53,24 @@ const myPosts = [
 ]
 
 const ItemsTabScreen = ({ route }) => {
+    const [selectedId , setSelectedId] = useState(null)
     const {user} = route.params
-    console.log(user)
-    const renderCategory = ({ item }) => (
-        <TouchableOpacity activeOpacity={0.8} style={{ width: Metrix.HorizontalSize(73), height: Metrix.VerticalSize(130) }}>
-            <View style={styles.category}>
+    console.log("user login=>",user)
+
+    const renderCategory = ({ item }) => {
+
+        const isSelect = selectedId == item.id
+        return(
+        <TouchableOpacity onPress={()=> setSelectedId(item.id)} activeOpacity={0.8} style={{ width: Metrix.HorizontalSize(73), height: Metrix.VerticalSize(130)  }}>
+            <View style={[styles.category, isSelect && {backgroundColor : "#5B5B5B"}]}>
                 <Image source={item.icon} />
             </View>
             <Text style={styles.categoryText}>{item.name}</Text>
         </TouchableOpacity>
-    );
+
+        )
+    }
+    
 
     const renderPopularListing = ({ item }) => (
         <TouchableOpacity activeOpacity={0.8} style={styles.listingContainer}>
@@ -99,16 +108,10 @@ const ItemsTabScreen = ({ route }) => {
 
             {
                 user ?
-                    <View style={styles.userDetail}>
-                        <Text style={{ fontSize: Metrix.normalize(20), fontFamily: fonts.InterBold }}>SG Marketplace</Text>
-                        <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5), alignItems: "center" }}>
-                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>50200</Text>
-                            <Image source={Images.homeGreenBit} style={styles.greenBit} />
-                        </View>
-                        <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
-                        <Image source={Images.homeBellIcon} style={styles.bellIcon} />
-                        <Image source={Images.homeProfile} style={styles.profile} />
-                    </View>
+                <View style={{paddingHorizontal : Metrix.HorizontalSize(15)}}>
+                    <NavBar
+                    title={"SG Marketplace"}/>
+                </View>
                     :
                     <View style={styles.address}>
                         <Image source={Images.homeLocation} style={styles.locationLogo} />

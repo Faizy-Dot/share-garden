@@ -180,29 +180,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center"
     },
-    userDetail: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap : Metrix.HorizontalSize(18),
-        marginBottom : Metrix.VerticalSize(9)
-    },
-
-    profile: {
-        width: Metrix.HorizontalSize(32),
-        height: Metrix.HorizontalSize(32),
-    },
-    bellIcon: {
-        width: Metrix.HorizontalSize(18),
-        height: Metrix.HorizontalSize(18),
-    },
-    messageIcon: {
-        width: Metrix.HorizontalSize(18),
-        height: Metrix.HorizontalSize(18),
-    },
-    greenBit: {
-        width: Metrix.VerticalSize(24),
-        height: Metrix.VerticalSize(24),
-    },
+    
 
 })
 

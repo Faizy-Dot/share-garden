@@ -27,8 +27,8 @@ const styles = StyleSheet.create({
         marginBottom: Metrix.VerticalSize(10),
         borderWidth: 1,
         borderColor: '#EAEAEA',
-        padding : Metrix.HorizontalSize(10),
-        fontSize : Metrix.FontExtraSmall
+        padding: Metrix.HorizontalSize(10),
+        fontSize: Metrix.FontExtraSmall
     },
     forgotPassword: {
         color: '#000000',
@@ -50,16 +50,13 @@ const styles = StyleSheet.create({
         marginRight: Metrix.HorizontalSize(20)
     },
     skipText: {
-        // fontWeight: "500",
         fontSize: Metrix.FontRegular,
-        textAlign : "right",
-        fontFamily:Fonts.InterBold,
+        fontFamily: Fonts.InterBold,
     },
     skip: {
-        marginTop: Metrix.VerticalSize(50),
-        flex : 1,
-        width : "100%",
-        marginRight : Metrix.HorizontalSize(20)
+        position: "absolute",
+        bottom: Metrix.VerticalSize(-50),
+        right: Metrix.HorizontalSize(30),
     }
 });
 

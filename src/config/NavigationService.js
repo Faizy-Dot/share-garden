@@ -1,7 +1,4 @@
-import {
-  CommonActions,
-  DrawerActions,
-} from '@react-navigation/native';
+import { CommonActions, DrawerActions } from '@react-navigation/native';
 
 let _navigator;
 
@@ -10,33 +7,50 @@ function setTopLevelNavigator(navigatorRef) {
 }
 
 function navigate(name, params) {
-  _navigator.dispatch(
-    CommonActions.navigate({
-      name,
-      params,
-    }),
-  );
+  if (_navigator) {
+    _navigator.dispatch(
+      CommonActions.navigate({
+        name,
+        params,
+      }),
+    );
+  }
 }
 
 function goBack() {
-  _navigator.dispatch(CommonActions.goBack());
+  if (_navigator) {
+    _navigator.dispatch(CommonActions.goBack());
+  }
 }
 
-function resetStack(name) {
-  _navigator.dispatch(
-    CommonActions.reset({
-      index: 0,
-      routes: [{name}],
-    }),
-  );
+function resetStack(name, params) {
+  if (_navigator) {
+    _navigator.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name, params }],
+      }),
+    );
+  }
 }
 
 function openDrawer() {
-  _navigator.dispatch(DrawerActions.openDrawer());
+  if (_navigator) {
+    _navigator.dispatch(DrawerActions.openDrawer());
+  }
 }
 
 function closeDrawer() {
-  _navigator.dispatch(DrawerActions.closeDrawer());
+  if (_navigator) {
+    _navigator.dispatch(DrawerActions.closeDrawer());
+  }
+}
+
+function getCurrentRoute() {
+  if (_navigator && _navigator.getCurrentRoute) {
+    return _navigator.getCurrentRoute();
+  }
+  return null;
 }
 
 export default {
@@ -46,4 +60,5 @@ export default {
   goBack,
   openDrawer,
   closeDrawer,
+  getCurrentRoute, // Added the method to get current route
 };

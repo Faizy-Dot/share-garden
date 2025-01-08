@@ -73,6 +73,7 @@ const OnboardingScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+    
       <FlatList
         ref={flatListRef} // Attach ref to FlatList
         data={onboardingData}
