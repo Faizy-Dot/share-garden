@@ -53,6 +53,7 @@ const Images = {
     homeOthers : require('../assets/images/home/home-others.png'),
     backArrowIcon : require('../assets/images/back-arrowIcon.png'),
     uploadImageIcon : require('../assets/images/postTab/upload-image.png'),
+    dropDownIcon : require('../assets/images/postTab/dropDownIcon.png'),
 
 
 }

@@ -26,8 +26,8 @@ export default function App() {
       // Example: Dynamically update StatusBar color based on active route
       const currentRoute = NavigationService.getCurrentRoute();
       // console.log(currentRoute.name)
-      if (currentRoute.name === 'Login') {
-        StatusBar.setBackgroundColor(colors.white);
+      if (currentRoute.name === 'OnBoarding') {
+        StatusBar.setBackgroundColor(colors.onBoardColor);
         StatusBar.setBarStyle('light-content');
       } else {
         StatusBar.setBackgroundColor(colors.white);

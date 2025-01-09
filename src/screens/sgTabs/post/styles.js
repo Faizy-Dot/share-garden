@@ -9,7 +9,8 @@ const styles = StyleSheet.create({
     postContainer: {
         padding: Metrix.VerticalSize(10),
         flex: 1,
-        backgroundColor: colors.white
+        backgroundColor: colors.white,
+        paddingBottom : 50
     }
     ,
     buttonsContainer: {
@@ -54,12 +55,70 @@ const styles = StyleSheet.create({
         marginTop: Metrix.VerticalSize(10),
         justifyContent: "center",
         alignItems: "center",
-        gap: 15
+        gap: Metrix.HorizontalSize(15)
     },
     image: {
         flex: 1,
-        height: 61,
+        height: Metrix.VerticalSize(61),
         backgroundColor: "#F5F4F4"
+    },
+    imagesContainer: {
+        height: Metrix.VerticalSize(61),
+        flexDirection: "row",
+        gap: Metrix.HorizontalSize(10),
+        paddingHorizontal: Metrix.HorizontalSize(10)
+    },
+    inputsContainer: {
+        marginTop: Metrix.VerticalSize(10),
+        gap: Metrix.VerticalSize(10),
+        marginBottom : Metrix.VerticalSize(40)
+    },
+    title: {
+        width: "100%",
+        height: Metrix.VerticalSize(58),
+        borderWidth: 1,
+        paddingHorizontal: Metrix.HorizontalSize(20),
+        borderRadius: Metrix.LightRadius,
+        borderColor: colors.borderColor,
+        fontFamily: fonts.InterRegular,
+        fontSize: Metrix.FontSmall
+
+    },
+    conditionContainer: {
+        width: "100%",
+        height: Metrix.VerticalSize(100),
+        borderWidth: 1,
+        borderColor: colors.borderColor,
+        borderRadius: Metrix.LightRadius,
+        justifyContent: "center",
+        gap : Metrix.VerticalSize(15)  ,
+        paddingHorizontal : 20
+    },
+    checkboxContainer: {
+        backgroundColor: "transparent",
+        borderWidth: 0,
+        padding: 0,
+        margin: 0,
+        alignItems : "center",
+        
+    },
+    checkboxText:{
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterLight
+    },
+    heading: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterRegular
+    },
+    description:{
+        width: "100%",
+        height: Metrix.VerticalSize(106),
+        borderWidth: 1,
+        paddingHorizontal: Metrix.HorizontalSize(20),
+        borderRadius: Metrix.LightRadius,
+        borderColor: colors.borderColor,
+        fontFamily: fonts.InterRegular,
+        fontSize: Metrix.FontSmall
     }
 })
 
