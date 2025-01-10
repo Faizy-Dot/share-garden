@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
         padding: Metrix.VerticalSize(10),
         flex: 1,
         backgroundColor: colors.white,
-        paddingBottom : 50
     }
     ,
     buttonsContainer: {
@@ -71,7 +70,7 @@ const styles = StyleSheet.create({
     inputsContainer: {
         marginTop: Metrix.VerticalSize(10),
         gap: Metrix.VerticalSize(10),
-        marginBottom : Metrix.VerticalSize(40)
+        marginBottom: Metrix.VerticalSize(30)
     },
     title: {
         width: "100%",
@@ -81,7 +80,21 @@ const styles = StyleSheet.create({
         borderRadius: Metrix.LightRadius,
         borderColor: colors.borderColor,
         fontFamily: fonts.InterRegular,
-        fontSize: Metrix.FontSmall
+        fontSize: Metrix.FontSmall,
+
+
+    },
+    description: {
+        width: "100%",
+        height: Metrix.VerticalSize(58),
+        borderWidth: 1,
+        paddingHorizontal: Metrix.HorizontalSize(20),
+        borderRadius: Metrix.LightRadius,
+        borderColor: colors.borderColor,
+        fontFamily: fonts.InterRegular,
+        fontSize: Metrix.FontSmall,
+        height: Metrix.VerticalSize(106)
+
 
     },
     conditionContainer: {
@@ -91,26 +104,24 @@ const styles = StyleSheet.create({
         borderColor: colors.borderColor,
         borderRadius: Metrix.LightRadius,
         justifyContent: "center",
-        gap : Metrix.VerticalSize(15)  ,
-        paddingHorizontal : 20
+        gap: Metrix.VerticalSize(15),
+        paddingHorizontal: 20
     },
     checkboxContainer: {
-        backgroundColor: "transparent",
-        borderWidth: 0,
-        padding: 0,
-        margin: 0,
-        alignItems : "center",
-        
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8
+
     },
-    checkboxText:{
+    checkboxText: {
         fontSize: Metrix.FontSmall,
-        fontFamily: fonts.InterLight
+        fontFamily: fonts.InterRegular
     },
     heading: {
         fontSize: Metrix.FontSmall,
         fontFamily: fonts.InterRegular
     },
-    description:{
+    description: {
         width: "100%",
         height: Metrix.VerticalSize(106),
         borderWidth: 1,
@@ -119,6 +130,18 @@ const styles = StyleSheet.create({
         borderColor: colors.borderColor,
         fontFamily: fonts.InterRegular,
         fontSize: Metrix.FontSmall
+    },
+    checkBox: {
+        width: Metrix.HorizontalSize(14),
+        height: Metrix.HorizontalSize(14),
+        borderWidth: 1,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    bottomButtons: {
+        flexDirection: "row",
+        marginBottom: Metrix.VerticalSize(35),
+        gap: 10
     }
 })
 

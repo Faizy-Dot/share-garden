@@ -52,25 +52,25 @@ const Login = ({ navigation }) => {
                     />}
                     backgroundColor='#1B70D4'
                     width={Metrix.HorizontalSize(300)}
-                    height={Metrix.VerticalSize(40)}
+                    height={Metrix.VerticalSize(50)}
                 />
 
                 <CustomButton
-                    title={"Continue With Facebook"}
+                    title={"Continue With Google"}
                     icon={<FontAwesome name="google" color="#fff" style={styles.socialButtonIcon}
                     />}
                     backgroundColor='#F8443E'
                     width={Metrix.HorizontalSize(300)}
-                    height={Metrix.VerticalSize(40)}
+                    height={Metrix.VerticalSize(50)}
                 />
 
                 <CustomButton
-                    title={"Continue With Facebook"}
+                    title={"Continue With Apple"}
                     icon={<FontAwesome name="apple" color="#fff" style={styles.socialButtonIcon}
                     />}
                     backgroundColor='#000000'
                     width={Metrix.HorizontalSize(300)}
-                    height={Metrix.VerticalSize(40)}
+                    height={Metrix.VerticalSize(50)}
                 />
             </View>
 

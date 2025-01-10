@@ -9,26 +9,22 @@ import fonts from "../../../config/Fonts";
 import { launchImageLibrary } from "react-native-image-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import DropdownComponent from "../../../components/dropDown/DropDownInput";
-import { CheckBox } from "react-native-elements";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import CustomButton from "../../../components/Button/Button";
+
 
 export default function PostTabScreen() {
     const [activeButton, setActiveButton] = useState("SG Item");
     const [sgPoints, setSGPoints] = useState(false);
     const [cash, setCash] = useState(false);
     const [images, setImages] = useState([null, null, null]); // State to store up to 3 images
-    const [checked, setChecked] = useState({
-        fairlyUsed: false,
-        good: false,
-        excellent: false,
-    });
+    const [checked, setChecked] = useState(""); // State to track the selected checkbox
+    const checkBoxNames = ["Fairly Used", "Good", "Excellent"];
 
     const handleCheckboxChange = (key) => {
-        setChecked({
-            fairlyUsed: key === "fairlyUsed",
-            good: key === "good",
-            excellent: key === "excellent",
-        });
+        setChecked(key); // Set the selected checkbox
     };
+
 
     const handleImagePicker = async () => {
         const result = await launchImageLibrary({
@@ -143,33 +139,25 @@ export default function PostTabScreen() {
                 <DropdownComponent />
                 <View style={styles.conditionContainer}>
                     <Text style={styles.heading}>Item Condition</Text>
-                    <View style={{ flexDirection: "row", }}>
-                        <CheckBox
-                            title="Fairly Used"
-                            checked={checked.fairlyUsed}
-                            onPress={() => handleCheckboxChange("fairlyUsed")}
-                            containerStyle={styles.checkboxContainer}
-                            textStyle={styles.checkboxText}
-                            activeOpacity={0.8}
-                        />
+                    <View style={{ flexDirection: "row", gap: 10 }}>
 
-                        <CheckBox
-                            title="Good"
-                            checked={checked.good}
-                            onPress={() => handleCheckboxChange("good")}
-                            containerStyle={styles.checkboxContainer}
-                            textStyle={styles.checkboxText}
-                            activeOpacity={0.8}
-                        />
+                        {
+                            checkBoxNames.map((name, index) => {
 
-                        <CheckBox
-                            title="Excellent"
-                            checked={checked.excellent}
-                            onPress={() => handleCheckboxChange("excellent")}
-                            containerStyle={styles.checkboxContainer}
-                            textStyle={styles.checkboxText}
-                            activeOpacity={0.8}
-                        />
+                                return (
+
+                                    <TouchableOpacity key={index} activeOpacity={0.9} onPress={() => handleCheckboxChange(name)} style={styles.checkboxContainer}>
+                                        <View style={styles.checkBox}>
+                                        </View>
+                                        {checked === name && (
+                                            <Icon name="check" size={20} color="black" style={{ position: "absolute" }} />
+                                        )}
+                                        <Text style={styles.checkboxText}>{name}</Text>
+                                    </TouchableOpacity>
+                                )
+
+                            })
+                        }
                     </View>
                 </View>
                 <TextInput
@@ -178,16 +166,35 @@ export default function PostTabScreen() {
                     style={styles.title}
                 />
                 <TextInput
-                    placeholderTextColor={colors.black}
-                    placeholder="Enter Point Value or Cash value"
-                    style={styles.title}
-                />
-                <TextInput
-                    placeholderTextColor={colors.black}
-                    placeholder="Description"
                     style={styles.description}
+                    multiline={true}
+                    numberOfLines={4}
+                    placeholder="Description"
+                    placeholderTextColor={colors.black}
+                     textAlignVertical="top"
                 />
+
+            </View>
+
+
+            <View style={styles.bottomButtons}>
                 
+                <CustomButton
+                height={Metrix.VerticalSize(42)}
+                title={"PREVIEW"}
+                backgroundColor={colors.white}
+                color={colors.black}
+                borderWidth={1}
+                borderColor={colors.borderColor}
+                borderRadius={Metrix.VerticalSize(4)}
+                flex={1}/>
+
+                <CustomButton 
+                height={Metrix.VerticalSize(42)}
+                title={"PUBLISH"}
+                backgroundColor={colors.buttonColor}
+                borderRadius={Metrix.VerticalSize(4)}
+                flex={1}/>
             </View>
         </KeyboardAwareScrollView>
     );

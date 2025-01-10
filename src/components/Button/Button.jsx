@@ -14,6 +14,9 @@ export default function CustomButton({
     fontSize = Metrix.FontMedium,
     fontFamily = Fonts.InterSemiBold,
     borderRadius = Metrix.HorizontalSize(8),
+    borderWidth ,
+    borderColor,
+    flex,
     icon
 }) {
     return (
@@ -21,7 +24,10 @@ export default function CustomButton({
             backgroundColor,
             height,
             width,
-            borderRadius
+            borderRadius,
+            borderWidth,
+            borderColor,
+            flex
         }]} activeOpacity={0.8} onPress={onPress}>
             
             {
@@ -38,7 +44,7 @@ const styles = StyleSheet.create({
     customButton: {
         justifyContent: "center",
         alignItems: "center",
-        flexDirection: "row"
+        flexDirection: "row",
     },
 
 })

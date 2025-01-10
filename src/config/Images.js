@@ -54,6 +54,10 @@ const Images = {
     backArrowIcon : require('../assets/images/back-arrowIcon.png'),
     uploadImageIcon : require('../assets/images/postTab/upload-image.png'),
     dropDownIcon : require('../assets/images/postTab/dropDownIcon.png'),
+    eyeIcon : require('../assets/images/postTab/eyeIcon.png'),
+    likeIcon : require('../assets/images/postTab/likeIcon.png'),
+    shareIcon : require('../assets/images/postTab/shareIcon.png'),
+    timeIcon : require('../assets/images/postTab/timeIcon.png'),
 
 
 }

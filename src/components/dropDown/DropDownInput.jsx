@@ -16,7 +16,7 @@ const data = [
     { label: 'Item 8', value: '8' },
 ];
 
-const DropdownComponent = () => {
+const DropdownComponent = ({placeholder}) => {
     const [value, setValue] = useState(null);
 
     const renderItem = item => {
@@ -38,7 +38,7 @@ const DropdownComponent = () => {
             maxHeight={300}
             labelField="label"
             valueField="value"
-            placeholder="Select item"
+            placeholder={placeholder}
             searchPlaceholder="Search..."
             value={value}
             onChange={item => {

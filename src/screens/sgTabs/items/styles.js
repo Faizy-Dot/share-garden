@@ -33,36 +33,6 @@ const styles = StyleSheet.create({
         width: "100%",
         paddingHorizontal: Metrix.HorizontalSize(15),
     },
-    inputContainer: {
-        flexDirection: "row",
-        marginTop: Metrix.VerticalSize(20),
-        alignItems: "center",
-        gap: Metrix.HorizontalSize(14),
-        width: "100%",
-        paddingHorizontal: Metrix.HorizontalSize(15),
-    },
-    input: {
-        width: Metrix.HorizontalSize(300),
-        height: Metrix.VerticalSize(60),
-        backgroundColor: "#F3F3F3",
-        borderColor: "#E6E6E6",
-        borderWidth: 1,
-        borderRadius: Metrix.LightRadius,
-        paddingLeft: Metrix.HorizontalSize(45),
-        fontSize: Metrix.FontRegular,
-        fontFamily: Fonts.InterSemiBold
-    },
-    filterLogo: {
-        width: Metrix.HorizontalSize(20),
-        height: Metrix.VerticalSize(15)
-    },
-    searchIcon: {
-        width: Metrix.HorizontalSize(25),
-        height: Metrix.VerticalSize(27),
-        position: "absolute",
-        left: Metrix.HorizontalSize(23),
-        zIndex: 1
-    },
 
     middle: {
         marginTop: Metrix.VerticalSize(15),
