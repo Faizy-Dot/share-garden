@@ -63,7 +63,14 @@ const Images = {
     earnArrowIcon : require('../assets/images/rewards/earnArrowIcon.png'),
     adsSticker : require('../assets/images/adsTab/ads-sticker.png'),
     locationIcon : require('../assets/images/adsTab/location-icon.png'),
-
+    bidsIcon : require('../assets/images/profile/bidsIcon.png'),
+    earnCoinIcon : require('../assets/images/profile/earnCoinIcon.png'),
+    logoutIcon : require('../assets/images/profile/logoutIcon.png'),
+    reviewsIcon : require('../assets/images/profile/reviewsIcon.png'),
+    settingsIcon : require('../assets/images/profile/settingsIcon.png'),
+    sgItemsIcon : require('../assets/images/profile/sgItemsIcon.png'),
+    rightArrowIcon : require('../assets/images/profile/rightArrowIcon.png'),
+    profileAppLogo : require('../assets/images/profile/profileAppLogo.png'),
 
 }
 

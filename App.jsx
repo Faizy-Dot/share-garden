@@ -25,9 +25,7 @@ export default function App() {
     <NavigationContainer
     ref={(ref) => NavigationService.setTopLevelNavigator(ref)}
     onStateChange={() => {
-      // Example: Dynamically update StatusBar color based on active route
       const currentRoute = NavigationService.getCurrentRoute();
-      // console.log(currentRoute.name)
       if (currentRoute.name === 'OnBoarding') {
         StatusBar.setBackgroundColor(colors.onBoardColor);
         StatusBar.setBarStyle('light-content');
@@ -44,6 +42,7 @@ export default function App() {
         <Stack.Screen name="Signup" component={Signup} />
         <Stack.Screen name="SuccessSignup" component={SuccessSignupScreen}/>
         <Stack.Screen name="SgTabs" component={SgTabNavigator} />
+        <Stack.Screen name="Profile" component={Profile} />
       </Stack.Navigator>
     </NavigationContainer>
   );

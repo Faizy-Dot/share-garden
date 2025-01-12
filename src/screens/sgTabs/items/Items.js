@@ -36,7 +36,7 @@ const myPosts = [
 
 const ItemsTabScreen = ({ route }) => {
 
-    const { user } = route.params
+    const { user } = route.params || {};
     console.log("user login=>", user)
 
     const renderPopularListing = ({ item }) => (

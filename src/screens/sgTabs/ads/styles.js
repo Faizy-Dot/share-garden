@@ -17,6 +17,7 @@ export const styles = StyleSheet.create({
     },
     bottomContainer: {
         marginTop: Metrix.VerticalSize(5),
+        gap : Metrix.VerticalSize(12)
 
     },
     adsDataStyle: {

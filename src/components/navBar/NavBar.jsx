@@ -19,7 +19,7 @@ export default function NavBar({ title }) {
                 </View>
                 <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
                 <Image source={Images.homeBellIcon} style={styles.bellIcon} />
-                <TouchableOpacity onPress={()=>navigation.navigate("profile") } activeOpacity={0.8}>
+                <TouchableOpacity onPress={()=>navigation.navigate("Profile") } activeOpacity={0.8}>
                 <Image  source={Images.homeProfile} style={styles.profile} />
                 </TouchableOpacity>
             </View>
