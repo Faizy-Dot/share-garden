@@ -16,7 +16,6 @@ const styles = StyleSheet.create({
         width:"100%",
         height : Metrix.VerticalSize(200),
         borderRadius : Metrix.LightRadius,
-        gap : Metrix.VerticalSize(5)
     },
     categoryList:{
         gap : Metrix.VerticalSize(30),

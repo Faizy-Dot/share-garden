@@ -5,7 +5,6 @@ import NavBar from "../../../components/navBar/NavBar";
 import { Images, Metrix } from "../../../config";
 import CustomInput from "../../../components/customInput/CustomInput";
 import DropdownComponent from "../../../components/dropDown/DropDownInput";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import fonts from "../../../config/Fonts";
 import colors from "../../../config/Colors";
 
@@ -65,32 +64,32 @@ export default function TipsTabScreen() {
     ]
 
 
-    const renderCategory = ({item}) => {
+    const renderCategory = ({ item }) => {
         return (
             <View style={styles.categoryContainer}>
-                <View style={{flexDirection : "row" ,padding : 20 , gap : Metrix.HorizontalSize(15) ,width : "100%"}}>
-                    <Image source={item.image} style={{width : Metrix.HorizontalSize(119) , height : Metrix.HorizontalSize(116) ,}}/>
-                    <View style={{width : Metrix.HorizontalSize(200) ,gap : 10 , height : Metrix.VerticalSize(116)}}>
-                        <Text style={{fontSize : Metrix.FontSmall , fontFamily :fonts.InterSemiBold , color : colors.buttonColor}}>{item.title}</Text>
-                        <Text style={{fontSize : Metrix.FontExtraSmall , fontFamily :fonts.InterRegular ,}}>{item.description}</Text>
+                <View style={{ flexDirection: "row", padding: 20, gap: Metrix.HorizontalSize(15), width: "100%" }}>
+                    <Image source={item.image} style={{ width: Metrix.HorizontalSize(119), height: Metrix.HorizontalSize(116), }} />
+                    <View style={{ width: Metrix.HorizontalSize(200), gap: 10, height: Metrix.VerticalSize(116) }}>
+                        <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold, color: colors.buttonColor }}>{item.title}</Text>
+                        <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular, }}>{item.description}</Text>
                     </View>
                 </View>
 
-                <View style={{flexDirection : "row" ,justifyContent : "space-around"}}>
-                    <View style={{flexDirection : "row" , gap : 5}}>
-                        <Image source={Images.eyeIcon}/>
+                <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                    <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Image source={Images.eyeIcon} />
                         <Text>{item.views} Views</Text>
                     </View>
-                    <View style={{flexDirection : "row", gap : 5}}>
-                        <Image source={Images.likeIcon}/>
+                    <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Image source={Images.likeIcon} />
                         <Text>{item.likes} Likes</Text>
                     </View>
-                    <View style={{flexDirection : "row", gap : 5}}>
-                        <Image source={Images.shareIcon}/>
+                    <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Image source={Images.shareIcon} />
                         <Text>{item.shared} Shared</Text>
                     </View>
-                    <View style={{flexDirection : "row", gap : 5}}>
-                        <Image source={Images.timeIcon}/>
+                    <View style={{ flexDirection: "row", gap: 5 }}>
+                        <Image source={Images.timeIcon} />
                         <Text>{item.time} h</Text>
                     </View>
                 </View>
@@ -99,7 +98,7 @@ export default function TipsTabScreen() {
     }
 
     return (
-        <KeyboardAwareScrollView style={styles.tipsContainer}>
+        <View style={styles.tipsContainer}>
             <View>
                 <BackArrowIcon />
             </View>
@@ -108,7 +107,7 @@ export default function TipsTabScreen() {
                 <NavBar title={"Explore SG Tips"} />
             </View>
 
-            <View style={{ marginTop: Metrix.VerticalSize(22) ,gap :10 }}>
+            <View style={{ marginTop: Metrix.VerticalSize(22), gap: 10 }}>
 
                 <View>
                     <CustomInput iconCondition={false} />
@@ -119,22 +118,20 @@ export default function TipsTabScreen() {
                         placeholder={"Select Category"} />
                 </View>
 
-                <View>
-                    <FlatList
-                        data={categoriesData}
-                        renderItem={renderCategory}
-                        keyExtractor={(item) => item.id}
-                        showsHorizontalScrollIndicator={false}
+                <FlatList
+                    data={categoriesData}
+                    renderItem={renderCategory}
+                    keyExtractor={(item) => item.id}
                     contentContainerStyle={styles.categoryList}
-                    />
+                    showsVerticalScrollIndicator={false}
+                />
 
-                </View>
 
 
 
             </View>
 
 
-        </KeyboardAwareScrollView>
+        </View>
     )
 }

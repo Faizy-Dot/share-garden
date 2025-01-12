@@ -6,6 +6,8 @@ import { GetStarted, Login, Signup , OnboardingScreen , SuccessSignupScreen , Sg
 import { NavigationService } from './src/config';
 import colors from './src/config/Colors';
 import { StatusBar } from 'react-native';
+import Profile from './src/screens/profile/Profile';
+
 
 
 const Stack = createNativeStackNavigator();

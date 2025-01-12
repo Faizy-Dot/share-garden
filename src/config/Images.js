@@ -58,6 +58,11 @@ const Images = {
     likeIcon : require('../assets/images/postTab/likeIcon.png'),
     shareIcon : require('../assets/images/postTab/shareIcon.png'),
     timeIcon : require('../assets/images/postTab/timeIcon.png'),
+    starGreen : require('../assets/images/rewards/star-green.png'),
+    starWhite : require('../assets/images/rewards/star-white.png'),
+    earnArrowIcon : require('../assets/images/rewards/earnArrowIcon.png'),
+    adsSticker : require('../assets/images/adsTab/ads-sticker.png'),
+    locationIcon : require('../assets/images/adsTab/location-icon.png'),
 
 
 }

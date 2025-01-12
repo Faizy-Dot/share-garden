@@ -54,29 +54,7 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center"
     },
-    categoryContainer: {
-        paddingHorizontal: Metrix.HorizontalSize(15),
-        marginTop: Metrix.VerticalSize(15)
-    },
-    categoryList: {
-        flexDirection: "row",
-        gap: Metrix.HorizontalSize(10),
-        alignItems: "center",
-        marginTop: Metrix.VerticalSize(15)
-    },
-    category: {
-        backgroundColor: "#F3F3F3",
-        width: Metrix.HorizontalSize(64),
-        height: Metrix.HorizontalSize(64),
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 32
-    },
-
-    categoryText: {
-        textAlign: "center",
-        marginTop: Metrix.VerticalSize(10)
-    },
+   
     popularListingsContainer: {
         paddingHorizontal: Metrix.HorizontalSize(15),
         // marginTop: Metrix.VerticalSize(15)
@@ -84,6 +62,15 @@ const styles = StyleSheet.create({
     listingContainer: {
         width: Metrix.HorizontalSize(130),
         height: Metrix.VerticalSize(275),
+    },
+    categoryContainer: {
+        paddingHorizontal: Metrix.HorizontalSize(15),
+    },
+    
+    categoryList: {
+        gap: Metrix.HorizontalSize(10),
+        alignItems: "center",
+        marginTop: Metrix.VerticalSize(15)
     },
     listingImage: {
         width: "100%",

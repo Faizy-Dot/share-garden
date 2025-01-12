@@ -1,10 +1,13 @@
-import { Image, StyleSheet, Text, View } from "react-native"
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { Images, Metrix } from "../../config"
 import fonts from "../../config/Fonts"
+import { useNavigation } from "@react-navigation/native"
 
 
 
 export default function NavBar({ title }) {
+
+    const navigation = useNavigation()
     return (
         <View style={styles.userDetail}>
             <Text style={{ fontSize: Metrix.normalize(20), fontFamily: fonts.InterBold }}>{title}</Text>
@@ -16,7 +19,9 @@ export default function NavBar({ title }) {
                 </View>
                 <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
                 <Image source={Images.homeBellIcon} style={styles.bellIcon} />
-                <Image source={Images.homeProfile} style={styles.profile} />
+                <TouchableOpacity onPress={()=>navigation.navigate("profile") } activeOpacity={0.8}>
+                <Image  source={Images.homeProfile} style={styles.profile} />
+                </TouchableOpacity>
             </View>
         </View>
     )

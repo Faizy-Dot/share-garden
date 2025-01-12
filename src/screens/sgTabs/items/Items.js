@@ -9,28 +9,9 @@ import fonts from "../../../config/Fonts";
 import colors from "../../../config/Colors";
 import NavBar from "../../../components/navBar/NavBar";
 import CustomInput from "../../../components/customInput/CustomInput";
+import CategoryFlatList from "../../../components/categoryFlatList/CategoryFlatList";
 
-const categories = [
-    { id: "1", name: "Mobile", icon: Images.homeCategoryMobile },
-    { id: "2", name: "Furniture", icon: Images.homeCategoryFurniture },
-    { id: "3", name: "Electronics", icon: Images.homeCategoryElectronics },
-    { id: "4", name: "Fashion", icon: Images.homeCategoryShoes },
-    { id: "5", name: "Books", icon: Images.homeCategoryBooks },
-    { id: "6", name: "Tools", icon: Images.homeTools },
-    { id: "7", name: "Luxury", icon: Images.homeLuxury },
-    { id: "8", name: "Services", icon: Images.homeServices },
-    { id: "9", name: "Vehicles", icon: Images.homeVehicles },
-    { id: "10", name: "Property", icon: Images.homeProperty },
-    { id: "11", name: "Baby", icon: Images.homeBaby },
-    { id: "12", name: "Toys", icon: Images.homeToys },
-    { id: "13", name: "Pets", icon: Images.homePets },
-    { id: "14", name: "Foods & Drinks", icon: Images.homeFoodDrinks },
-    { id: "15", name: "Sports   Equipment", icon: Images.homeSports },
-    { id: "16", name: "Staionary", icon: Images.homeStationary },
-    { id: "17", name: "Music", icon: Images.homeMusic },
-    { id: "18", name: "Art", icon: Images.homeArt },
-    { id: "19", name: "Others", icon: Images.homeOthers },
-];
+
 
 const popularListings = [
     { id: "1", title: "Single Bed", location: "First Floor Maya Apartments", price: "8.5", image: Images.homePopularListing, bit: true, dollarLogo: false },
@@ -54,24 +35,9 @@ const myPosts = [
 ]
 
 const ItemsTabScreen = ({ route }) => {
-    const [selectedId, setSelectedId] = useState(null)
+
     const { user } = route.params
     console.log("user login=>", user)
-
-    const renderCategory = ({ item }) => {
-
-        const isSelect = selectedId == item.id
-        return (
-            <TouchableOpacity onPress={() => setSelectedId(item.id)} activeOpacity={0.8} style={{ width: Metrix.HorizontalSize(73), height: Metrix.VerticalSize(130) }}>
-                <View style={[styles.category, isSelect && { backgroundColor: "#5B5B5B" }]}>
-                    <Image source={item.icon} />
-                </View>
-                <Text style={styles.categoryText}>{item.name}</Text>
-            </TouchableOpacity>
-
-        )
-    }
-
 
     const renderPopularListing = ({ item }) => (
         <TouchableOpacity activeOpacity={0.8} style={styles.listingContainer}>
@@ -89,6 +55,11 @@ const ItemsTabScreen = ({ route }) => {
             </View>
         </TouchableOpacity >
     )
+
+
+
+
+
 
     const renderMyPosts = ({ item }) => (
         <TouchableOpacity activeOpacity={0.8} style={styles.postBox}>
@@ -163,15 +134,9 @@ const ItemsTabScreen = ({ route }) => {
                             <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
                         </View>
                     }
-
-                    <FlatList
-                        data={categories}
-                        renderItem={renderCategory}
-                        keyExtractor={(item) => item.id}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.categoryList}
-                    />
+                    <View style={{ marginTop: Metrix.VerticalSize(15)}}>
+                        <CategoryFlatList />
+                    </View>
 
                 </View>
 

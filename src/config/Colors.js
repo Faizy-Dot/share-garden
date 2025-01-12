@@ -7,6 +7,8 @@ const colors = {
   onBoardColor : "#008675",
   buttonColor : "#009D89",
   borderColor : "#E6E6E6",
+  yellowColor : "#FFC202",
+  redColor : "#F8443E"
 };
 
 export default colors;
