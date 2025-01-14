@@ -1,13 +1,61 @@
 import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import styles from './styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Images from '../../../config/Images';
 import CustomButton from '../../../components/Button/Button';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Metrix } from '../../../config';
+import { useDispatch } from 'react-redux';
+import DeviceInfo from 'react-native-device-info';
+import { login } from '../../../assets/redux/Actions/authActions/loginAction';
 
 const Login = ({ navigation }) => {
+
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const dispatch = useDispatch();
+
+    const getDeviceDetails = async () => {
+        const deviceid = (await DeviceInfo.getUniqueId()).toString(); 
+        const fcmtoken = "Coming Soon"; 
+        const devicetype = Platform.OS.toString(); 
+        
+        return { deviceid, fcmtoken, devicetype };
+    };
+
+    const handleLogin = async () => {
+        if (!email || !password) {
+            alert('Please fill in both email and password.');
+            return;
+        }
+
+        // Get device details
+        const { deviceid, fcmtoken, devicetype } = await getDeviceDetails();
+
+        // Prepare user data
+        const userData = {
+            emailaddress: email,
+            password,
+            deviceid,
+            fcmtoken,
+            devicetype,
+        };
+
+        // Call login action
+        try {
+            const res = await dispatch(login(userData)).unwrap();
+            alert(res.message);
+            console.log('Login successfully:', res);
+            navigation.navigate('SgTabs');
+        } catch (err) {
+            alert('Login failed!');
+            console.error(err);
+        }
+    };
+
+
     return (
         <KeyboardAwareScrollView style={styles.container} contentContainerStyle={{
             alignItems: 'center',
@@ -21,12 +69,17 @@ const Login = ({ navigation }) => {
 
             {/* Input Fields */}
             <View style={styles.inputContainer}>
-                <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#999" />
+                <TextInput style={styles.input}
+                 placeholder="Email"
+                  placeholderTextColor="#999"
+                  onChangeText={setEmail}
+                   />
                 <TextInput
                     style={styles.input}
                     placeholder="Password"
                     placeholderTextColor="#999"
                     secureTextEntry
+                    onChangeText={setPassword}
                 />
             </View>
 
@@ -37,7 +90,7 @@ const Login = ({ navigation }) => {
             <CustomButton
                 title={"Login"}
                 width={Metrix.HorizontalSize(300)}
-                onPress={()=>navigation.navigate("SgTabs", { screen: "Items", params: { user: true} })}
+                onPress={handleLogin}
             />
 
             {/* OR Divider */}

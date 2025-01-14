@@ -75,6 +75,6 @@ dependencies {
     implementation project(':react-native-vector-icons')
 implementation project(':react-native-image-picker')
     implementation 'com.facebook.react:react-native:+'
-
+implementation project(':react-native-device-info')
    
 }

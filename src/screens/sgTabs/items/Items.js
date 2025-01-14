@@ -10,6 +10,7 @@ import colors from "../../../config/Colors";
 import NavBar from "../../../components/navBar/NavBar";
 import CustomInput from "../../../components/customInput/CustomInput";
 import CategoryFlatList from "../../../components/categoryFlatList/CategoryFlatList";
+import { useSelector } from "react-redux";
 
 
 
@@ -36,7 +37,8 @@ const myPosts = [
 
 const ItemsTabScreen = ({ route }) => {
 
-    const { user } = route.params || {};
+    const { loading, error, user } = useSelector((state) => state.auth);
+
     console.log("user login=>", user)
 
     const renderPopularListing = ({ item }) => (
