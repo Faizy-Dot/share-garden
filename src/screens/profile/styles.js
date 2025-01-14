@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        paddingHorizontal: Metrix.HorizontalSize(15)
     },
     profileImg: {
         width: Metrix.HorizontalSize(64),
@@ -21,7 +20,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         width: "100%",
-        paddingHorizontal: Metrix.HorizontalSize(5),
+        paddingHorizontal: Metrix.HorizontalSize(20),
         marginTop: Metrix.VerticalSize(12)
     },
     tabBarContainer: {
@@ -62,7 +61,8 @@ const styles = StyleSheet.create({
         fontSize: Metrix.FontSmall,
         fontFamily: fonts.InterBold,
         textDecorationLine: "underline",
-        color: colors.buttonColor
+        color: colors.buttonColor,
+        
     },
     title: {
         fontSize: Metrix.FontMedium,
@@ -79,11 +79,14 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         padding: 13,
         borderBottomColor: colors.borderColor,
+        marginHorizontal : Metrix.HorizontalSize(15)
     },
     helpBox: {
         borderTopWidth: Metrix.VerticalSize(10),
         borderBottomWidth: Metrix.VerticalSize(10),
-        borderColor: colors.buttonColor
+        borderColor: colors.buttonColor,
+        marginHorizontal : 0,
+        paddingHorizontal : Metrix.HorizontalSize(27)
     }
 });
 

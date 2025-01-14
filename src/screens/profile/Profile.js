@@ -1,11 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import { Metrix } from "../../config";
-import fonts from "../../config/Fonts";
 import { Images } from "../../config";
-import colors from "../../config/Colors";
+import colors from '../../config/Colors';
 import styles from './styles';
-import NavBar from '../../components/navBar/NavBar';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
 
 
@@ -80,10 +78,11 @@ const profileData = [
 
 export default function Profile({ navigation }) {
 
+
     const renderProfileData = ({ item }) => {
         return (
             <View style={[styles.profileDataContainer , item.borders && styles.helpBox]}>
-                <Image source={item.image} />
+                <Image source={item.image} style={{resizeMode : "contain", width : Metrix.HorizontalSize(30)}}/>
                 <View style={{ gap: Metrix.VerticalSize(5),marginLeft :20,flex :1 }}>
                     <Text style={styles.title}>{item.title}</Text>
                     {
@@ -99,7 +98,7 @@ export default function Profile({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                <View style={{ marginTop: Metrix.VerticalSize(13) }}>
+                <View style={{ marginTop: Metrix.VerticalSize(13),paddingHorizontal: Metrix.HorizontalSize(15), }}>
                     <BackArrowIcon />
                 </View>
 
@@ -108,7 +107,7 @@ export default function Profile({ navigation }) {
                     <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15) }}>
                         <View style={{ gap: Metrix.VerticalSize(5) }}>
                             <Text style={styles.userName}>Ashley Simson</Text>
-                            <Text style={styles.editProfile}>Edit Profile</Text>
+                            <Text onPress={()=> navigation.navigate("EditProfile")} style={styles.editProfile}>Edit Profile</Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5) }}>
                             <Text>50200</Text>
@@ -120,7 +119,8 @@ export default function Profile({ navigation }) {
 
                 </View>
 
-                <View style={{ marginTop: Metrix.VerticalSize(15), flex: 1 }}>
+       
+        <View style={{ marginTop: Metrix.VerticalSize(15), flex: 1 ,}}>
 
                     <FlatList data={profileData}
                         renderItem={renderProfileData}
