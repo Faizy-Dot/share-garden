@@ -10,9 +10,9 @@ import Profile from './src/screens/profile/Profile';
 import { Provider } from 'react-redux';
 import store from './src/assets/redux/store';
 import EditProfile from './src/screens/profile/editProfile/EditProfile';
+import Toast from 'react-native-toast-message'; // Import Toast
 
-
-
+ 
 const Stack = createNativeStackNavigator();
 
 
@@ -51,6 +51,7 @@ export default function App() {
           <Stack.Screen name="EditProfile" component={EditProfile} />
         </Stack.Navigator>
       </NavigationContainer>
+      <Toast />
     </Provider>
   );
 }

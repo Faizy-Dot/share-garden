@@ -37,9 +37,9 @@ const myPosts = [
 
 const ItemsTabScreen = ({ route }) => {
 
-    const { loading, error, user } = useSelector((state) => state.auth);
+    const { loading, error, user } = useSelector((state) => state.login);
 
-    console.log("user login=>", user)
+    // console.log("user login=>", user)
 
     const renderPopularListing = ({ item }) => (
         <TouchableOpacity activeOpacity={0.8} style={styles.listingContainer}>
@@ -103,9 +103,6 @@ const ItemsTabScreen = ({ route }) => {
             </View>
 
             <View style={styles.middle}>
-                {
-                    !user &&
-
                     <View>
                         <Image source={Images.homeBackground} style={styles.homeBackgroundImg} />
                         <View style={styles.middleShown}>
@@ -125,7 +122,6 @@ const ItemsTabScreen = ({ route }) => {
                             />
                         </View>
                     </View>
-                }
 
                 <View style={[styles.categoryContainer, user && { marginTop: Metrix.VerticalSize(0) }]}>
                     {
@@ -162,8 +158,6 @@ const ItemsTabScreen = ({ route }) => {
                     />
 
                 </View>
-                {
-                    !user &&
 
                     <View>
                         <View style={styles.merchantShowcaseContainer}>
@@ -198,7 +192,6 @@ const ItemsTabScreen = ({ route }) => {
                         </View>
 
                     </View>
-                }
 
                 <View style={styles.popularListingsContainer}>
                     {

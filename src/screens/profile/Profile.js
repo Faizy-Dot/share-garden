@@ -5,6 +5,9 @@ import { Images } from "../../config";
 import colors from '../../config/Colors';
 import styles from './styles';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
+import { useSelector } from "react-redux";
+import { useDispatch } from 'react-redux';
+import { logout } from '../../assets/redux/Actions/authActions/loginAction';
 
 
 
@@ -78,20 +81,39 @@ const profileData = [
 
 export default function Profile({ navigation }) {
 
+    const { loading, error, user } = useSelector((state) => state.login);
+    const dispatch = useDispatch();
 
+  const handleLogout = () => {
+    dispatch(logout());
+    console.log('Logged out successfully!');
+    navigation.navigate('Login');
+    // Redirect or any other action can be added here
+  };
+
+  const handleItemPress = (item) => {
+    if (item.title === 'Logout') {
+      handleLogout(); // Call logout when "Logout" is pressed
+    } else {
+      console.log(`Navigating to ${item.label}`);
+      // Navigate to other screens based on item.label
+    }
+  };
     const renderProfileData = ({ item }) => {
         return (
-            <View style={[styles.profileDataContainer , item.borders && styles.helpBox]}>
-                <Image source={item.image} style={{resizeMode : "contain", width : Metrix.HorizontalSize(30)}}/>
-                <View style={{ gap: Metrix.VerticalSize(5),marginLeft :20,flex :1 }}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    {
-                        item.description &&
-                        <Text style={styles.description}>{item.description}</Text>
-                    }
+            <TouchableOpacity onPress={() => handleItemPress(item)}>
+                <View style={[styles.profileDataContainer , item.borders && styles.helpBox]}>
+                    <Image source={item.image} style={{resizeMode : "contain", width : Metrix.HorizontalSize(30)}}/>
+                    <View style={{ gap: Metrix.VerticalSize(5),marginLeft :20,flex :1 }}>
+                        <Text style={styles.title}>{item.title}</Text>
+                        {
+                            item.description &&
+                            <Text style={styles.description}>{item.description}</Text>
+                        }
+                    </View>
+                    <Image source={Images.rightArrowIcon} />
                 </View>
-                <Image source={Images.rightArrowIcon} />
-            </View>
+            </TouchableOpacity>
         )
     }
 
@@ -106,7 +128,7 @@ export default function Profile({ navigation }) {
                     <Image source={Images.homeProfile} style={styles.profileImg} />
                     <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15) }}>
                         <View style={{ gap: Metrix.VerticalSize(5) }}>
-                            <Text style={styles.userName}>Ashley Simson</Text>
+                            <Text style={styles.userName}>{user?.firstname} {user?.lastname}</Text>
                             <Text onPress={()=> navigation.navigate("EditProfile")} style={styles.editProfile}>Edit Profile</Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5) }}>
@@ -120,7 +142,7 @@ export default function Profile({ navigation }) {
                 </View>
 
        
-        <View style={{ marginTop: Metrix.VerticalSize(15), flex: 1 ,}}>
+                <View style={{ marginTop: Metrix.VerticalSize(15), flex: 1 ,}}>
 
                     <FlatList data={profileData}
                         renderItem={renderProfileData}

@@ -61,7 +61,12 @@ export default function SignUpScreen({ navigation }) {
 
     const handleSubmit = async () => {
         if (form.password !== form.confirmpassword) {
-            alert('Passwords do not match!');
+            // alert('Passwords do not match!');
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Passwords do not match!',
+              });
             return;
         }
 
@@ -77,6 +82,7 @@ export default function SignUpScreen({ navigation }) {
             address2: form.address2,
             postalcode: form.postalcode,
             phonenumber: form.phonenumber1 + form.phonenumber2,
+            isactive: true,
             deviceid: (await DeviceInfo.getUniqueId()).toString(),
             fcmtoken: "COming SOon",
             devicetype: Platform.OS.toString(),
@@ -88,7 +94,12 @@ export default function SignUpScreen({ navigation }) {
 
         if (missingFields.length > 0) {
             const missingKeys = missingFields.map(([key]) => key).join(', ');
-            alert(`Please fill the following fields: ${missingKeys}`);
+            // alert(`Please fill the following fields: ${missingKeys}`);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: `Please fill the following fields: ${missingKeys}`,
+              });
             return;
         }
 
@@ -96,7 +107,12 @@ export default function SignUpScreen({ navigation }) {
         
         if (deviceid && fcmtoken && devicetype) {
         const res = await dispatch(signUp(userData)).unwrap();
-            alert(res.message);
+            // alert(res.message);
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: res.message,
+              });
             console.log("Signup successfully==>", res);
             navigation.navigate('Login');
             setForm({

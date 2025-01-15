@@ -9,6 +9,7 @@ import { Metrix } from '../../../config';
 import { useDispatch } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
 import { login } from '../../../assets/redux/Actions/authActions/loginAction';
+import Toast from 'react-native-toast-message';
 
 const Login = ({ navigation }) => {
 
@@ -27,7 +28,12 @@ const Login = ({ navigation }) => {
 
     const handleLogin = async () => {
         if (!email || !password) {
-            alert('Please fill in both email and password.');
+            // alert('Please fill in both email and password.');
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Please fill in both email and password.',
+              });
             return;
         }
 
@@ -46,11 +52,21 @@ const Login = ({ navigation }) => {
         // Call login action
         try {
             const res = await dispatch(login(userData)).unwrap();
-            alert(res.message);
-            console.log('Login successfully:', res);
+            // alert(res.message);
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: res.message,
+              });
+            console.log('Login successfully:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', res);
             navigation.navigate('SgTabs');
         } catch (err) {
-            alert('Login failed!');
+            // alert('Login failed!');
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Login failed!',
+              });
             console.error(err);
         }
     };
