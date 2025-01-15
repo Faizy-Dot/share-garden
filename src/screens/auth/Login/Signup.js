@@ -20,6 +20,7 @@ import { signUp } from "../../../assets/redux/Actions/authActions/signupAction";
 import { useNavigation } from "@react-navigation/native";
 import getDeviceDetails from "../../../config/DeviceDetails";
 import DeviceInfo from "react-native-device-info";
+import Toast from 'react-native-toast-message';
 
 export default function SignUpScreen({ navigation }) {
     const [form, setForm] = useState({
@@ -114,7 +115,7 @@ export default function SignUpScreen({ navigation }) {
                 text2: res.message,
               });
             console.log("Signup successfully==>", res);
-            navigation.navigate('Login');
+            navigation.navigate('SuccessSignup');
             setForm({
                 firstname: '',
                 lastname: '',
