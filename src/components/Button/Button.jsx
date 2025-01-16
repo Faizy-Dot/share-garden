@@ -27,7 +27,7 @@ export default function CustomButton({
             borderRadius,
             borderWidth,
             borderColor,
-            flex
+            flex,   
         }]} activeOpacity={0.8} onPress={onPress}>
             
             {

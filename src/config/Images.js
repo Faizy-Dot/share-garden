@@ -71,6 +71,7 @@ const Images = {
     sgItemsIcon : require('../assets/images/profile/sgItemsIcon.png'),
     rightArrowIcon : require('../assets/images/profile/rightArrowIcon.png'),
     profileAppLogo : require('../assets/images/profile/profileAppLogo.png'),
+    cameraIcon : require('../assets/images/profile/cameraIcon.png'),
 
 }
 
