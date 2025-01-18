@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { Colors, Fonts, Metrix } from "../../../config";
+import fonts from "../../../config/Fonts";
 
 const styles = StyleSheet.create({
     container: {
@@ -28,7 +29,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#EAEAEA',
         padding: Metrix.HorizontalSize(10),
-        fontSize: Metrix.FontExtraSmall
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily : fonts.InterSemiBold
     },
     forgotPassword: {
         color: '#000000',
@@ -47,8 +49,9 @@ const styles = StyleSheet.create({
 
     socialButtonIcon: {
         fontSize: Metrix.FontLarge,
-        marginRight: Metrix.HorizontalSize(20)
+        marginRight: Metrix.HorizontalSize(20),
     },
+    
     skipText: {
         fontSize: Metrix.FontRegular,
         fontFamily: Fonts.InterBold,

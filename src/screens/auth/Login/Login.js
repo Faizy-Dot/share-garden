@@ -8,7 +8,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Metrix } from '../../../config';
 import { useDispatch } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
-import { login } from '../../../assets/redux/Actions/authActions/loginAction';
+import { login } from '../../../redux/Actions/authActions/loginAction';
+import fonts from '../../../config/Fonts';
+import Toast from 'react-native-toast-message';
 
 const Login = ({ navigation }) => {
 
@@ -47,9 +49,21 @@ const Login = ({ navigation }) => {
         // Call login action
         try {
             const res = await dispatch(login(userData)).unwrap();
-            alert(res.message);
-            console.log('Login successfully:', res);
-            navigation.navigate('SgTabs');
+          
+            if(res.isSuccess){
+                console.log('Login successfully:', res);
+                navigation.navigate('SgTabs');
+                Toast.show({
+                    type: 'success',
+                    text1: res.message,
+                });
+            }else{
+                Toast.show({
+                    type: 'error',
+                    text1: res.message,
+                });
+                
+            }
         } catch (err) {
             alert('Login failed!');
             console.error(err);
@@ -107,6 +121,8 @@ const Login = ({ navigation }) => {
                     backgroundColor='#1B70D4'
                     width={Metrix.HorizontalSize(300)}
                     height={Metrix.VerticalSize(50)}
+                    fontSize={Metrix.FontExtraSmall}
+                    fontFamily={fonts.InterRegular}
                 />
 
                 <CustomButton
@@ -116,6 +132,8 @@ const Login = ({ navigation }) => {
                     backgroundColor='#F8443E'
                     width={Metrix.HorizontalSize(300)}
                     height={Metrix.VerticalSize(50)}
+                    fontSize={Metrix.FontExtraSmall}
+                    fontFamily={fonts.InterRegular}
                 />
 
                 <CustomButton
@@ -125,6 +143,8 @@ const Login = ({ navigation }) => {
                     backgroundColor='#000000'
                     width={Metrix.HorizontalSize(300)}
                     height={Metrix.VerticalSize(50)}
+                    fontSize={Metrix.FontExtraSmall}
+                    fontFamily={fonts.InterRegular}
                 />
             </View>
 

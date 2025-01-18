@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import ApiCaller from '../../../../config/ApiCaller';
+import ApiCaller from '../../../config/ApiCaller';
 
 // Async Thunk for SignUp
 export const signUp = createAsyncThunk('auth/signUp', async (userData, { rejectWithValue }) => {

@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import ApiCaller from '../../../../config/ApiCaller';
-
+import ApiCaller from '../../../config/ApiCaller';
 // Async Thunk for Login
 export const login = createAsyncThunk('auth/login', async (userData, { rejectWithValue }) => {
   try {
@@ -35,6 +34,9 @@ const loginSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    updateUserProfile: (state, action) => {
+      state.user = { ...state.user, ...action.payload }; // Update the user with new data
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -44,16 +46,21 @@ const loginSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.data.userinfo;
-        state.token = action.payload.data.token;
-        console.log("something to share", action.payload)
+  
+        // Check if the response is successful
+        if (action.payload.isSuccess && action.payload.data) {
+          state.user = action.payload.data.userinfo || null; // Assign userinfo or null
+          state.token = action.payload.data.token || null;  // Assign token or null
+        } else {
+          state.error = action.payload.message || 'An unknown error occurred';
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.status;
+        state.error = action.payload.message || 'Login failed';
       });
-  },
+  }
 });
 
-export const { clearError, logout } = loginSlice.actions;
+export const { clearError, logout,updateUserProfile } = loginSlice.actions;
 export default loginSlice.reducer;

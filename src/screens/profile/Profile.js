@@ -7,7 +7,8 @@ import styles from './styles';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
 import { useSelector } from "react-redux";
 import { useDispatch } from 'react-redux';
-import { logout } from '../../assets/redux/Actions/authActions/loginAction';
+import { logout } from '../../redux/Actions/authActions/loginAction';
+import Toast from 'react-native-toast-message';
 
 
 
@@ -86,7 +87,10 @@ export default function Profile({ navigation }) {
 
   const handleLogout = () => {
     dispatch(logout());
-    console.log('Logged out successfully!');
+   Toast.show({
+                    type: 'success',
+                    text1: "Logout Successfully",
+                });
     navigation.navigate('Login');
     // Redirect or any other action can be added here
   };
@@ -126,9 +130,9 @@ export default function Profile({ navigation }) {
 
                 <View style={styles.navBar}>
                     <Image source={Images.homeProfile} style={styles.profileImg} />
-                    <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15) }}>
+                    <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15),marginLeft : Metrix.HorizontalSize(15) }}>
                         <View style={{ gap: Metrix.VerticalSize(5) }}>
-                            <Text style={styles.userName}>{user?.firstname} {user?.lastname}</Text>
+                            <Text style={styles.userName}>{user ? user.firstname + user.lastname : "Ashley Simson"}</Text>
                             <Text onPress={()=> navigation.navigate("EditProfile")} style={styles.editProfile}>Edit Profile</Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5) }}>

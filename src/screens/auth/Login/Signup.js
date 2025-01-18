@@ -16,11 +16,11 @@ import colors from "../../../config/Colors";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import CustomButton from "../../../components/Button/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { signUp } from "../../../assets/redux/Actions/authActions/signupAction";
 import { useNavigation } from "@react-navigation/native";
 import getDeviceDetails from "../../../config/DeviceDetails";
 import DeviceInfo from "react-native-device-info";
 import Toast from 'react-native-toast-message';
+import { signUp } from "../../../redux/Actions/authActions/signupAction";
 
 export default function SignUpScreen({ navigation }) {
     const [form, setForm] = useState({

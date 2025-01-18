@@ -37,7 +37,7 @@ const myPosts = [
 
 const ItemsTabScreen = ({ route }) => {
 
-    const { loading, error, user } = useSelector((state) => state.auth);
+    const { loading, error, user } = useSelector((state) => state.login);
 
     console.log("user login=>", user)
 

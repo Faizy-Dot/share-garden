@@ -8,9 +8,9 @@ import colors from './src/config/Colors';
 import { StatusBar } from 'react-native';
 import Profile from './src/screens/profile/Profile';
 import { Provider } from 'react-redux';
-import store from './src/assets/redux/store';
 import EditProfile from './src/screens/profile/editProfile/EditProfile';
 import Toast from 'react-native-toast-message'; // Import Toast
+import store from './src/redux/store';
 
  
 const Stack = createNativeStackNavigator();

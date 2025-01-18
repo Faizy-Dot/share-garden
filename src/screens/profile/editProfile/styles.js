@@ -30,8 +30,7 @@ const styles = StyleSheet.create({
         fontSize: Metrix.normalize(15),
         fontFamily: fonts.InterLight,
         height: Metrix.VerticalSize(40),
-        paddingLeft: Metrix.HorizontalSize(15)
-
+        paddingLeft: Metrix.HorizontalSize(15),
     },
     editProfileText: {
         fontSize: Metrix.normalize(20),
@@ -63,12 +62,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 16.5,
-        left: Metrix.HorizontalSize(80),
+        left: Metrix.HorizontalSize(56),
         bottom: 0
     },
     userName: {
         fontSize: Metrix.FontSmall,
-        fontFamily: fonts.InterBold
+        fontFamily: fonts.InterBold,
+        
     },
     topInputContainer: {
         marginTop: Metrix.VerticalSize(30),

@@ -18,7 +18,6 @@ const styles = StyleSheet.create({
     navBar: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
         width: "100%",
         paddingHorizontal: Metrix.HorizontalSize(20),
         marginTop: Metrix.VerticalSize(12)
@@ -55,7 +54,8 @@ const styles = StyleSheet.create({
     },
     userName: {
         fontSize: Metrix.FontRegular,
-        fontFamily: fonts.InterSemiBold
+        fontFamily: fonts.InterSemiBold,
+        width : Metrix.HorizontalSize(105)
     },
     editProfile: {
         fontSize: Metrix.FontSmall,
