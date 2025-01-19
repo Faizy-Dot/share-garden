@@ -21,20 +21,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 var baseUrl = 'https://api.sharegarden.ca/api/';
 
-const TabBarButton = ({ iconSource, label, focused, onPress }) => (
-    <TouchableOpacity onPress={onPress} style={styles.tabButton} activeOpacity={1}>
-        <Image
-            source={iconSource}
-            style={{
-                width: Metrix.HorizontalSize(28),
-                height: Metrix.VerticalSize(28),
-                resizeMode: "contain",
-                tintColor: focused ? colors.buttonColor : colors.black,
-            }}
-        />
-        <Text style={[styles.tabLabel, { color: focused ? colors.buttonColor : colors.black }]}>{label}</Text>
-    </TouchableOpacity>
-);
 
 export default function EditProfile({ navigation }) {
     const { user, token } = useSelector((state) => state.login);
@@ -447,13 +433,7 @@ export default function EditProfile({ navigation }) {
 
             </View>
 
-            <View style={styles.tabBarContainer}>
-                <TabBarButton onPress={() => navigation.navigate("SgTabs", { screen: "Post" })} iconSource={Images.postBlackTab} label="Post" />
-                <TabBarButton onPress={() => navigation.navigate("SgTabs", { screen: "Tips" })} iconSource={Images.tipsBlackTab} label="Tips" />
-                <TabBarButton onPress={() => navigation.navigate("SgTabs", { screen: "Items" })} iconSource={Images.itemsBlackTab} label="Items" />
-                <TabBarButton onPress={() => navigation.navigate("SgTabs", { screen: "Rewards" })} iconSource={Images.rewardsBlackTab} label="Rewards" />
-                <TabBarButton onPress={() => navigation.navigate("SgTabs", { screen: "Ads" })} iconSource={Images.adsBlackTab} label="Ads" />
-            </View>
+          
         </View>
     );
 }

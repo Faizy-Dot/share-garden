@@ -11,6 +11,10 @@ import colors from './src/config/Colors';
 import { StatusBar } from 'react-native';
 import Toast from 'react-native-toast-message';
 import store from './src/redux/store';
+import ProductDetail from './src/screens/sgTabs/items/ProductDetail';
+import ForgotPassword from './src/screens/auth/Login/frogotPassword/ForgotPassword';
+import OneTimePassword from './src/screens/auth/Login/frogotPassword/OneTimePassword';
+import ResetPassword from './src/screens/auth/Login/frogotPassword/ResetPassword';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,9 +46,10 @@ function AppNavigator() {
           // Authenticated user screens
           <>
             <Stack.Screen name="SgTabs" component={SgTabNavigator} />
-            <Stack.Screen name="Profile" component={Profile} />
-            <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+            <Stack.Screen name="OneTimePassword" component={OneTimePassword} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
           </>
         ) : (
           // Unauthenticated user screens
@@ -54,7 +59,10 @@ function AppNavigator() {
             <Stack.Screen name="GetStarted" component={GetStarted} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Signup" component={Signup} />
-            <Stack.Screen name="SuccessSignup" component={SuccessSignupScreen} />
+            <Stack.Screen name="SuccessSignup" component={SuccessSignupScreen}/>
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+            <Stack.Screen name="OneTimePassword" component={OneTimePassword} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
           </>
         )}
       </Stack.Navigator>

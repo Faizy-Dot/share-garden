@@ -22,24 +22,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: Metrix.HorizontalSize(20),
         marginTop: Metrix.VerticalSize(12)
     },
-    tabBarContainer: {
-        flexDirection: 'row',
-        height: Metrix.VerticalSize(60),
-        width: "100%",
-        backgroundColor: colors.white,
-        borderTopWidth: 1,
-        borderTopColor: colors.borderColor,
-    },
-    tabButton: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    tabLabel: {
-        fontSize: Metrix.FontExtraSmall,
-        fontFamily: fonts.InterMedium,
-        marginTop: Metrix.VerticalSize(2),
-    },
+
     geenBitImg: {
         width: Metrix.HorizontalSize(24),
         height: Metrix.HorizontalSize(24),

@@ -36,24 +36,6 @@ const styles = StyleSheet.create({
         fontSize: Metrix.normalize(20),
         fontFamily: fonts.InterBold
     },
-    tabBarContainer: {
-        flexDirection: 'row',
-        height: Metrix.VerticalSize(60),
-        width: "100%",
-        backgroundColor: colors.white,
-        borderTopWidth: 1,
-        borderTopColor: colors.borderColor,
-    },
-    tabButton: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    tabLabel: {
-        fontSize: Metrix.FontExtraSmall,
-        fontFamily: fonts.InterMedium,
-        marginTop: Metrix.VerticalSize(2),
-    },
     cameraPicker: {
         backgroundColor: colors.buttonColor,
         width: Metrix.VerticalSize(33),

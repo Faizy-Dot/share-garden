@@ -1,18 +1,15 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Image, FlatList, TouchableOpacity, ScrollView } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
-import { Fonts, Images, Metrix } from "../../../config";
+import React from "react";
+import { View, Text, Image, FlatList, TouchableOpacity, ScrollView } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Fonts, Images, Metrix } from "../../../config";
 import styles from "./styles";
 import CustomButton from "../../../components/Button/Button";
-import fonts from "../../../config/Fonts";
 import colors from "../../../config/Colors";
 import NavBar from "../../../components/navBar/NavBar";
 import CustomInput from "../../../components/customInput/CustomInput";
 import CategoryFlatList from "../../../components/categoryFlatList/CategoryFlatList";
 import { useSelector } from "react-redux";
-
-
 
 const popularListings = [
     { id: "1", title: "Single Bed", location: "First Floor Maya Apartments", price: "8.5", image: Images.homePopularListing, bit: true, dollarLogo: false },
@@ -21,28 +18,21 @@ const popularListings = [
 ];
 
 const myPosts = [
-    {
-        id: 1,
-        post: "Single bed in Toronto"
-    },
-    {
-        id: 2,
-        post: "Audi A6 in Toronto"
-    },
-    {
-        id: 3,
-        post: "Sofa Set in Toronto"
-    }
-]
+    { id: 1, post: "Single bed in Toronto" },
+    { id: 2, post: "Audi A6 in Toronto" },
+    { id: 3, post: "Sofa Set in Toronto" }
+];
 
-const ItemsTabScreen = ({ route }) => {
-
-    const { loading, error, user } = useSelector((state) => state.login);
-
-    console.log("user login=>", user)
+const ItemsTabScreen = () => {
+    const navigation = useNavigation();
+    const { user } = useSelector((state) => state.login);
 
     const renderPopularListing = ({ item }) => (
-        <TouchableOpacity activeOpacity={0.8} style={styles.listingContainer}>
+        <TouchableOpacity 
+            activeOpacity={0.8} 
+            style={styles.listingContainer}
+            onPress={() => navigation.navigate('ProductDetail', { item })}
+        >
             <Image source={item.image} style={styles.listingImage} />
             <Text style={styles.listingTitle}>{item.title}</Text>
             <Text style={styles.listingLocation}>{item.location}</Text>
@@ -52,60 +42,53 @@ const ItemsTabScreen = ({ route }) => {
                 ) : item.dollarLogo ? (
                     <Image source={Images.homeDollarLogo} />
                 ) : null}
-
                 <Text style={styles.listingPrice}>{item.price}</Text>
             </View>
-        </TouchableOpacity >
-    )
+        </TouchableOpacity>
+    );
 
     const renderMyPosts = ({ item }) => (
         <TouchableOpacity activeOpacity={0.8} style={styles.postBox}>
             <Image source={Images.homePostVector} style={{ width: Metrix.VerticalSize(14), height: Metrix.VerticalSize(14) }} />
-            <Text style={{ fontSize: Metrix.customFontSize(10), fontFamily: fonts.InterLight }}>{item.post}</Text>
-        </TouchableOpacity >
+            <Text style={{ fontSize: Metrix.customFontSize(10), fontFamily: Fonts.InterLight }}>{item.post}</Text>
+        </TouchableOpacity>
     );
-
 
     return (
         <KeyboardAwareScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-
             <View style={styles.header}>
                 <Image source={Images.homeLogo} style={styles.logo} />
             </View>
 
-
-
-            {
-                user ?
-                    <View style={{ paddingHorizontal: Metrix.HorizontalSize(15) }}>
-                        <NavBar
-                            title={"SG Marketplace"} />
+            {user ? (
+                <View style={{ paddingHorizontal: Metrix.HorizontalSize(15) }}>
+                    <NavBar title={"SG Marketplace"} />
+                </View>
+            ) : (
+                <View style={styles.address}>
+                    <Image source={Images.homeLocation} style={styles.locationLogo} />
+                    <View>
+                        <Text style={{ fontSize: Metrix.FontRegular, fontFamily: Fonts.InterBold }}>Maya Appartments</Text>
+                        <Text style={{ fontSize: Metrix.FontExtraSmall }}>2132 Halsey Avenue, Toronto</Text>
                     </View>
-                    :
-                    <View style={styles.address}>
-                        <Image source={Images.homeLocation} style={styles.locationLogo} />
-                        <View>
-                            <Text style={{ fontSize: Metrix.FontRegular, fontFamily: Fonts.InterBold }}>Maya Appartments</Text>
-                            <Text style={{ fontSize: Metrix.FontExtraSmall }}>2132 Halsey Avenue, Toronto</Text>
-                        </View>
-                    </View>
+                </View>
+            )}
 
-            }
             <View style={{ marginTop: Metrix.VerticalSize(20) }}>
-                <CustomInput justifyContent={'space-around'}
+                <CustomInput 
+                    justifyContent={'space-around'}
                     iconCondition={true}
-                    placeholder={"Search items near you"} />
+                    placeholder={"Search items near you"} 
+                />
             </View>
 
             <View style={styles.middle}>
-                {
-                    !user &&
-
+                {!user && (
                     <View>
                         <Image source={Images.homeBackground} style={styles.homeBackgroundImg} />
                         <View style={styles.middleShown}>
                             <Image source={Images.homeLogo} style={styles.middleLogo} />
-                            <View >
+                            <View>
                                 <Text style={{ fontSize: Metrix.normalize(19), fontFamily: Fonts.InterBold, textAlign: "center" }}>Empowering</Text>
                                 <Text style={{ fontSize: Metrix.normalize(19), fontFamily: Fonts.InterRegular, textAlign: "center", position: "relative", bottom: Metrix.VerticalSize(7) }}>Sustainable Exchanges</Text>
                             </View>
@@ -116,36 +99,31 @@ const ItemsTabScreen = ({ route }) => {
                                 backgroundColor="#E35498"
                                 borderRadius={Metrix.HorizontalSize(4)}
                                 fontSize={Metrix.FontExtraSmall}
-                                fontFamily={fonts.InterLight}
+                                fontFamily={Fonts.InterLight}
                             />
                         </View>
                     </View>
-                }
+                )}
 
                 <View style={[styles.categoryContainer, user && { marginTop: Metrix.VerticalSize(0) }]}>
-                    {
-                        !user &&
-
+                    {!user && (
                         <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Categories</Text>
-                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
+                            <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: Fonts.InterBold }}>Categories</Text>
+                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: Fonts.InterSemiBold }}>See All</Text>
                         </View>
-                    }
-                    <View style={{ marginTop: Metrix.VerticalSize(15)}}>
+                    )}
+                    <View style={{ marginTop: Metrix.VerticalSize(15) }}>
                         <CategoryFlatList />
                     </View>
-
                 </View>
 
                 <View style={[styles.popularListingsContainer, user && { marginTop: Metrix.VerticalSize(20) }]}>
-                    {
-                        !user &&
-
+                    {!user && (
                         <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Popular Listings</Text>
-                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
+                            <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: Fonts.InterBold }}>Popular Listings</Text>
+                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: Fonts.InterSemiBold }}>See All</Text>
                         </View>
-                    }
+                    )}
 
                     <FlatList
                         data={popularListings}
@@ -155,19 +133,15 @@ const ItemsTabScreen = ({ route }) => {
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={styles.categoryList}
                     />
-
                 </View>
-                {
-                    !user &&
 
-                    <View>
+                {!user && (
+                    <>
                         <View style={styles.merchantShowcaseContainer}>
                             <View>
-                                <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Merchants's Showcase</Text>
+                                <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: Fonts.InterBold }}>Merchants's Showcase</Text>
                             </View>
-                            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={
-                                { gap: Metrix.HorizontalSize(8) }
-                            }>
+                            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: Metrix.HorizontalSize(8) }}>
                                 <TouchableOpacity activeOpacity={0.8}>
                                     <Image source={Images.homeMerchantShowcasetion} style={styles.merchantImg} />
                                 </TouchableOpacity>
@@ -179,31 +153,27 @@ const ItemsTabScreen = ({ route }) => {
 
                         <View style={styles.postContainer}>
                             <View>
-                                <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>My Posts</Text>
+                                <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: Fonts.InterBold }}>My Posts</Text>
                             </View>
                             <FlatList
                                 data={myPosts}
                                 renderItem={renderMyPosts}
-                                keyExtractor={(item) => item.id}
+                                keyExtractor={(item) => item.id.toString()}
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
                                 contentContainerStyle={styles.myPost}
                             />
-
                         </View>
-
-                    </View>
-                }
+                    </>
+                )}
 
                 <View style={styles.popularListingsContainer}>
-                    {
-                        !user &&
-
+                    {!user && (
                         <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Toys</Text>
-                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
+                            <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: Fonts.InterBold }}>Toys</Text>
+                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: Fonts.InterSemiBold }}>See All</Text>
                         </View>
-                    }
+                    )}
 
                     <FlatList
                         data={popularListings}
@@ -213,18 +183,15 @@ const ItemsTabScreen = ({ route }) => {
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={styles.categoryList}
                     />
-
                 </View>
 
                 <View style={styles.popularListingsContainer}>
-                    {
-                        !user &&
-
+                    {!user && (
                         <View style={{ justifyContent: "space-between", flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Books</Text>
-                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>See All</Text>
+                            <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontRegular, fontFamily: Fonts.InterBold }}>Books</Text>
+                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: Fonts.InterSemiBold }}>See All</Text>
                         </View>
-                    }
+                    )}
 
                     <FlatList
                         data={popularListings}
@@ -234,16 +201,10 @@ const ItemsTabScreen = ({ route }) => {
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={styles.categoryList}
                     />
-
                 </View>
-
             </View>
-
-
         </KeyboardAwareScrollView>
     );
 };
-
-
 
 export default ItemsTabScreen;
