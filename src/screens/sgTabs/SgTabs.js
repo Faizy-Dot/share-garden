@@ -4,7 +4,6 @@ import ItemsTabScreen from "./items/Items";
 import RewardsTabScreen from "./rewards/Rewards";
 import AdsTabScreen from "./ads/Ads";
 import TipsTabScreen from "./tips/Tips"
-import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "react-native";
 import { Images, Metrix } from "../../config";

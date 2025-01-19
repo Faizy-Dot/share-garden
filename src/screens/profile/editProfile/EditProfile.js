@@ -16,6 +16,7 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { Alert } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { updateUserProfile } from '../../../redux/Actions/authActions/loginAction';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 var baseUrl = 'https://api.sharegarden.ca/api/';
@@ -44,7 +45,7 @@ export default function EditProfile({ navigation }) {
     const [gender, setGender] = useState(user?.gender)
     const [imageUri, setImageUri] = useState(null);
     const [date, setDate] = useState(new Date()); // Current date
-    const [formattedDate, setFormattedDate] = useState(user?.dob); 
+    const [formattedDate, setFormattedDate] = useState(user?.dob);
     const [open, setOpen] = useState(false); // Modal visibility
     const dispatch = useDispatch();
 
@@ -63,7 +64,7 @@ export default function EditProfile({ navigation }) {
                 text1: 'Validation Error',
                 text2: 'All fields are required!',
             });
-            return; 
+            return;
         }
 
         try {
@@ -283,13 +284,19 @@ export default function EditProfile({ navigation }) {
                         alignItems: "center"
                     }}>
                         <TouchableOpacity activeOpacity={0.8} onPress={handleImagePicker}>
-                            <Image source={Images.homeProfile} style={{ width: Metrix.HorizontalSize(80), height: Metrix.HorizontalSize(80) }} />
+                            {
+                                user.profilePicutreUrl ?
+                                    <Image  source={{ uri: user.profilePicutreUrl }} style={{ width: Metrix.HorizontalSize(80), height: Metrix.HorizontalSize(80) }} />
+                                    :
+                                    <Icon name="user-circle" size={Metrix.HorizontalSize(80)} color="#ccc"  />
+
+                            }
                             <View style={styles.cameraPicker}>
                                 <Image source={Images.cameraIcon} />
                             </View>
                         </TouchableOpacity>
                         <View style={{ gap: 10, flex: 1 }}>
-                            <Text style={[styles.userName, { fontSize: Metrix.FontExtraLarge, }]}>{user?.firstname +" "+ user?.lastname}</Text>
+                            <Text style={[styles.userName, { fontSize: Metrix.FontExtraLarge, }]}>{user?.firstname + " " + user?.lastname}</Text>
                         </View>
                     </View>
 
@@ -316,14 +323,14 @@ export default function EditProfile({ navigation }) {
                         <View style={{ gap: Metrix.VerticalSize(7) }}>
                             <Text style={styles.userName}>Last Name</Text>
                             <TextInput style={styles.inputs}
-                               onChangeText={setLname}
-                               value={lname} />
+                                onChangeText={setLname}
+                                value={lname} />
                         </View>
                         <View style={{ gap: Metrix.VerticalSize(7) }}>
                             <Text style={styles.userName}>Something about you</Text>
                             <TextInput style={styles.inputs}
-                               onChangeText={setAbout}
-                               value={about} />
+                                onChangeText={setAbout}
+                                value={about} />
                         </View>
                         <View style={{ gap: Metrix.VerticalSize(7) }}>
                             <Text style={styles.userName}>Gender</Text>
@@ -393,10 +400,10 @@ export default function EditProfile({ navigation }) {
                         <View style={{ gap: Metrix.VerticalSize(7) }}>
                             <Text style={styles.userName}>Email</Text>
                             <TextInput style={styles.inputs}
-                            value={user?.emailaddress} 
-                            editable={false} 
-                            selectTextOnFocus={false} 
-                            disableFullscreenUI={true}
+                                value={user?.emailaddress}
+                                editable={false}
+                                selectTextOnFocus={false}
+                                disableFullscreenUI={true}
                             />
                             <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterRegular }}>This email will be useful to keep in touch. we dont share your private email address with other SG users</Text>
                         </View>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Images, Metrix } from "../../../config";
 import BackArrowIcon from "../../../components/backArrowIcon/BackArrowIcon";
@@ -11,15 +11,21 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import DropdownComponent from "../../../components/dropDown/DropDownInput";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import CustomButton from "../../../components/Button/Button";
+import { useSelector } from "react-redux";
+import Toast from "react-native-toast-message";
 
 
-export default function PostTabScreen() {
+export default function PostTabScreen({ navigation }) {
     const [activeButton, setActiveButton] = useState("SG Item");
     const [sgPoints, setSGPoints] = useState(false);
     const [cash, setCash] = useState(false);
     const [images, setImages] = useState([null, null, null]); // State to store up to 3 images
     const [checked, setChecked] = useState(""); // State to track the selected checkbox
     const checkBoxNames = ["Fairly Used", "Good", "Excellent"];
+
+    const {user} = useSelector((state)=> state.login)
+
+   
 
     const handleCheckboxChange = (key) => {
         setChecked(key); // Set the selected checkbox
@@ -47,8 +53,24 @@ export default function PostTabScreen() {
         }
     };
 
+    
+      useEffect(() => {
+          if (!user) {
+                  navigation.navigate("Login")
+                    Toast.show({
+                                  type: 'error',
+                                  text1: 'Login or Signup',
+                                  text2: 'First Login plz',
+                              });
+              }
+      }, [user, navigation]);
+  
+      if (!user) {
+          return null;
+      }
+
     return (
-        <KeyboardAwareScrollView style={styles.postContainer} >
+        <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false}>
             <View>
                 <BackArrowIcon />
             </View>
@@ -171,30 +193,30 @@ export default function PostTabScreen() {
                     numberOfLines={4}
                     placeholder="Description"
                     placeholderTextColor={colors.black}
-                     textAlignVertical="top"
+                    textAlignVertical="top"
                 />
 
             </View>
 
 
             <View style={styles.bottomButtons}>
-                
-                <CustomButton
-                height={Metrix.VerticalSize(42)}
-                title={"PREVIEW"}
-                backgroundColor={colors.white}
-                color={colors.black}
-                borderWidth={1}
-                borderColor={colors.borderColor}
-                borderRadius={Metrix.VerticalSize(4)}
-                flex={1}/>
 
-                <CustomButton 
-                height={Metrix.VerticalSize(42)}
-                title={"PUBLISH"}
-                backgroundColor={colors.buttonColor}
-                borderRadius={Metrix.VerticalSize(4)}
-                flex={1}/>
+                <CustomButton
+                    height={Metrix.VerticalSize(42)}
+                    title={"PREVIEW"}
+                    backgroundColor={colors.white}
+                    color={colors.black}
+                    borderWidth={1}
+                    borderColor={colors.borderColor}
+                    borderRadius={Metrix.VerticalSize(4)}
+                    flex={1} />
+
+                <CustomButton
+                    height={Metrix.VerticalSize(42)}
+                    title={"PUBLISH"}
+                    backgroundColor={colors.buttonColor}
+                    borderRadius={Metrix.VerticalSize(4)}
+                    flex={1} />
             </View>
         </KeyboardAwareScrollView>
     );

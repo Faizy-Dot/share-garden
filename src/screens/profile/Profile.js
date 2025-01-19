@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/Actions/authActions/loginAction';
 import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 
@@ -70,7 +71,7 @@ const profileData = [
         image: Images.profileAppLogo,
         title: "Help & Support Share Garden",
         description: "Help centre and legal terms",
-        borders : true
+        borders: true
     },
     {
         id: 9,
@@ -85,30 +86,30 @@ export default function Profile({ navigation }) {
     const { loading, error, user } = useSelector((state) => state.login);
     const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    dispatch(logout());
-   Toast.show({
-                    type: 'success',
-                    text1: "Logout Successfully",
-                });
-    navigation.navigate('Login');
-    // Redirect or any other action can be added here
-  };
+    const handleLogout = () => {
+        dispatch(logout());
+        Toast.show({
+            type: 'success',
+            text1: "Logout Successfully",
+        });
+        navigation.navigate('Login');
+        // Redirect or any other action can be added here
+    };
 
-  const handleItemPress = (item) => {
-    if (item.title === 'Logout') {
-      handleLogout(); // Call logout when "Logout" is pressed
-    } else {
-      console.log(`Navigating to ${item.label}`);
-      // Navigate to other screens based on item.label
-    }
-  };
+    const handleItemPress = (item) => {
+        if (item.title === 'Logout') {
+            handleLogout(); // Call logout when "Logout" is pressed
+        } else {
+            console.log(`Navigating to ${item.label}`);
+            // Navigate to other screens based on item.label
+        }
+    };
     const renderProfileData = ({ item }) => {
         return (
             <TouchableOpacity onPress={() => handleItemPress(item)}>
-                <View style={[styles.profileDataContainer , item.borders && styles.helpBox]}>
-                    <Image source={item.image} style={{resizeMode : "contain", width : Metrix.HorizontalSize(30)}}/>
-                    <View style={{ gap: Metrix.VerticalSize(5),marginLeft :20,flex :1 }}>
+                <View style={[styles.profileDataContainer, item.borders && styles.helpBox]}>
+                    <Image source={item.image} style={{ resizeMode: "contain", width: Metrix.HorizontalSize(30) }} />
+                    <View style={{ gap: Metrix.VerticalSize(5), marginLeft: 20, flex: 1 }}>
                         <Text style={styles.title}>{item.title}</Text>
                         {
                             item.description &&
@@ -124,16 +125,23 @@ export default function Profile({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                <View style={{ marginTop: Metrix.VerticalSize(13),paddingHorizontal: Metrix.HorizontalSize(15), }}>
+                <View style={{ marginTop: Metrix.VerticalSize(13), paddingHorizontal: Metrix.HorizontalSize(15), }}>
                     <BackArrowIcon />
                 </View>
 
                 <View style={styles.navBar}>
-                    <Image source={Images.homeProfile} style={styles.profileImg} />
-                    <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15),marginLeft : Metrix.HorizontalSize(15) }}>
+                    {
+                        user.profilePicutreUrl ?
+                            <Image source={{ uri: user.profilePicutreUrl }} style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64) }} />
+                            :
+                            <Icon name="user-circle" size={Metrix.HorizontalSize(64)} color="#ccc" />
+
+                    }
+                  
+                    <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15), marginLeft: Metrix.HorizontalSize(15) }}>
                         <View style={{ gap: Metrix.VerticalSize(5) }}>
                             <Text style={styles.userName}>{user ? user.firstname + user.lastname : "Ashley Simson"}</Text>
-                            <Text onPress={()=> navigation.navigate("EditProfile")} style={styles.editProfile}>Edit Profile</Text>
+                            <Text onPress={() => navigation.navigate("EditProfile")} style={styles.editProfile}>Edit Profile</Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5) }}>
                             <Text>50200</Text>
@@ -145,8 +153,8 @@ export default function Profile({ navigation }) {
 
                 </View>
 
-       
-                <View style={{ marginTop: Metrix.VerticalSize(15), flex: 1 ,}}>
+
+                <View style={{ marginTop: Metrix.VerticalSize(15), flex: 1, }}>
 
                     <FlatList data={profileData}
                         renderItem={renderProfileData}

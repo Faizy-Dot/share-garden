@@ -3,16 +3,20 @@ import BackArrowIcon from "../../../components/backArrowIcon/BackArrowIcon";
 import NavBar from "../../../components/navBar/NavBar";
 import styles from "./styles";
 import colors from "../../../config/Colors";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Images, Metrix } from "../../../config";
 import fonts from "../../../config/Fonts";
+import { useSelector } from "react-redux";
+import Toast from "react-native-toast-message";
 
-export default function RewardsTabScreen() {
+export default function RewardsTabScreen({navigation}) {
 
+    const {user} = useSelector((state)=> state.login)
     const [buttons, setButtons] = useState({
         sgPoints: true,
         sgCoupons: false
     })
+
 
     const buttonOptions = [
         { key: 'sgPoints', label: 'SG Points', color: colors.buttonColor },
@@ -42,6 +46,22 @@ export default function RewardsTabScreen() {
                     </View>
                 </View>
         )
+    }
+
+    
+    useEffect(() => {
+        if (!user) {
+                navigation.navigate("Login")
+                  Toast.show({
+                                type: 'error',
+                                text1: 'Login or Signup',
+                                text2: 'First Login plz',
+                            });
+            }
+    }, [user, navigation]);
+
+    if (!user) {
+        return null;
     }
 
     return (
