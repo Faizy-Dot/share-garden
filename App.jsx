@@ -8,7 +8,7 @@ import Profile from './src/screens/profile/Profile';
 import EditProfile from './src/screens/profile/editProfile/EditProfile';
 import { NavigationService } from './src/config';
 import colors from './src/config/Colors';
-import { StatusBar } from 'react-native';
+import { StatusBar, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 import store from './src/redux/store';
 import ProductDetail from './src/screens/sgTabs/items/ProductDetail';
@@ -33,10 +33,14 @@ function AppNavigator() {
       onStateChange={() => {
         const currentRoute = NavigationService.getCurrentRoute();
         if (currentRoute.name === 'OnBoarding') {
-          StatusBar.setBackgroundColor(colors.onBoardColor);
+            if (Platform.OS === 'android') {
+            StatusBar.setBackgroundColor(colors.white); // Android-specific
+            }
           StatusBar.setBarStyle('light-content');
         } else {
-          StatusBar.setBackgroundColor(colors.white);
+            if (Platform.OS === 'android') {
+            StatusBar.setBackgroundColor(colors.white); // Android-specific
+            }
           StatusBar.setBarStyle('dark-content');
         }
       }}
