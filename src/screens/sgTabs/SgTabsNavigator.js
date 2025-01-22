@@ -7,6 +7,9 @@ import RewardsTabScreen from "./rewards/Rewards";
 import AdsTabScreen from "./ads/Ads";
 import Profile from "../profile/Profile";
 import EditProfile from "../profile/editProfile/EditProfile";
+import SgUserNotification from "../sgUserNotifcation/SgUserNotification";
+import SgUserChat from "../sgUserChat/SgUserChat";
+import EarnSGpts from "../profile/earnSGpts/EarnSGpts";
 
 const ItemsStack = createNativeStackNavigator();
 
@@ -17,6 +20,9 @@ function PostStackScreen() {
         <ItemsStack.Screen name="PostList" component={PostTabScreen} />
         <ItemsStack.Screen name="Profile" component={Profile} />
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
+        <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
+        <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
       </ItemsStack.Navigator>
     );
   }
@@ -26,6 +32,9 @@ function PostStackScreen() {
         <ItemsStack.Screen name="TipsList" component={TipsTabScreen} />
         <ItemsStack.Screen name="Profile" component={Profile} />
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
+        <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
+        <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
       </ItemsStack.Navigator>
     );
   }
@@ -36,6 +45,9 @@ function PostStackScreen() {
         <ItemsStack.Screen name="ProductDetail" component={ProductDetail} />
         <ItemsStack.Screen name="Profile" component={Profile} />
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
+        <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
+        <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
       </ItemsStack.Navigator>
     );
   }
@@ -45,6 +57,9 @@ function PostStackScreen() {
         <ItemsStack.Screen name="RewardsList" component={RewardsTabScreen} />
         <ItemsStack.Screen name="Profile" component={Profile} />
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
+        <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
+        <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
       </ItemsStack.Navigator>
     );
   }
@@ -54,6 +69,9 @@ function PostStackScreen() {
         <ItemsStack.Screen name="AdsList" component={AdsTabScreen} />
         <ItemsStack.Screen name="Profile" component={Profile} />
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
+        <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
+        <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
       </ItemsStack.Navigator>
     );
   }

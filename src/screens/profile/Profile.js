@@ -20,7 +20,8 @@ const profileData = [
         id: 1,
         image: Images.earnCoinIcon,
         title: "How to earn SG Pts",
-        description: "how it works to earn points"
+        description: "how it works to earn points",
+        navigationPath : "EarnSGpts"
     },
     {
         id: 2,
@@ -86,13 +87,13 @@ export default function Profile({ navigation }) {
         if (item.title === 'Logout') {
             handleLogout(); // Call logout when "Logout" is pressed
         } else {
-            console.log(`Navigating to ${item.label}`);
+           navigation.navigate(`${item.navigationPath}`)
             // Navigate to other screens based on item.label
         }
     };
     const renderProfileData = ({ item }) => {
         return (
-            <TouchableOpacity onPress={() => handleItemPress(item)}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => handleItemPress(item)}>
                 <View style={[styles.profileDataContainer, item.borders && styles.helpBox]}>
                     <Image source={item.image} style={{ resizeMode: "contain", width: Metrix.HorizontalSize(30) }} />
                     <View style={{ gap: Metrix.VerticalSize(5), marginLeft: 20, flex: 1 }}>
@@ -133,8 +134,34 @@ export default function Profile({ navigation }) {
                             <Text>50200</Text>
                             <Image source={Images.homeGreenBit} style={styles.geenBitImg} />
                         </View>
-                        <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
-                        <Image source={Images.homeBellIcon} style={styles.bellIcon} />
+                        <TouchableOpacity onPress={() => {
+                                          if (user) {
+                                              navigation.navigate("SgUserChat")
+                                          } else {
+                                              navigation.navigate("Login")
+                                              Toast.show({
+                                                  type: 'error',
+                                                  text1: 'Login or Signup',
+                                                  text2: 'First Login plz',
+                                              });
+                                          }
+                                      }} activeOpacity={0.8}>
+                                          <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
+                                      </TouchableOpacity>
+                                      <TouchableOpacity onPress={() => {
+                                          if (user) {
+                                              navigation.navigate("SgUserNotification")
+                                          } else {
+                                              navigation.navigate("Login")
+                                              Toast.show({
+                                                  type: 'error',
+                                                  text1: 'Login or Signup',
+                                                  text2: 'First Login plz',
+                                              });
+                                          }
+                                      }} activeOpacity={0.8}>
+                                          <Image source={Images.homeBellIcon} style={styles.bellIcon} />
+                                      </TouchableOpacity>
                     </View>
 
                 </View>

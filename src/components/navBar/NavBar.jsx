@@ -21,8 +21,34 @@ export default function NavBar({ title }) {
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>50200</Text>
                     <Image source={Images.homeGreenBit} style={styles.greenBit} />
                 </View>
-                <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
-                <Image source={Images.homeBellIcon} style={styles.bellIcon} />
+                <TouchableOpacity onPress={() => {
+                    if (user) {
+                        navigation.navigate("SgUserChat")
+                    } else {
+                        navigation.navigate("Login")
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Login or Signup',
+                            text2: 'First Login plz',
+                        });
+                    }
+                }} activeOpacity={0.8}>
+                    <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    if (user) {
+                        navigation.navigate("SgUserNotification")
+                    } else {
+                        navigation.navigate("Login")
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Login or Signup',
+                            text2: 'First Login plz',
+                        });
+                    }
+                }} activeOpacity={0.8}>
+                    <Image source={Images.homeBellIcon} style={styles.bellIcon} />
+                </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                     if (user) {
                         navigation.navigate("Profile")

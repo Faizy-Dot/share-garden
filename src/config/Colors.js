@@ -8,7 +8,8 @@ const colors = {
   buttonColor : "#009D89",
   borderColor : "#E6E6E6",
   yellowColor : "#FFC202",
-  redColor : "#F8443E"
+  redColor : "#F8443E",
+  inputBackgroundColor : "#EAEAEA"
 };
 
 export default colors;
