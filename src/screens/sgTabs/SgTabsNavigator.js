@@ -10,6 +10,7 @@ import EditProfile from "../profile/editProfile/EditProfile";
 import SgUserNotification from "../sgUserNotifcation/SgUserNotification";
 import SgUserChat from "../sgUserChat/SgUserChat";
 import EarnSGpts from "../profile/earnSGpts/EarnSGpts";
+import MySGItems from "../profile/mySGItems/MySGItems";
 
 const ItemsStack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
+        <ItemsStack.Screen name="MySGItems" component={MySGItems} />
       </ItemsStack.Navigator>
     );
   }
@@ -35,6 +37,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
+        <ItemsStack.Screen name="MySGItems" component={MySGItems} />
       </ItemsStack.Navigator>
     );
   }
@@ -48,6 +51,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
+        <ItemsStack.Screen name="MySGItems" component={MySGItems} />
       </ItemsStack.Navigator>
     );
   }
@@ -60,6 +64,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
+        <ItemsStack.Screen name="MySGItems" component={MySGItems} />
       </ItemsStack.Navigator>
     );
   }
@@ -72,6 +77,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
+        <ItemsStack.Screen name="MySGItems" component={MySGItems} />
       </ItemsStack.Navigator>
     );
   }

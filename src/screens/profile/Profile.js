@@ -27,7 +27,8 @@ const profileData = [
         id: 2,
         image: Images.sgItemsIcon,
         title: "My SG Items",
-        description: "View my posted, draft & favorite items."
+        description: "View my posted, draft & favorite items.",
+        navigationPath : "MySGItems"
     },
     {
         id: 3,
@@ -80,15 +81,13 @@ export default function Profile({ navigation }) {
             text1: "Logout Successfully",
         });
         navigation.navigate('Login');
-        // Redirect or any other action can be added here
     };
 
     const handleItemPress = (item) => {
         if (item.title === 'Logout') {
-            handleLogout(); // Call logout when "Logout" is pressed
+            handleLogout(); 
         } else {
            navigation.navigate(`${item.navigationPath}`)
-            // Navigate to other screens based on item.label
         }
     };
     const renderProfileData = ({ item }) => {
