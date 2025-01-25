@@ -34,32 +34,37 @@ const profileData = [
         id: 3,
         image: Images.bidsIcon,
         title: "My Bids",
-        description: "view the status of bids offered by me"
+        description: "view the status of bids offered by me",
+         navigationPath : "MyBids"
     },
     {
         id: 4,
         image: Images.tipsBlackTab,
         title: "My SG Tips",
-        description: "view my posted tips, draft & favorite tips."
+        description: "view my posted tips, draft & favorite tips.",
+         navigationPath : "MySGTips"
     },
     {
         id: 6,
         image: Images.reviewsIcon,
         title: "Reviews",
-        description: "Check SG ratings & reviews on your profile"
+        description: "Check SG ratings & reviews on your profile",
+         navigationPath : "Reviews"
     },
     {
         id: 7,
         image: Images.settingsIcon,
         title: "Settings",
-        description: "Privacy & manage account"
+        description: "Privacy & manage account",
+         navigationPath : "Settings"
     },
     {
         id: 8,
         image: Images.profileAppLogo,
         title: "Help & Support Share Garden",
         description: "Help centre and legal terms",
-        borders: true
+        borders: true,
+         navigationPath : "HelpAndSupport"
     },
     {
         id: 9,

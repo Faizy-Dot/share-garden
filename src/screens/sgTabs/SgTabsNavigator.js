@@ -11,6 +11,11 @@ import SgUserNotification from "../sgUserNotifcation/SgUserNotification";
 import SgUserChat from "../sgUserChat/SgUserChat";
 import EarnSGpts from "../profile/earnSGpts/EarnSGpts";
 import MySGItems from "../profile/mySGItems/MySGItems";
+import MyBids from "../profile/myBids/MyBids";
+import MySGTips from "../profile/mySGtips/MySGTips";
+import Reviews from "../profile/reviews/Reviews";
+import Settings from "../profile/settings/Settings";
+import HelpAndSupport from "../profile/helpAndsupport/HelpAndSupport";
 
 const ItemsStack = createNativeStackNavigator();
 
@@ -25,6 +30,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
+        <ItemsStack.Screen name="MyBids" component={MyBids} />
       </ItemsStack.Navigator>
     );
   }
@@ -38,6 +44,11 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
+         <ItemsStack.Screen name="MyBids" component={MyBids} />
+         <ItemsStack.Screen name="MySGTips" component={MySGTips} />
+         <ItemsStack.Screen name="Reviews" component={Reviews} />
+         <ItemsStack.Screen name="Settings" component={Settings} />
+         <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
       </ItemsStack.Navigator>
     );
   }
@@ -52,6 +63,11 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
+         <ItemsStack.Screen name="MyBids" component={MyBids} />
+         <ItemsStack.Screen name="MySGTips" component={MySGTips} />
+         <ItemsStack.Screen name="Reviews" component={Reviews} />
+         <ItemsStack.Screen name="Settings" component={Settings} />
+         <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
       </ItemsStack.Navigator>
     );
   }
@@ -65,6 +81,11 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
+         <ItemsStack.Screen name="MyBids" component={MyBids} />
+         <ItemsStack.Screen name="MySGTips" component={MySGTips} />
+         <ItemsStack.Screen name="Reviews" component={Reviews} />
+         <ItemsStack.Screen name="Settings" component={Settings} />
+         <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
       </ItemsStack.Navigator>
     );
   }
@@ -78,6 +99,11 @@ function PostStackScreen() {
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
+         <ItemsStack.Screen name="MyBids" component={MyBids} />
+         <ItemsStack.Screen name="MySGTips" component={MySGTips} />
+         <ItemsStack.Screen name="Reviews" component={Reviews} />
+         <ItemsStack.Screen name="Settings" component={Settings} />
+         <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
       </ItemsStack.Navigator>
     );
   }
