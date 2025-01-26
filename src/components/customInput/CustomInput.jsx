@@ -3,6 +3,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput, Image, Alert } from 'react-native';
 import { Fonts, Images, Metrix } from '../../config';
+import colors from '../../config/Colors';
 
 export default function CustomInput({
     justifyContent,
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
               input: {
                     width: Metrix.HorizontalSize(300),
                     height: Metrix.VerticalSize(60),
-                    backgroundColor: "#F3F3F3",
+                    backgroundColor: colors.inputBackgroundColor,
                     borderColor: "#E6E6E6",
                     borderWidth: 1,
                     borderRadius: Metrix.LightRadius,

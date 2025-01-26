@@ -9,7 +9,7 @@ const colors = {
   borderColor : "#E6E6E6",
   yellowColor : "#FFC202",
   redColor : "#F8443E",
-  inputBackgroundColor : "#EAEAEA"
+  inputBackgroundColor : "#F3F3F3"
 };
 
 export default colors;

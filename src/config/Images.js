@@ -75,6 +75,7 @@ const Images = {
     redBidsIcon : require('../assets/images/notifications/redBidsIcon.png'),
     notificationScreenImg : require('../assets/images/notifications/notificationScreenImg.png'),
     myBidsTitleIcon : require('../assets/images/profile/myBidsTitleIcon.png'),
+    editIcon : require('../assets/images/profile/editIcon.png'),
 
 }
 
