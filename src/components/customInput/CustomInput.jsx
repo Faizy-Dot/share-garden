@@ -9,6 +9,8 @@ export default function CustomInput({
     justifyContent,
     iconCondition , 
     placeholder,
+    height,
+    borderRadius,
 }) {
   const onEnterPress = ()=>{
     Alert.alert("Enter Pressed!", "You submitted the input.");
@@ -16,7 +18,7 @@ export default function CustomInput({
   return (
     <View style={[styles.inputContainer, {justifyContent} ,]}>
     <Image source={Images.homeSearch} style={[styles.searchIcon , !iconCondition && {left : Metrix.HorizontalSize(15)}]} />
-    <TextInput style={[styles.input, !iconCondition && {width : "100%" , paddingLeft : Metrix.HorizontalSize(60)}]} placeholder={placeholder} placeholderTextColor="#999" 
+    <TextInput style={[styles.input,{height,borderRadius}, !iconCondition && {width : "100%" , paddingLeft : Metrix.HorizontalSize(60)}]} placeholder={placeholder} placeholderTextColor="#999" 
      returnKeyType="done" // Changes the Enter key label to "Done"
      onSubmitEditing={onEnterPress}/>
    {
