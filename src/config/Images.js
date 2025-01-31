@@ -76,6 +76,11 @@ const Images = {
     notificationScreenImg : require('../assets/images/notifications/notificationScreenImg.png'),
     myBidsTitleIcon : require('../assets/images/profile/myBidsTitleIcon.png'),
     editIcon : require('../assets/images/profile/editIcon.png'),
+    bitLogoBig : require('../assets/images/postTab/bitLogoBig.png'),
+    successIcon : require('../assets/images/postTab/successIcon.png'),
+    crossIcon : require('../assets/images/postTab/crossIcon.png'),
+    infoIcon : require('../assets/images/postTab/infoIcon.png'),
+    dollarLogoBig : require('../assets/images/postTab/dollarLogoBig.png'),
 
 }
 

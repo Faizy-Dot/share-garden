@@ -16,7 +16,7 @@ export default function HelpAndSupport() {
       </View>
       <ScrollView contentContainerStyle={{ paddingBottom: Metrix.VerticalSize(15) }} showsVerticalScrollIndicator={false}>
         <View style={styles.middleContainer}>
-          <Image source={Images.logo} style={styles.logo} />
+          <Image source={Images.logo} style={styles.logo}/>
           <View>
             <Text style={styles.helpText}>Help & Support </Text>
             <Text style={styles.termsText}>Help centre and legal terms</Text>

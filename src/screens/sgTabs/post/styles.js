@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     bottomButtons: {
         flexDirection: "row",
         marginBottom: Metrix.VerticalSize(35),
-        gap: 10
+        gap: Metrix.VerticalSize(10)
     }
 })
 

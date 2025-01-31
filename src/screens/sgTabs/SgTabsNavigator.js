@@ -16,9 +16,10 @@ import MySGTips from "../profile/mySGtips/MySGTips";
 import Reviews from "../profile/reviews/Reviews";
 import Settings from "../profile/settings/Settings";
 import HelpAndSupport from "../profile/helpAndsupport/HelpAndSupport";
+import Preview from "./post/preview/Preview";
+
 
 const ItemsStack = createNativeStackNavigator();
-
 
 function PostStackScreen() {
     return (
@@ -31,6 +32,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
         <ItemsStack.Screen name="MyBids" component={MyBids} />
+        <ItemsStack.Screen name="Preview" component={Preview} />
       </ItemsStack.Navigator>
     );
   }

@@ -17,15 +17,18 @@ import Toast from "react-native-toast-message";
 
 export default function PostTabScreen({ navigation }) {
     const [activeButton, setActiveButton] = useState("SG Item");
-    const [sgPoints, setSGPoints] = useState(false);
+    const [sgPoints, setSGPoints] = useState(true);
     const [cash, setCash] = useState(false);
-    const [images, setImages] = useState([null, null, null]); // State to store up to 3 images
-    const [checked, setChecked] = useState(""); // State to track the selected checkbox
+    const [images, setImages] = useState([null, null, null]);
+    const [title, setTitle] = useState("");
+    const [pointOrCashValue, setPointOrCashValue] = useState("");
+    const [description, setDescription] = useState("");
+    const [checked, setChecked] = useState("");
     const checkBoxNames = ["Fairly Used", "Good", "Excellent"];
 
-    const {user} = useSelector((state)=> state.login)
+    const { user } = useSelector((state) => state.login)
 
-   
+
 
     const handleCheckboxChange = (key) => {
         setChecked(key); // Set the selected checkbox
@@ -53,21 +56,21 @@ export default function PostTabScreen({ navigation }) {
         }
     };
 
-    
-      useEffect(() => {
-          if (!user) {
-                  navigation.navigate("Login")
-                    Toast.show({
-                                  type: 'error',
-                                  text1: 'Login or Signup',
-                                  text2: 'First Login plz',
-                              });
-              }
-      }, [user, navigation]);
-  
-      if (!user) {
-          return null;
-      }
+
+    useEffect(() => {
+        if (!user) {
+            navigation.navigate("Login")
+            Toast.show({
+                type: 'error',
+                text1: 'Login or Signup',
+                text2: 'First Login plz',
+            });
+        }
+    }, [user, navigation]);
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false}>
@@ -124,13 +127,19 @@ export default function PostTabScreen({ navigation }) {
                     <View style={styles.Switch}>
                         <Image source={Images.homeGreenBit} style={styles.logos} />
                         <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>SG Points</Text>
-                        <Switch value={sgPoints} onValueChange={() => setSGPoints(!sgPoints)} />
+                        <Switch value={sgPoints} onValueChange={() => {
+                            setSGPoints(true);
+                            setCash(false);
+                        }} />
                     </View>
 
                     <View style={styles.Switch}>
                         <Image source={Images.homeDollarLogo} style={styles.logos} />
                         <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>Cash</Text>
-                        <Switch value={cash} onValueChange={() => setCash(!cash)} />
+                        <Switch value={cash} onValueChange={() => {
+                            setCash(true);
+                            setSGPoints(false);
+                        }} />
                     </View>
                 </View>
             </View>
@@ -157,6 +166,8 @@ export default function PostTabScreen({ navigation }) {
                     placeholderTextColor={colors.black}
                     placeholder="Add title"
                     style={styles.title}
+                    value={title}
+                    onChangeText={setTitle}
                 />
                 <DropdownComponent />
                 <View style={styles.conditionContainer}>
@@ -186,6 +197,8 @@ export default function PostTabScreen({ navigation }) {
                     placeholderTextColor={colors.black}
                     placeholder="Enter Point Value or Cash value"
                     style={styles.title}
+                    value={pointOrCashValue}
+                    onChangeText={setPointOrCashValue}
                 />
                 <TextInput
                     style={styles.description}
@@ -194,6 +207,8 @@ export default function PostTabScreen({ navigation }) {
                     placeholder="Description"
                     placeholderTextColor={colors.black}
                     textAlignVertical="top"
+                    value={description}
+                    onChangeText={setDescription}
                 />
 
             </View>
@@ -209,7 +224,16 @@ export default function PostTabScreen({ navigation }) {
                     borderWidth={1}
                     borderColor={colors.borderColor}
                     borderRadius={Metrix.VerticalSize(4)}
-                    flex={1} />
+                    flex={1}
+                    onPress={() => navigation.navigate("Preview", {
+                        title,
+                        pointOrCashValue,
+                        description,
+                        images,
+                        sgPoints,
+                        cash,
+                        checked
+                    })} />
 
                 <CustomButton
                     height={Metrix.VerticalSize(42)}

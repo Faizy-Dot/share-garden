@@ -8,13 +8,18 @@ import Toast from "react-native-toast-message";
 
 
 
-export default function NavBar({ title }) {
+export default function NavBar({ 
+    title,
+    fontSize = Metrix.normalize(20),
+    fontFamily= fonts.InterBold,
+    color,
+ }) {
     const { user } = useSelector((state) => state.login);
 
     const navigation = useNavigation()
     return (
         <View style={styles.userDetail}>
-            <Text style={{ fontSize: Metrix.normalize(20), fontFamily: fonts.InterBold }}>{title}</Text>
+            <Text style={{ fontSize,fontFamily , color  }}>{title}</Text>
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(18) }}>
                 <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5), alignItems: "center" }}>
