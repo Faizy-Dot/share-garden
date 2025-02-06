@@ -1,6 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ItemsTabScreen from "./items/Items";
-import ProductDetail from "./items/ProductDetail";
 import PostTabScreen from "./post/Post";
 import TipsTabScreen from "./tips/Tips";
 import RewardsTabScreen from "./rewards/Rewards";
@@ -17,6 +16,8 @@ import Reviews from "../profile/reviews/Reviews";
 import Settings from "../profile/settings/Settings";
 import HelpAndSupport from "../profile/helpAndsupport/HelpAndSupport";
 import Preview from "./post/preview/Preview";
+import ProductDetail from "./items/productDetails/ProductDetail";
+
 
 
 const ItemsStack = createNativeStackNavigator();

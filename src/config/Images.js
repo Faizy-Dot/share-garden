@@ -81,6 +81,10 @@ const Images = {
     crossIcon : require('../assets/images/postTab/crossIcon.png'),
     infoIcon : require('../assets/images/postTab/infoIcon.png'),
     dollarLogoBig : require('../assets/images/postTab/dollarLogoBig.png'),
+    likeWhiteIcon : require('../assets/images/home/likeWhiteIcon.png'),
+    shareWhiteIcon : require('../assets/images/home/shareWhiteIcon.png'),
+    soundIcon : require('../assets/images/items/soundIcon.png'),
+    callIcon : require('../assets/images/items/callIcon.png'),
 
 }
 

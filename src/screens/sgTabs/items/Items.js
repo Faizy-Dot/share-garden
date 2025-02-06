@@ -13,8 +13,8 @@ import { useSelector } from "react-redux";
 
 const popularListings = [
     { id: "1", title: "Single Bed", location: "First Floor Maya Apartments", price: "8.5", image: Images.homePopularListing, bit: true, dollarLogo: false },
-    { id: "2", title: "7 Seater Sofa Set", location: "7 seater sofa set 10/10", price: "$ 450", image: Images.homePopularListing, bit: false, dollarLogo: true },
-    { id: "3", title: "Audi A6", location: "4th (C7) Generation 2016 1.8 TFSI for Sale", price: "$ 1850", image: Images.homePopularListing, bit: false, dollarLogo: false },
+    { id: "2", title: "7 Seater Sofa Set", location: "7 seater sofa set 10/10", price: "450", image: Images.homePopularListing, bit: false, dollarLogo: true },
+    { id: "3", title: "Audi A6", location: "4th (C7) Generation 2016 1.8 TFSI for Sale", price: "1850", image: Images.homePopularListing, bit: false, dollarLogo: true },
 ];
 
 const myPosts = [
