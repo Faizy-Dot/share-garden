@@ -13,10 +13,7 @@ export default class ApiCaller {
 
   static Post = (endPoint = '', body = {},
      headers = {
-     " content-type": "application/json; charset=utf-8 ",
-      "date": Date.now(),
-      "server": "Microsoft-IIS/10.0" ,
-     " x-powered-by":" ASP.NET "
+     " content-type": "application/json",
      }) => {
     return Axios.post(`${baseUrl}${endPoint}`, body, {
       headers: {'Content-Type': 'application/json', ...headers},

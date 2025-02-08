@@ -24,14 +24,14 @@ var baseUrl = 'https://api.sharegarden.ca/api/';
 
 export default function EditProfile({ navigation }) {
     const { user, token } = useSelector((state) => state.login);
-    const [fname, setFname] = useState(user?.firstname);
-    const [lname, setLname] = useState(user?.lastname);
-    const [about, setAbout] = useState(user?.about)
-    const [phoneNumber, setPhoneNumber] = useState(user?.phonenumber);
-    const [gender, setGender] = useState(user?.gender)
+    const [fname, setFname] = useState(user?.firstName);
+    const [lname, setLname] = useState(user?.lastName);
+    const [about, setAbout] = useState(user?.about || '');
+    const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber);
+    const [gender, setGender] = useState(user?.gender);
     const [imageUri, setImageUri] = useState(null);
     const [date, setDate] = useState(new Date()); // Current date
-    const [formattedDate, setFormattedDate] = useState(user?.dob);
+    const [formattedDate, setFormattedDate] = useState(user?.dateOfBirth);
     const [open, setOpen] = useState(false); // Modal visibility
     const dispatch = useDispatch();
 
@@ -44,18 +44,18 @@ export default function EditProfile({ navigation }) {
 
 
     const handleSubmit = async () => {
-        if (!fname || !lname || !about || !phoneNumber) {
+        if (!fname || !lname || !phoneNumber) {
             Toast.show({
                 type: 'error',
                 text1: 'Validation Error',
-                text2: 'All fields are required!',
+                text2: 'Some fields are required!',
             });
             return;
         }
 
         try {
             const response = await Axios.post(
-                `${baseUrl}User/UpdateProfile`,
+                `${baseUrl}auth/updateProfile`,
                 {
                     firstName: fname,
                     lastName: lname,
@@ -71,7 +71,7 @@ export default function EditProfile({ navigation }) {
             );
 
 
-            if (response.data.status === "success") {
+            if (response.status === 200) {
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
@@ -79,8 +79,8 @@ export default function EditProfile({ navigation }) {
                 });
                 const updatedUser = {
                     ...user,
-                    firstname: fname,
-                    lastname: lname,
+                    firstName: fname,
+                    lastName: lname,
                     profilePicutreUrl: imageUri ? imageUri : user.profilePicutreUrl,
                     about,
                     phoneNumber,
@@ -217,7 +217,7 @@ export default function EditProfile({ navigation }) {
         console.log("file=>>>", file)
 
         try {
-            const response = await Axios.post(`${baseUrl}User/UploadProfileImage`, file, {
+            const response = await Axios.post(`${baseUrl}auth/uploadProfileImage`, file, {
                 header: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
             });
 
@@ -282,7 +282,7 @@ export default function EditProfile({ navigation }) {
                             </View>
                         </TouchableOpacity>
                         <View style={{ gap: 10, flex: 1 }}>
-                            <Text style={[styles.userName, { fontSize: Metrix.FontExtraLarge, }]}>{user?.firstname + " " + user?.lastname}</Text>
+                            <Text style={[styles.userName, { fontSize: Metrix.FontExtraLarge, }]}>{user?.firstName + " " + user?.lastName}</Text>
                         </View>
                     </View>
 

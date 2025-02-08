@@ -41,18 +41,19 @@ const Login = ({ navigation }) => {
         // Prepare user data
 
         const userData = {
-            emailaddress: email,
+            email: email,
             password,
-            deviceid,
-            fcmtoken,
-            devicetype,
+            deviceToken: fcmtoken,
+            deviceType: devicetype,
         };
 
         // Call login action
         try {
             const res = await dispatch(login(userData)).unwrap();
 
-            if (res.isSuccess) {
+            console.log('Login response:', res);
+
+            if (res.token && res.token !== '') {
                 console.log('Login successfully:', res);
                 navigation.navigate('SgTabs');
                 Toast.show({

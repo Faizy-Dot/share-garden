@@ -3,7 +3,7 @@ import ApiCaller from '../../../config/ApiCaller';
 // Async Thunk for Login
 export const login = createAsyncThunk('auth/login', async (userData, { rejectWithValue }) => {
   try {
-    const response = await ApiCaller.Post('Authentication/Login', userData);
+    const response = await ApiCaller.Post('auth/Login', userData);
     console.log(response);
     if (response.status === 200) {
       return response.data; // Return response if successful
@@ -46,11 +46,11 @@ const loginSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-  
+
         // Check if the response is successful
-        if (action.payload.isSuccess && action.payload.data) {
-          state.user = action.payload.data.userinfo || null; // Assign userinfo or null
-          state.token = action.payload.data.token || null;  // Assign token or null
+        if (action.payload && action.payload.token && action.payload.token !== '') {
+          state.user = action.payload || null; // Assign userinfo or null
+          state.token = action.payload.token || null;  // Assign token or null
         } else {
           state.error = action.payload.message || 'An unknown error occurred';
         }

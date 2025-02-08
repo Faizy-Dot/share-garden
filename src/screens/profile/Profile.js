@@ -131,7 +131,7 @@ export default function Profile({ navigation }) {
                   
                     <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15), marginLeft: Metrix.HorizontalSize(15) }}>
                         <View style={{ gap: Metrix.VerticalSize(5) }}>
-                            <Text style={styles.userName}>{user ? user.firstname + user.lastname : "Ashley Simson"}</Text>
+                            <Text style={styles.userName}>{user ? user.firstName + ' ' + user.lastName : "Ashley Simson"}</Text>
                             <Text onPress={() => navigation.navigate("EditProfile")} style={styles.editProfile}>Edit Profile</Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5) }}>
