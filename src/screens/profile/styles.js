@@ -70,7 +70,23 @@ const styles = StyleSheet.create({
         borderColor: colors.buttonColor,
         marginHorizontal : 0,
         paddingHorizontal : Metrix.HorizontalSize(27)
-    }
+    },
+    profileContainer: {
+        width: Metrix.HorizontalSize(64),
+        height: Metrix.HorizontalSize(64),
+        borderRadius: Metrix.VerticalSize(32),  // Half of width/height to make it a circle
+        overflow: "hidden", // Ensures the image is clipped to the circular shape
+        borderWidth: 1,
+        borderColor: colors.borderColor,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    
+    profileImage: {
+        width: "100%",
+        height: "100%",
+        borderRadius:  Metrix.VerticalSize(16), // Ensures the image itself is also rounded
+    },
 });
 
 export default styles;

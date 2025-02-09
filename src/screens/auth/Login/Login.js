@@ -11,6 +11,7 @@ import DeviceInfo from 'react-native-device-info';
 import { login } from '../../../redux/Actions/authActions/loginAction';
 import fonts from '../../../config/Fonts';
 import Toast from 'react-native-toast-message';
+import getDeviceDetails from '../../../config/DeviceDetails';
 
 const Login = ({ navigation }) => {
 
@@ -20,14 +21,6 @@ const Login = ({ navigation }) => {
     const { loading } = useSelector((state) => state.login)
 
     const dispatch = useDispatch();
-
-    const getDeviceDetails = async () => {
-        const deviceid = (await DeviceInfo.getUniqueId()).toString();
-        const fcmtoken = "Coming Soon";
-        const devicetype = Platform.OS.toString();
-
-        return { deviceid, fcmtoken, devicetype };
-    };
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -43,18 +36,18 @@ const Login = ({ navigation }) => {
         const userData = {
             email: email,
             password,
-            deviceToken: fcmtoken,
-            deviceType: devicetype,
+            // deviceToken: fcmtoken,
+            // deviceType: devicetype,
         };
 
         // Call login action
         try {
             const res = await dispatch(login(userData)).unwrap();
 
-            console.log('Login response:', res);
+            // console.log('Login response:', res);
 
             if (res.token && res.token !== '') {
-                console.log('Login successfully:', res);
+                // console.log('Login successfully:', res);
                 navigation.navigate('SgTabs');
                 Toast.show({
                     type: 'success',

@@ -4,10 +4,11 @@ import ApiCaller from '../../../config/ApiCaller';
 // Async Thunk for SignUp
 export const signUp = createAsyncThunk('auth/signUp', async (userData, { rejectWithValue }) => {
   try {
-    const response = await ApiCaller.Post('Authentication/SignUp', userData);
+    const response = await ApiCaller.Post('/api/auth/register', userData);
     
+    // console.log("response from redux==>>",response.data)
  
-    if (response.status === 200) {
+    if (response.status === 201) {
       return response.data;
     } else {
       return rejectWithValue(response.data);

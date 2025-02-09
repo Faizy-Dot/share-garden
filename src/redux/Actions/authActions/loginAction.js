@@ -3,11 +3,14 @@ import ApiCaller from '../../../config/ApiCaller';
 // Async Thunk for Login
 export const login = createAsyncThunk('auth/login', async (userData, { rejectWithValue }) => {
   try {
-    const response = await ApiCaller.Post('auth/Login', userData);
-    console.log(response);
+    const response = await ApiCaller.Post('/api/auth/login', userData);
+    console.log("response from redux==>>",response);
     if (response.status === 200) {
       return response.data; // Return response if successful
-    } else {
+    } else if(response.status === 401) {
+      return response.data; // Reject if not successful
+    }else{
+      
       return rejectWithValue(response.data); // Reject if not successful
     }
   } catch (error) {
@@ -20,7 +23,7 @@ const loginSlice = createSlice({
   name: 'login',
   initialState: {
     user: null,
-    token: null,
+    // token: null,
     loading: false,
     error: null,
   },
@@ -30,7 +33,7 @@ const loginSlice = createSlice({
     },
     logout: (state) => {
       state.user = null;
-      state.token = null;
+      // state.token = null;
       state.loading = false;
       state.error = null;
     },
@@ -50,7 +53,7 @@ const loginSlice = createSlice({
         // Check if the response is successful
         if (action.payload && action.payload.token && action.payload.token !== '') {
           state.user = action.payload || null; // Assign userinfo or null
-          state.token = action.payload.token || null;  // Assign token or null
+          // state.token = action.payload.token || null;
         } else {
           state.error = action.payload.message || 'An unknown error occurred';
         }

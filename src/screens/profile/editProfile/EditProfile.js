@@ -19,11 +19,11 @@ import { updateUserProfile } from '../../../redux/Actions/authActions/loginActio
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 
-var baseUrl = 'https://api.sharegarden.ca/api/';
+var baseUrl = 'https://api.sharegarden.ca';
 
 
 export default function EditProfile({ navigation }) {
-    const { user, token } = useSelector((state) => state.login);
+    const { user } = useSelector((state) => state.login);
     const [fname, setFname] = useState(user?.firstName);
     const [lname, setLname] = useState(user?.lastName);
     const [about, setAbout] = useState(user?.about || '');
@@ -33,14 +33,14 @@ export default function EditProfile({ navigation }) {
     const [date, setDate] = useState(new Date()); // Current date
     const [formattedDate, setFormattedDate] = useState(user?.dateOfBirth);
     const [open, setOpen] = useState(false); // Modal visibility
+    const [loading, setLoading] = useState(false)
     const dispatch = useDispatch();
 
     const config = {
-        header: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+        headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'application/json' }
     }
 
-    console.log("user from edit profile==>>>", user)
-    console.log(gender)
+    console.log("user from edit profile==>>>", user.token)
 
 
     const handleSubmit = async () => {
@@ -52,20 +52,20 @@ export default function EditProfile({ navigation }) {
             });
             return;
         }
-
+        setLoading(true)
         try {
-            const response = await Axios.post(
-                `${baseUrl}auth/updateProfile`,
+            const response = await Axios.put(
+                `${baseUrl}/api/auth/profile`,
                 {
                     firstName: fname,
                     lastName: lname,
-                    profilePicutreUrl: imageUri ? imageUri : user.profilePicutreUrl,
+                    profileImage: imageUri ? imageUri : user.profileImage,
                     about,
-                    genderId: gender,
-                    dob: formattedDate,
+                    gender: gender,
+                    dateOfBirth: formattedDate,
                     phoneNumber: phoneNumber,
-                    email: user.emailaddress,
-                    userId: user.userid,
+                    // email: user.emailaddress,
+                    // userId: user.userid,
                 },
                 config
             );
@@ -75,13 +75,13 @@ export default function EditProfile({ navigation }) {
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
-                    text2: 'Profile updated successfully!',
+                    text2: response.data.message,
                 });
                 const updatedUser = {
                     ...user,
                     firstName: fname,
                     lastName: lname,
-                    profilePicutreUrl: imageUri ? imageUri : user.profilePicutreUrl,
+                    profileImage: imageUri ? imageUri : user.profileImage,
                     about,
                     phoneNumber,
                 };
@@ -95,12 +95,14 @@ export default function EditProfile({ navigation }) {
                 });
             }
         } catch (error) {
-            console.error(error);
+            console.error(error.response?.status, error.response?.data);
             Toast.show({
                 type: 'error',
                 text1: 'Error',
                 text2: 'Error updating profile!',
             });
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -208,7 +210,7 @@ export default function EditProfile({ navigation }) {
 
     const uploadProfileImage = async (selectedFile) => {
         const file = new FormData();
-        file.append('file', {
+        file.append('profileImage', {
             uri: selectedFile.uri,
             type: selectedFile.type || 'image/jpeg',
             name: selectedFile.fileName || 'uploaded_image.jpg',
@@ -217,22 +219,19 @@ export default function EditProfile({ navigation }) {
         console.log("file=>>>", file)
 
         try {
-            const response = await Axios.post(`${baseUrl}auth/uploadProfileImage`, file, {
-                header: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+            const response = await Axios.post(`${baseUrl}/api/auth/upload-profile-image`, file, {
+                headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'multipart/form-data' }
             });
-
-            if (response.isSuccess) {
-                setImageUri(response.data);
+            if (response.status === 200) {
+                setImageUri(response.data.imageUrl);
                 Toast.show({
                     type: 'success',
-                    text1: response.message,
-                    text2: 'Profile image updated successfully!',
+                    text1: response.data.message,
                 });
             } else {
                 Toast.show({
                     type: 'error',
-                    text1: response.message,
-                    text2: 'Failed to upload profile image.',
+                    text1: response.data.message,
                 });
             }
         } catch (error) {
@@ -259,7 +258,7 @@ export default function EditProfile({ navigation }) {
                         <Text style={styles.editProfileText}>Edit Profile</Text>
                         <CustomButton width={Metrix.HorizontalSize(81)}
                             height={Metrix.VerticalSize(36)}
-                            title={"Save"}
+                            title={loading ? "Save..." : "Save"}
                             borderRadius={Metrix.VerticalSize(4)}
                             onPress={handleSubmit} />
                     </View>
@@ -269,12 +268,12 @@ export default function EditProfile({ navigation }) {
                         gap: Metrix.HorizontalSize(20), paddingHorizontal: Metrix.HorizontalSize(20),
                         alignItems: "center"
                     }}>
-                        <TouchableOpacity activeOpacity={0.8} onPress={handleImagePicker}>
+                        <TouchableOpacity activeOpacity={0.8} style={styles.profileContainer} onPress={handleImagePicker}>
                             {
-                                user.profilePicutreUrl ?
-                                    <Image  source={{ uri: user.profilePicutreUrl }} style={{ width: Metrix.HorizontalSize(80), height: Metrix.HorizontalSize(80) }} />
+                                user.profileImage ?
+                                    <Image source={{ uri:imageUri ? imageUri :  user.profileImage }} style={styles.profileImage} />
                                     :
-                                    <Icon name="user-circle" size={Metrix.HorizontalSize(80)} color="#ccc"  />
+                                    <Icon name="user-circle" size={Metrix.HorizontalSize(80)} color="#ccc" />
 
                             }
                             <View style={styles.cameraPicker}>
@@ -386,7 +385,7 @@ export default function EditProfile({ navigation }) {
                         <View style={{ gap: Metrix.VerticalSize(7) }}>
                             <Text style={styles.userName}>Email</Text>
                             <TextInput style={styles.inputs}
-                                value={user?.emailaddress}
+                                value={user?.email}
                                 editable={false}
                                 selectTextOnFocus={false}
                                 disableFullscreenUI={true}
@@ -433,7 +432,7 @@ export default function EditProfile({ navigation }) {
 
             </View>
 
-          
+
         </View>
     );
 }

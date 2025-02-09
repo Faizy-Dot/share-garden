@@ -26,6 +26,7 @@ const myPosts = [
 const ItemsTabScreen = () => {
     const navigation = useNavigation();
     const { user } = useSelector((state) => state.login);
+    console.log("user from sg tabs==>>",user)
 
     const renderPopularListing = ({ item }) => (
         <TouchableOpacity 

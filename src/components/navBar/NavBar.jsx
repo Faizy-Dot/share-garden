@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from "react-native-toast-message";
+import colors from "../../config/Colors";
 
 
 
@@ -65,10 +66,10 @@ export default function NavBar({
                             text2: 'First Login plz',
                         });
                     }
-                }} activeOpacity={0.8}>
+                }} activeOpacity={0.8} style={styles.profileContainer}>
                     {
-                        user?.profilePicutreUrl ?
-                            <Image source={{ uri: user?.profilePicutreUrl }} style={{ width: Metrix.HorizontalSize(32), height: Metrix.HorizontalSize(32) }} />
+                        user?.profileImage ?
+                            <Image source={{ uri: user?.profileImage }} style={styles.profileImage} />
                             :
                             <Icon name="user-circle" size={Metrix.HorizontalSize(32)} color="#ccc" />
 
@@ -103,6 +104,22 @@ const styles = StyleSheet.create({
     greenBit: {
         width: Metrix.VerticalSize(24),
         height: Metrix.VerticalSize(24),
+    },
+    profileContainer: {
+        width: Metrix.HorizontalSize(32),
+        height: Metrix.HorizontalSize(32),
+        borderRadius: Metrix.HorizontalSize(16),  // Half of width/height to make it a circle
+        overflow: "hidden", // Ensures the image is clipped to the circular shape
+        borderWidth: 1,
+        borderColor: colors.borderColor,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    
+    profileImage: {
+        width: "100%",
+        height: "100%",
+        borderRadius:  Metrix.VerticalSize(16), // Ensures the image itself is also rounded
     },
 
 })

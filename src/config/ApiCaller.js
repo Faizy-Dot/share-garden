@@ -1,5 +1,5 @@
 import Axios from 'axios';
-var baseUrl = 'https://api.sharegarden.ca/api/';
+var baseUrl = 'https://api.sharegarden.ca';
 export const Img_url = '';
 
 export default class ApiCaller {

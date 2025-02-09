@@ -117,6 +117,21 @@ const styles = StyleSheet.create({
     selectedTextStyle: {
         fontSize: Metrix.FontSmall
     },
+    profileContainer: {
+        width: Metrix.HorizontalSize(80),
+        height: Metrix.HorizontalSize(80),
+        borderRadius: Metrix.HorizontalSize(40),  // Half of width/height to make it a circle
+        borderWidth: 1,
+        borderColor: colors.borderColor,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    
+    profileImage: {
+        width: "100%",
+        height: "100%",
+        borderRadius:  Metrix.VerticalSize(16), // Ensures the image itself is also rounded
+    },
 
 
 });

@@ -21,42 +21,42 @@ const profileData = [
         image: Images.earnCoinIcon,
         title: "How to earn SG Pts",
         description: "how it works to earn points",
-        navigationPath : "EarnSGpts"
+        navigationPath: "EarnSGpts"
     },
     {
         id: 2,
         image: Images.sgItemsIcon,
         title: "My SG Items",
         description: "View my posted, draft & favorite items.",
-        navigationPath : "MySGItems"
+        navigationPath: "MySGItems"
     },
     {
         id: 3,
         image: Images.bidsIcon,
         title: "My Bids",
         description: "view the status of bids offered by me",
-         navigationPath : "MyBids"
+        navigationPath: "MyBids"
     },
     {
         id: 4,
         image: Images.tipsBlackTab,
         title: "My SG Tips",
         description: "view my posted tips, draft & favorite tips.",
-         navigationPath : "MySGTips"
+        navigationPath: "MySGTips"
     },
     {
         id: 6,
         image: Images.reviewsIcon,
         title: "Reviews",
         description: "Check SG ratings & reviews on your profile",
-         navigationPath : "Reviews"
+        navigationPath: "Reviews"
     },
     {
         id: 7,
         image: Images.settingsIcon,
         title: "Settings",
         description: "Privacy & manage account",
-         navigationPath : "Settings"
+        navigationPath: "Settings"
     },
     {
         id: 8,
@@ -64,7 +64,7 @@ const profileData = [
         title: "Help & Support Share Garden",
         description: "Help centre and legal terms",
         borders: true,
-         navigationPath : "HelpAndSupport"
+        navigationPath: "HelpAndSupport"
     },
     {
         id: 9,
@@ -90,9 +90,9 @@ export default function Profile({ navigation }) {
 
     const handleItemPress = (item) => {
         if (item.title === 'Logout') {
-            handleLogout(); 
+            handleLogout();
         } else {
-           navigation.navigate(`${item.navigationPath}`)
+            navigation.navigate(`${item.navigationPath}`)
         }
     };
     const renderProfileData = ({ item }) => {
@@ -121,14 +121,17 @@ export default function Profile({ navigation }) {
                 </View>
 
                 <View style={styles.navBar}>
-                    {
-                        user?.profilePicutreUrl ?
-                            <Image source={{ uri: user.profilePicutreUrl }} style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64) }} />
-                            :
-                            <Icon name="user-circle" size={Metrix.HorizontalSize(64)} color="#ccc" />
+                    <View style={styles.profileContainer}>
 
-                    }
-                  
+                        {
+                            user?.profileImage ?
+                                <Image source={{ uri: user.profileImage }} style={styles.profileImage} />
+                                :
+                                <Icon name="user-circle" size={Metrix.HorizontalSize(64)} color="#ccc" />
+
+                        }
+                    </View>
+
                     <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15), marginLeft: Metrix.HorizontalSize(15) }}>
                         <View style={{ gap: Metrix.VerticalSize(5) }}>
                             <Text style={styles.userName}>{user ? user.firstName + ' ' + user.lastName : "Ashley Simson"}</Text>
@@ -139,33 +142,33 @@ export default function Profile({ navigation }) {
                             <Image source={Images.homeGreenBit} style={styles.geenBitImg} />
                         </View>
                         <TouchableOpacity onPress={() => {
-                                          if (user) {
-                                              navigation.navigate("SgUserChat")
-                                          } else {
-                                              navigation.navigate("Login")
-                                              Toast.show({
-                                                  type: 'error',
-                                                  text1: 'Login or Signup',
-                                                  text2: 'First Login plz',
-                                              });
-                                          }
-                                      }} activeOpacity={0.8}>
-                                          <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
-                                      </TouchableOpacity>
-                                      <TouchableOpacity onPress={() => {
-                                          if (user) {
-                                              navigation.navigate("SgUserNotification")
-                                          } else {
-                                              navigation.navigate("Login")
-                                              Toast.show({
-                                                  type: 'error',
-                                                  text1: 'Login or Signup',
-                                                  text2: 'First Login plz',
-                                              });
-                                          }
-                                      }} activeOpacity={0.8}>
-                                          <Image source={Images.homeBellIcon} style={styles.bellIcon} />
-                                      </TouchableOpacity>
+                            if (user) {
+                                navigation.navigate("SgUserChat")
+                            } else {
+                                navigation.navigate("Login")
+                                Toast.show({
+                                    type: 'error',
+                                    text1: 'Login or Signup',
+                                    text2: 'First Login plz',
+                                });
+                            }
+                        }} activeOpacity={0.8}>
+                            <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                            if (user) {
+                                navigation.navigate("SgUserNotification")
+                            } else {
+                                navigation.navigate("Login")
+                                Toast.show({
+                                    type: 'error',
+                                    text1: 'Login or Signup',
+                                    text2: 'First Login plz',
+                                });
+                            }
+                        }} activeOpacity={0.8}>
+                            <Image source={Images.homeBellIcon} style={styles.bellIcon} />
+                        </TouchableOpacity>
                     </View>
 
                 </View>
@@ -182,7 +185,7 @@ export default function Profile({ navigation }) {
 
             </View>
 
-       
+
         </View>
     );
 }
