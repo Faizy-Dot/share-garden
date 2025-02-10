@@ -12,7 +12,7 @@ import { Images, Metrix } from "../../../../config";
 import styles from "./style";
 import fonts from "../../../../config/Fonts";
 import CustomButton from "../../../../components/Button/Button";
-import Axios from 'axios';
+import axiosInstance from '../../../../config/axios';
 
 
 export default function PostTabScreen({ navigation, route }) {
@@ -219,12 +219,11 @@ export default function PostTabScreen({ navigation, route }) {
             imageCount: images.filter(img => img !== null).length
         });
 
-        const response = await Axios.post(
-            'https://api.sharegarden.ca/api/products/createProduct',
+        const response = await axiosInstance.post(
+            '/api/products/createProduct',
             formData,
             {
                 headers: {
-                    Authorization: `Bearer ${user.token}`,
                     'Content-Type': 'multipart/form-data',
                 },
             }
@@ -260,16 +259,11 @@ export default function PostTabScreen({ navigation, route }) {
             setNavigateTimeout(timeout);
         }
     } catch (error) {
-        console.error('API Error:', {
-            message: error.message,
-            response: error.response?.data,
-            status: error.response?.status
-        });
-        
+        const errorMessage = error.response?.data?.message || 'Failed to create product';
         Toast.show({
             type: 'error',
             text1: 'Error',
-            text2: error.response?.data?.error || 'Failed to create product',
+            text2: errorMessage,
         });
     } finally {
         setLoading(false);
