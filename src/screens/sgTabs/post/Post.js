@@ -17,7 +17,7 @@ import Axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 
 
-export default function PostTabScreen({ navigation }) {
+export default function PostTabScreen({ navigation, route }) {
     const [activeButton, setActiveButton] = useState("SG Item");
     const [sgPoints, setSGPoints] = useState(true);
     const [cash, setCash] = useState(false);
@@ -202,6 +202,14 @@ export default function PostTabScreen({ navigation }) {
             fetchCategories();
         }, [user, navigation])
     );
+
+    useEffect(() => {
+        if (route.params?.refresh) {
+            resetForm();
+            // Clear the parameter to prevent multiple resets
+            navigation.setParams({ refresh: undefined });
+        }
+    }, [route.params?.refresh]);
 
     if (!user) {
         return null;

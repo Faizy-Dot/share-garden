@@ -16,10 +16,10 @@ import Axios from 'axios';
 
 
 export default function PostTabScreen({ navigation, route }) {
-  const [days, setDays] = useState(12);
-  const [hours, setHours] = useState(10);
-  const [minutes, setMinutes] = useState(3);
-  const [seconds, setSeconds] = useState(50);
+  const [days, setDays] = useState('');
+  const [hours, setHours] = useState('');
+  const [minutes, setMinutes] = useState('');
+  const [seconds, setSeconds] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [publish, setPublish] = useState(false)
   const [draft, setDraft] = useState(false)
@@ -110,23 +110,55 @@ export default function PostTabScreen({ navigation, route }) {
         seconds: ''
     });
 
-    if (isSGPoints) {
-        const totalSeconds = (Number(days) * 24 * 60 * 60) + (Number(hours) * 60 * 60) + 
-                           (Number(minutes) * 60) + Number(seconds);
+    // Convert to numbers for comparison
+    const daysNum = Number(days) || 0;
+    const hoursNum = Number(hours) || 0;
+    const minutesNum = Number(minutes) || 0;
+    const secondsNum = Number(seconds) || 0;
 
-        // Validation for empty duration
-        if (totalSeconds === 0) {
+    // Calculate total seconds
+    const totalSeconds = (daysNum * 24 * 60 * 60) + 
+                        (hoursNum * 60 * 60) + 
+                        (minutesNum * 60) + 
+                        secondsNum;
+
+    if (isSGPoints) {
+        // First validate the bid value
+        if (!pointOrCashValue || pointOrCashValue <= 0) {
             Toast.show({
                 type: 'error',
-                text1: 'Invalid Duration',
-                text2: 'Please set a valid bid duration',
+                text1: 'Invalid Bid Value',
+                text2: 'Please enter a valid minimum bid value',
             });
             return;
         }
 
-        // If days is empty (0), hours must not be empty
-        if (Number(days) === 0 && Number(hours) === 0) {
-            setTimeErrors(prev => ({ ...prev, hours: 'Hours required when days is 0' }));
+        // Validate time inputs - ensure they're not empty or invalid
+        if (!days && !hours && !minutes && !seconds) {
+            Toast.show({
+                type: 'error',
+                text1: 'Missing Duration',
+                text2: 'Please set a bid duration',
+            });
+            return;
+        }
+
+        // If days is 0, hours must not be 0
+        if (daysNum === 0 && hoursNum === 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Duration',
+                text2: 'Hours must not be 0 when days is 0',
+            });
+            return;
+        }
+
+        if (totalSeconds === 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Duration',
+                text2: 'Bid duration cannot be zero',
+            });
             return;
         }
 
@@ -141,29 +173,8 @@ export default function PostTabScreen({ navigation, route }) {
         }
     }
 
-    if (isSGPoints && (!pointOrCashValue || totalSeconds === 0)) {
-        Toast.show({
-            type: 'error',
-            text1: 'Missing Fields',
-            text2: 'Please enter minimum bid value and bid duration',
-        });
-        return;
-    }
-
-    if (!isSGPoints && !pointOrCashValue) {
-        Toast.show({
-            type: 'error',
-            text1: 'Missing Fields',
-            text2: 'Please enter price value',
-        });
-        return;
-    }
-
     setLoading(true);
     try {
-        const totalSeconds = (Number(days) * 24 * 60 * 60) + (Number(hours) * 60 * 60) + 
-                           (Number(minutes) * 60) + Number(seconds);
-
         const formData = new FormData();
         
         // Required fields
@@ -171,8 +182,8 @@ export default function PostTabScreen({ navigation, route }) {
         formData.append('description', description);
         formData.append('categoryId', categoryId);
         formData.append('condition', condition);
-        formData.append('isSGPoints', isSGPoints.toString()); // Convert boolean to string
-        formData.append('isPublished', (!isDraft).toString()); // Convert boolean to string
+        formData.append('isSGPoints', isSGPoints.toString());
+        formData.append('isPublished', (!isDraft).toString());
 
         // Conditional fields based on payment type
         if (isSGPoints) {
@@ -191,8 +202,8 @@ export default function PostTabScreen({ navigation, route }) {
             });
         });
 
-        // Debug log
-        console.log('Sending FormData:', {
+        // Debug logs
+        console.log('Form Data Contents:', {
             title,
             description,
             categoryId,
@@ -219,6 +230,8 @@ export default function PostTabScreen({ navigation, route }) {
             }
         );
 
+        console.log('API Response:', response.data);
+
         if (response.status === 201) {
             setModalVisible(true);
             if (isDraft) {
@@ -229,20 +242,29 @@ export default function PostTabScreen({ navigation, route }) {
                 setPublish(true);
             }
 
-            // Set timeout to navigate after 2 seconds
             const timeout = setTimeout(() => {
                 setModalVisible(false);
                 resetPreviewForm();
-                onSuccess(); // Reset Post screen form
-                navigation.navigate('Items');
+                onSuccess();
+                navigation.reset({
+                    index: 0,
+                    routes: [
+                        { 
+                            name: 'PostList',
+                            params: { refresh: true }
+                        }
+                    ],
+                });
             }, 2000);
 
             setNavigateTimeout(timeout);
         }
     } catch (error) {
-        console.log("Full error object:", error);
-        console.log("Error response data:", error.response?.data);
-        console.log("Error status:", error.response?.status);
+        console.error('API Error:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+        });
         
         Toast.show({
             type: 'error',
@@ -299,8 +321,16 @@ const handleModalClose = () => {
     setDraft(false);
     setPublish(false);
     resetPreviewForm();
-    onSuccess(); // Reset Post screen form
-    navigation.navigate('Items');
+    onSuccess();
+    navigation.reset({
+        index: 0,
+        routes: [
+            { 
+                name: 'PostList',
+                params: { refresh: true }
+            }
+        ],
+    });
 };
 
   return (
