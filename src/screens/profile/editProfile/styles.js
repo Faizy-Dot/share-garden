@@ -128,11 +128,33 @@ const styles = StyleSheet.create({
     },
     
     profileImage: {
-        width: "100%",
-        height: "100%",
-        borderRadius:  Metrix.VerticalSize(16), // Ensures the image itself is also rounded
+        width: Metrix.HorizontalSize(80),
+        height: Metrix.HorizontalSize(80),
+        borderRadius: Metrix.HorizontalSize(40),
+        borderWidth: 1,
+        borderColor: colors.borderColor,
     },
 
+    imagePickerContainer: {
+        alignSelf: 'center',
+        marginVertical: 20,
+    },
+    imagePlaceholder: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: '#f0f0f0',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderStyle: 'dashed',
+    },
+    uploadText: {
+        marginTop: 5,
+        fontSize: 12,
+        color: colors.grey,
+    },
 
 });
 

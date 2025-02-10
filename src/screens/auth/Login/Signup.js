@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
     View,
@@ -9,6 +8,7 @@ import {
     TouchableOpacity,
     ScrollView,
     Linking,
+    Alert,
 } from "react-native";
 import { Image } from "react-native";
 import { Colors, Images, Metrix } from "../../../config";
@@ -21,6 +21,11 @@ import getDeviceDetails from "../../../config/DeviceDetails";
 import DeviceInfo from "react-native-device-info";
 import Toast from 'react-native-toast-message';
 import { signUp } from "../../../redux/Actions/authActions/signupAction";
+
+const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+};
 
 export default function SignUpScreen({ navigation }) {
     const [form, setForm] = useState({
@@ -36,7 +41,6 @@ export default function SignUpScreen({ navigation }) {
         phonenumber2: '',
     });
 
-
     const [isSGMember, setIsSGMember] = useState(true);
     const [isMerchant, setIsMerchant] = useState(false);
 
@@ -47,25 +51,20 @@ export default function SignUpScreen({ navigation }) {
         console.log(error)
     }
 
-
     const usertypeid = isSGMember ? "1" : "2"
 
-
-
+    const [emailError, setEmailError] = useState('');
 
     const handleInputChange = (key, value) => {
         setForm((prev) => ({ ...prev, [key]: value }));
+        if (key === 'emailaddress') {
+            setEmailError('');
+        }
     };
 
-
-
     const handleSubmit = async () => {
-
         try {
-
-
             if (form.password !== form.confirmpassword) {
-                // alert('Passwords do not match!');
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -74,31 +73,31 @@ export default function SignUpScreen({ navigation }) {
                 return;
             }
 
-            const { deviceid, fcmtoken, devicetype } = await getDeviceDetails();
+            if (!isValidEmail(form.emailaddress)) {
+                setEmailError('Please enter a valid email address');
+                return;
+            }
 
+            const { deviceid, fcmtoken, devicetype } = await getDeviceDetails();
 
             const userData = {
                 firstName: form.firstname,
                 lastName: form.lastname,
                 email: form.emailaddress,
                 password: form.password,
-                // address1: form.address1,
-                // address2: form.address2,
-                // postalcode: form.postalcode,
+                address1: form.address1,
+                address2: form.address2,
+                postalcode: form.postalcode,
                 phoneNumber: form.phonenumber1 + form.phonenumber2,
-                // isactive: true,
                 deviceToken: deviceid,
-                // fcmtoken: "COming SOon",
                 deviceType: devicetype,
-                // usertypeid,
+                role: isSGMember ? "USER" : "MERCHANT",
             };
 
-            // Validate user data
             const missingFields = Object.entries(userData).filter(([key, value]) => !value);
 
             if (missingFields.length > 0) {
                 const missingKeys = missingFields.map(([key]) => key).join(', ');
-                // alert(`Please fill the following fields: ${missingKeys}`);
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -106,9 +105,6 @@ export default function SignUpScreen({ navigation }) {
                 });
                 return;
             }
-
-            // console.log("form=>", userData);
-
 
             const res = await dispatch(signUp(userData)).unwrap();
             console.log("response==>>",res)
@@ -142,134 +138,133 @@ export default function SignUpScreen({ navigation }) {
                 text2: "Something went wrong",
             });
         }
-}
+    }
 
-
-
-
-
-return (
-
-    <KeyboardAwareScrollView style={styles.container} contentContainerStyle={{
-        alignItems: "center",
-    }}>
-        {/* Logo Section */}
-        <View style={styles.logoContainer}>
-            <Image
-                source={Images.logo} // Fallback image
-                style={styles.logo}
-                resizeMode="contain"
-            />
-        </View>
-
-        {/* Toggle Switches */}
-        <View style={styles.toggleContainer}>
-            <View style={styles.toggle}>
-                <Text style={styles.toggleLabel}>SG Member</Text>
-                <Switch
-                    style={{ marginLeft: Metrix.HorizontalSize(62) }}
-                    value={isSGMember}
-                    onValueChange={() => {
-                        setIsSGMember(true);
-                        setIsMerchant(false);
-                    }}
+    return (
+        <KeyboardAwareScrollView style={styles.container} contentContainerStyle={{
+            alignItems: "center",
+        }}>
+            <View style={styles.logoContainer}>
+                <Image
+                    source={Images.logo}
+                    style={styles.logo}
+                    resizeMode="contain"
                 />
             </View>
-            <View style={styles.toggle}>
-                <View style={styles.switchText}>
-                    <Text style={styles.toggleLabel}>Merchant</Text>
-                    <Text style={styles.toggleDesc}>Name of the comapany</Text>
+
+            <View style={styles.toggleContainer}>
+                <View style={styles.toggle}>
+                    <Text style={styles.toggleLabel}>SG Member</Text>
+                    <Switch
+                        style={{ marginLeft: Metrix.HorizontalSize(62) }}
+                        value={isSGMember}
+                        onValueChange={() => {
+                            setIsSGMember(true);
+                            setIsMerchant(false);
+                        }}
+                    />
                 </View>
-                <Switch
-                    value={isMerchant}
-                    onValueChange={() => {
-                        setIsMerchant(true);
-                        setIsSGMember(false);
-                    }}
-                />
+                <View style={styles.toggle}>
+                    <View style={styles.switchText}>
+                        <Text style={styles.toggleLabel}>Merchant</Text>
+                        <Text style={styles.toggleDesc}>Name of the comapany</Text>
+                    </View>
+                    <Switch
+                        value={isMerchant}
+                        onValueChange={() => {
+                            setIsMerchant(true);
+                            setIsSGMember(false);
+                        }}
+                    />
+                </View>
             </View>
-        </View>
 
-        {/* Input Fields */}
-        <View style={styles.form}>
-            <View style={styles.row}>
-                <TextInput
-                    placeholder="First Name"
-                    style={styles.input}
-                    onChangeText={(text) => handleInputChange('firstname', text)}
-                />
-                <TextInput
-                    placeholder="Last Name"
-                    style={styles.input}
-                    onChangeText={(text) => handleInputChange('lastname', text)}
-                />
-            </View>
-            <TextInput placeholder="Email"
-                style={[styles.input, { width: "100%" }]}
-                onChangeText={(text) => handleInputChange('emailaddress', text)} />
+            <View style={styles.form}>
+                <View style={styles.row}>
+                    <TextInput
+                        placeholder="First Name"
+                        style={styles.input}
+                        onChangeText={(text) => handleInputChange('firstname', text)}
+                    />
+                    <TextInput
+                        placeholder="Last Name"
+                        style={styles.input}
+                        onChangeText={(text) => handleInputChange('lastname', text)}
+                    />
+                </View>
+                <View>
+                    <TextInput 
+                        placeholder="Email"
+                        style={[
+                            styles.input, 
+                            { width: "100%" },
+                            emailError ? styles.inputError : null
+                        ]}
+                        onChangeText={(text) => handleInputChange('emailaddress', text)} 
+                    />
+                    {emailError ? (
+                        <Text style={styles.errorText}>{emailError}</Text>
+                    ) : null}
+                </View>
 
-            <TextInput
-                placeholder="Password"
-                style={[styles.input, { width: "100%" }]}
-                secureTextEntry
-                onChangeText={(text) => handleInputChange('password', text)}
-            />
-            <TextInput
-                placeholder="Confirm Password"
-                style={[styles.input, { width: "100%" }]}
-                secureTextEntry
-                onChangeText={(text) => handleInputChange('confirmpassword', text)}
-            />
-            <View style={styles.row}>
                 <TextInput
-                    placeholder="+1"
-                    style={[styles.input, styles.smallInput]}
-                    onChangeText={(text) => handleInputChange('phonenumber1', text)}
+                    placeholder="Password"
+                    style={[styles.input, { width: "100%" }]}
+                    secureTextEntry
+                    onChangeText={(text) => handleInputChange('password', text)}
                 />
                 <TextInput
-                    placeholder="786 124 - 3425"
-                    style={[styles.input, styles.largeInput]}
-                    onChangeText={(text) => handleInputChange('phonenumber2', text)}
+                    placeholder="Confirm Password"
+                    style={[styles.input, { width: "100%" }]}
+                    secureTextEntry
+                    onChangeText={(text) => handleInputChange('confirmpassword', text)}
                 />
+                <View style={styles.row}>
+                    <TextInput
+                        placeholder="+1"
+                        style={[styles.input, styles.smallInput]}
+                        onChangeText={(text) => handleInputChange('phonenumber1', text)}
+                    />
+                    <TextInput
+                        placeholder="786 124 - 3425"
+                        style={[styles.input, styles.largeInput]}
+                        onChangeText={(text) => handleInputChange('phonenumber2', text)}
+                    />
+                </View>
+                <View style={styles.row}>
+                    <TextInput placeholder="Postal code"
+                        style={[styles.input, { width: "30%" }]}
+                        onChangeText={(text) => handleInputChange('postalcode', text)} />
+                    <TextInput placeholder="Address"
+                        style={[styles.input, { width: "65%" }]}
+                        onChangeText={(text) => handleInputChange('address1', text)} />
+                </View>
+                <View>
+                    <TextInput placeholder="Address" style={[styles.input, { width: "100%" }]}
+                        onChangeText={(text) => handleInputChange('address2', text)} />
+                </View>
             </View>
-            <View style={styles.row}>
-                <TextInput placeholder="Postal code"
-                    style={[styles.input, { width: "30%" }]}
-                    onChangeText={(text) => handleInputChange('postalcode', text)} />
-                <TextInput placeholder="Address"
-                    style={[styles.input, { width: "65%" }]}
-                    onChangeText={(text) => handleInputChange('address1', text)} />
-            </View>
-            <View>
-                <TextInput placeholder="Address" style={[styles.input, { width: "100%" }]}
-                    onChangeText={(text) => handleInputChange('address2', text)} />
-            </View>
-        </View>
 
-        {/* Terms and Conditions */}
-        <Text style={styles.terms}>
-            By signing up, you're agreeing to our{" "}
-            <Text
-                style={styles.link}
-                onPress={() => Linking.openURL("https://example.com/terms")}
-            >
-                Terms & Conditions
-            </Text>{" "}
-            and{" "}
-            <Text
-                style={styles.link}
-                onPress={() => Linking.openURL("https://example.com/privacy")}
-            >
-                Privacy Policy
+            <Text style={styles.terms}>
+                By signing up, you're agreeing to our{" "}
+                <Text
+                    style={styles.link}
+                    onPress={() => Linking.openURL("https://example.com/terms")}
+                >
+                    Terms & Conditions
+                </Text>{" "}
+                and{" "}
+                <Text
+                    style={styles.link}
+                    onPress={() => Linking.openURL("https://example.com/privacy")}
+                >
+                    Privacy Policy
+                </Text>
             </Text>
-        </Text>
 
-        {/* Submit Button */}
-
-        <CustomButton title={loading ? 'Submitting...' : 'Submit'} onPress={handleSubmit} />
-    </KeyboardAwareScrollView>
-
-);
+            <CustomButton title={loading ? 'Submitting...' : 'Submit'} onPress={handleSubmit} />
+        </KeyboardAwareScrollView>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -295,7 +290,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flex: 1,
         justifyContent: 'space-between'
-
     },
     toggleLabel: {
         fontSize: Metrix.FontExtraSmall,
@@ -343,5 +337,15 @@ const styles = StyleSheet.create({
     },
     switchText: {
         marginLeft: Metrix.HorizontalSize(10)
-    }
+    },
+    inputError: {
+        borderColor: 'red',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 12,
+        marginTop: -8,
+        marginBottom: 10,
+        marginLeft: 4,
+    },
 });

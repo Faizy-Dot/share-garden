@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Image, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Switch, Text, TextInput, TouchableOpacity, View, Alert, PermissionsAndroid, Platform } from "react-native";
 import { Images, Metrix } from "../../../config";
 import BackArrowIcon from "../../../components/backArrowIcon/BackArrowIcon";
 import colors from "../../../config/Colors";
 import NavBar from "../../../components/navBar/NavBar";
 import styles from "./styles";
 import fonts from "../../../config/Fonts";
-import { launchImageLibrary } from "react-native-image-picker";
+import { launchImageLibrary, launchCamera } from "react-native-image-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import DropdownComponent from "../../../components/dropDown/DropDownInput";
+import DropDownInput from "../../../components/dropDown/DropDownInput.jsx";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import CustomButton from "../../../components/Button/Button";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
+import Axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function PostTabScreen({ navigation }) {
@@ -24,53 +26,223 @@ export default function PostTabScreen({ navigation }) {
     const [pointOrCashValue, setPointOrCashValue] = useState("");
     const [description, setDescription] = useState("");
     const [checked, setChecked] = useState("");
-    const checkBoxNames = ["Fairly Used", "Good", "Excellent"];
+    const checkBoxNames = [
+        { display: "Fairly Used", value: "FAIRLY_GOOD" },
+        { display: "Good", value: "GOOD" },
+        { display: "Excellent", value: "EXCELLENT" }
+    ];
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedCategoryName, setSelectedCategoryName] = useState('');
 
     const { user } = useSelector((state) => state.login)
 
 
 
     const handleCheckboxChange = (key) => {
-        setChecked(key); // Set the selected checkbox
+        setChecked(key);
     };
 
+    const requestCameraPermission = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                    {
+                        title: 'Camera Permission',
+                        message: 'App needs camera permission to take product photos',
+                        buttonNeutral: 'Ask Me Later',
+                        buttonNegative: 'Cancel',
+                        buttonPositive: 'OK',
+                    }
+                );
+                return granted === PermissionsAndroid.RESULTS.GRANTED;
+            } catch (err) {
+                console.warn(err);
+                return false;
+            }
+        }
+        return true;
+    };
 
     const handleImagePicker = async () => {
-        const result = await launchImageLibrary({
-            mediaType: "photo",
-            selectionLimit: 1,
+        if (!images.includes(null)) {
+            Toast.show({
+                type: 'error',
+                text1: 'Limit Reached',
+                text2: 'Maximum 3 images allowed',
+            });
+            return;
+        }
+
+        Alert.alert(
+            'Select Image',
+            'Choose an option to add product image',
+            [
+                {
+                    text: 'Take Photo',
+                    onPress: async () => {
+                        const hasPermission = await requestCameraPermission();
+                        if (hasPermission) {
+                            try {
+                                const result = await launchCamera({
+                                    mediaType: 'photo',
+                                    quality: 0.8,
+                                });
+
+                                if (!result.didCancel && result.assets && result.assets.length > 0) {
+                                    const newImageUri = result.assets[0].uri;
+                                    handleNewImage(newImageUri);
+                                }
+                            } catch (error) {
+                                console.error('Camera error:', error);
+                                Toast.show({
+                                    type: 'error',
+                                    text1: 'Error',
+                                    text2: 'Failed to take photo',
+                                });
+                            }
+                        } else {
+                            Toast.show({
+                                type: 'error',
+                                text1: 'Permission Denied',
+                                text2: 'Camera permission is required',
+                            });
+                        }
+                    },
+                },
+                {
+                    text: 'Choose from Gallery',
+                    onPress: async () => {
+                        try {
+                            const result = await launchImageLibrary({
+                                mediaType: 'photo',
+                                quality: 0.8,
+                                selectionLimit: 1,
+                            });
+
+                            if (!result.didCancel && result.assets && result.assets.length > 0) {
+                                const newImageUri = result.assets[0].uri;
+                                handleNewImage(newImageUri);
+                            }
+                        } catch (error) {
+                            console.error('Gallery error:', error);
+                            Toast.show({
+                                type: 'error',
+                                text1: 'Error',
+                                text2: 'Failed to pick image from gallery',
+                            });
+                        }
+                    },
+                },
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+            ],
+        );
+    };
+
+    const handleNewImage = (newImageUri) => {
+        setImages((prevImages) => {
+            const updatedImages = [...prevImages];
+            const firstEmptyIndex = updatedImages.findIndex((img) => img === null);
+            if (firstEmptyIndex !== -1) {
+                updatedImages[firstEmptyIndex] = newImageUri;
+            }
+            return updatedImages;
         });
+    };
 
-        if (!result.didCancel && result.assets && result.assets.length > 0) {
-            const newImageUri = result.assets[0].uri;
-
-            // Add the selected image to the first empty slot
-            setImages((prevImages) => {
-                const updatedImages = [...prevImages];
-                const firstEmptyIndex = updatedImages.findIndex((img) => img === null);
-                if (firstEmptyIndex !== -1) {
-                    updatedImages[firstEmptyIndex] = newImageUri;
+    const fetchCategories = async () => {
+        try {
+            const response = await Axios.get(
+                'https://api.sharegarden.ca/api/categories/getCategories',
+                {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                    },
                 }
-                return updatedImages;
+            );
+            
+            console.log('Categories response:', response.data);
+            
+            // Transform categories for dropdown while preserving all data
+            const formattedCategories = response.data.map(cat => ({
+                label: cat.name,
+                value: cat.id,
+                icon: cat.icon,
+                slug: cat.slug,
+                _count: cat._count
+            }));
+            
+            console.log('Formatted categories:', formattedCategories);
+            setCategories(formattedCategories);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to load categories',
             });
         }
     };
 
-
-    useEffect(() => {
-        if (!user) {
-            navigation.navigate("Login")
-            Toast.show({
-                type: 'error',
-                text1: 'Login or Signup',
-                text2: 'First Login plz',
-            });
-        }
-    }, [user, navigation]);
+    useFocusEffect(
+        React.useCallback(() => {
+            if (!user) {
+                navigation.navigate("Login")
+                Toast.show({
+                    type: 'error',
+                    text1: 'Login or Signup',
+                    text2: 'First Login plz',
+                });
+                return;
+            }
+            fetchCategories();
+        }, [user, navigation])
+    );
 
     if (!user) {
         return null;
     }
+
+    const resetForm = () => {
+        setTitle("");
+        setPointOrCashValue("");
+        setDescription("");
+        setChecked("");
+        setImages([null, null, null]);
+        setSelectedCategory(null);
+        setSelectedCategoryName('');
+        setSGPoints(true);
+        setCash(false);
+        setActiveButton("SG Item");
+    };
+
+    const handlePreview = () => {
+        if (!title || !description || !selectedCategory || images.every(img => img === null) || !checked) {
+            Toast.show({
+                type: 'error',
+                text1: 'Missing Fields',
+                text2: 'Please fill all required fields, select condition and add at least one image',
+            });
+            return;
+        }
+
+        navigation.navigate("Preview", {
+            title,
+            description,
+            images: images.filter(img => img !== null),
+            categoryId: selectedCategory,
+            categoryName: selectedCategoryName,
+            isSGPoints: sgPoints,
+            isCash: cash,
+            condition: checked,
+            pointOrCashValue: pointOrCashValue,
+            onSuccess: resetForm
+        });
+    };
 
     return (
         <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false}>
@@ -169,26 +341,42 @@ export default function PostTabScreen({ navigation }) {
                     value={title}
                     onChangeText={setTitle}
                 />
-                <DropdownComponent />
+                <View style={styles.dropdownContainer}>
+                    <Text style={styles.label}>Category*</Text>
+                    <DropDownInput
+                        data={categories}
+                        value={selectedCategory}
+                        onChange={item => {
+                            setSelectedCategory(item.value);
+                            setSelectedCategoryName(item.label);
+                        }}
+                        placeholder="Select category"
+                    />
+                </View>
                 <View style={styles.conditionContainer}>
                     <Text style={styles.heading}>Item Condition</Text>
                     <View style={{ flexDirection: "row", gap: 10 }}>
 
                         {
-                            checkBoxNames.map((name, index) => {
-
+                            checkBoxNames.map((item, index) => {
                                 return (
-
-                                    <TouchableOpacity key={index} activeOpacity={0.9} onPress={() => handleCheckboxChange(name)} style={styles.checkboxContainer}>
+                                    <TouchableOpacity 
+                                        key={index} 
+                                        activeOpacity={0.9} 
+                                        onPress={() => handleCheckboxChange(item.value)} 
+                                        style={[
+                                            styles.checkboxContainer,
+                                            checked === item.value && styles.activeCheckbox
+                                        ]}
+                                    >
                                         <View style={styles.checkBox}>
+                                            {checked === item.value && (
+                                                <Icon name="check" size={20} color="black" style={{ position: "absolute" }} />
+                                            )}
                                         </View>
-                                        {checked === name && (
-                                            <Icon name="check" size={20} color="black" style={{ position: "absolute" }} />
-                                        )}
-                                        <Text style={styles.checkboxText}>{name}</Text>
+                                        <Text style={styles.checkboxText}>{item.display}</Text>
                                     </TouchableOpacity>
                                 )
-
                             })
                         }
                     </View>
@@ -225,15 +413,8 @@ export default function PostTabScreen({ navigation }) {
                     borderColor={colors.borderColor}
                     borderRadius={Metrix.VerticalSize(4)}
                     flex={1}
-                    onPress={() => navigation.navigate("Preview", {
-                        title,
-                        pointOrCashValue,
-                        description,
-                        images,
-                        sgPoints,
-                        cash,
-                        checked
-                    })} />
+                    onPress={handlePreview}
+                />
 
                 <CustomButton
                     height={Metrix.VerticalSize(42)}

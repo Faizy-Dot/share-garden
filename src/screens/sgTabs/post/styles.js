@@ -5,13 +5,83 @@ import colors from "../../../config/Colors";
 
 
 const styles = StyleSheet.create({
-
+    container: {
+        flex: 1,
+        backgroundColor: colors.white,
+    },
+    content: {
+        padding: Metrix.HorizontalSize(20),
+    },
+    inputContainer: {
+        marginBottom: Metrix.VerticalSize(20),
+    },
+    label: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterBold,
+        marginBottom: Metrix.VerticalSize(8),
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: colors.borderColor,
+        borderRadius: Metrix.VerticalSize(4),
+        padding: Metrix.HorizontalSize(10),
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterRegular,
+    },
+    textArea: {
+        height: Metrix.VerticalSize(100),
+        textAlignVertical: 'top',
+    },
+    imageSection: {
+        marginBottom: Metrix.VerticalSize(20),
+    },
+    imageContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: Metrix.HorizontalSize(10),
+    },
+    imageWrapper: {
+        width: Metrix.HorizontalSize(100),
+        height: Metrix.VerticalSize(100),
+        position: 'relative',
+    },
+    productImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: Metrix.VerticalSize(4),
+    },
+    removeImageBtn: {
+        position: 'absolute',
+        top: Metrix.VerticalSize(5),
+        right: Metrix.HorizontalSize(5),
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderRadius: Metrix.VerticalSize(15),
+        width: Metrix.HorizontalSize(30),
+        height: Metrix.VerticalSize(30),
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    addImageBtn: {
+        width: Metrix.HorizontalSize(100),
+        height: Metrix.VerticalSize(100),
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderColor: colors.borderColor,
+        borderRadius: Metrix.VerticalSize(4),
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    addImageText: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.grey,
+        marginTop: Metrix.VerticalSize(5),
+    },
     postContainer: {
         padding: Metrix.VerticalSize(10),
         flex: 1,
         backgroundColor: colors.white,
-    }
-    ,
+    },
     buttonsContainer: {
         flexDirection: "row",
         height: Metrix.VerticalSize(40),
@@ -142,7 +212,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         marginBottom: Metrix.VerticalSize(35),
         gap: Metrix.VerticalSize(10)
-    }
+    },
 })
 
 export default styles;
