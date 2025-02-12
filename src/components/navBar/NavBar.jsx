@@ -24,7 +24,7 @@ export default function NavBar({
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(18) }}>
                 <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5), alignItems: "center" }}>
-                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>50200</Text>
+                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>{user?.points || 0}</Text>
                     <Image source={Images.homeGreenBit} style={styles.greenBit} />
                 </View>
                 <TouchableOpacity onPress={() => {

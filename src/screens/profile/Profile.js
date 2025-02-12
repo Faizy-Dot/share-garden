@@ -138,7 +138,7 @@ export default function Profile({ navigation }) {
                             <Text onPress={() => navigation.navigate("EditProfile")} style={styles.editProfile}>Edit Profile</Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5) }}>
-                            <Text>50200</Text>
+                            <Text>{user?.points || 0}</Text>
                             <Image source={Images.homeGreenBit} style={styles.geenBitImg} />
                         </View>
                         <TouchableOpacity onPress={() => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, FlatList, TextInput, PermissionsAndroid, Platform, Modal } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList, TextInput, PermissionsAndroid, Platform, Modal, ActivityIndicator, StyleSheet } from 'react-native';
 import styles from './styles';
 import { Colors, Images, Metrix } from '../../../config';
 import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
@@ -12,7 +12,7 @@ import fonts from '../../../config/Fonts';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'react-native-image-picker';
 import { Alert } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { updateUserProfile } from '../../../redux/Actions/authActions/loginAction';
@@ -35,6 +35,8 @@ export default function EditProfile({ navigation }) {
     const [open, setOpen] = useState(false); // Modal visibility
     const [loading, setLoading] = useState(false)
     const dispatch = useDispatch();
+    const [imageLoading, setImageLoading] = useState(false);
+    const [profileImage, setProfileImage] = useState(null);
 
     const config = {
         headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'application/json' }
@@ -64,8 +66,6 @@ export default function EditProfile({ navigation }) {
                     gender: gender,
                     dateOfBirth: formattedDate,
                     phoneNumber: phoneNumber,
-                    // email: user.emailaddress,
-                    // userId: user.userid,
                 },
                 config
             );
@@ -109,9 +109,9 @@ export default function EditProfile({ navigation }) {
 
 
     const data = [
-        { label: 'Male', value: 0 },
-        { label: 'Female', value: 1 },
-
+        { label: 'Male', value: 'Male' },
+        { label: 'Female', value: 'Female' },
+        { label: 'Other', value: 'Other' },
     ];
 
     const renderItem = item => {
@@ -154,98 +154,96 @@ export default function EditProfile({ navigation }) {
         return true;
     };
 
-    const handleImagePicker = async () => {
+    const handleImagePick = async () => {
         const options = {
             mediaType: 'photo',
-            quality: 1,
+            quality: 0.8,
+            includeBase64: false,
         };
 
-        // Show action sheet with options
         Alert.alert(
             'Select Image',
             'Choose an option to select a profile picture.',
             [
                 {
-                    text: 'Camera',
+                    text: 'Take Photo',
                     onPress: async () => {
                         const hasPermission = await requestCameraPermission();
                         if (hasPermission) {
-                            openCamera();
-                        } else {
-                            Alert.alert('Permission Denied', 'Camera permission is required.');
+                            try {
+                                const result = await ImagePicker.launchCamera(options);
+                                if (!result.didCancel && result.assets) {
+                                    handleImageUpload(result.assets[0]);
+                                }
+                            } catch (error) {
+                                console.error('Camera error:', error);
+                            }
                         }
                     },
                 },
-                { text: 'Gallery', onPress: openGallery },
-                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Choose from Gallery',
+                    onPress: async () => {
+                        try {
+                            const result = await ImagePicker.launchImageLibrary(options);
+                            if (!result.didCancel && result.assets) {
+                                handleImageUpload(result.assets[0]);
+                            }
+                        } catch (error) {
+                            console.error('Gallery error:', error);
+                        }
+                    },
+                },
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
             ],
-            { cancelable: true },
         );
     };
 
-    const openCamera = () => {
-        launchCamera({ mediaType: 'photo', quality: 1 }, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled camera');
-            } else if (response.errorCode) {
-                console.log('Camera error: ', response.errorMessage);
-            } else {
-                uploadProfileImage(response.assets[0])
-            }
-        });
-    };
-
-    const openGallery = () => {
-        launchImageLibrary({ mediaType: 'photo', quality: 1 }, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled gallery');
-            } else if (response.errorCode) {
-                console.log('Gallery error: ', response.errorMessage);
-            } else {
-                uploadProfileImage(response.assets[0])
-            }
-        });
-    };
-
-
-    const uploadProfileImage = async (selectedFile) => {
-        const file = new FormData();
-        file.append('profileImage', {
-            uri: selectedFile.uri,
-            type: selectedFile.type || 'image/jpeg',
-            name: selectedFile.fileName || 'uploaded_image.jpg',
-        });
-
-        console.log("file=>>>", file)
-
+    const handleImageUpload = async (imageFile) => {
+        setImageLoading(true);
         try {
-            const response = await Axios.post(`${baseUrl}/api/auth/upload-profile-image`, file, {
-                headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'multipart/form-data' }
+            const formData = new FormData();
+            formData.append('profileImage', {
+                uri: imageFile.uri,
+                type: imageFile.type || 'image/jpeg',
+                name: imageFile.fileName || 'image.jpg',
             });
+
+            const response = await Axios.post(
+                `${baseUrl}/api/auth/upload-profile-image`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+
             if (response.status === 200) {
+                console.log("response.data.imageUrl==>>>", response.data.imageUrl)
+                setProfileImage(response.data.imageUrl);
                 setImageUri(response.data.imageUrl);
                 Toast.show({
                     type: 'success',
-                    text1: response.data.message,
-                });
-            } else {
-                Toast.show({
-                    type: 'error',
-                    text1: response.data.message,
+                    text1: 'Success',
+                    text2: 'Profile image updated successfully',
                 });
             }
         } catch (error) {
-            console.error('Error uploading profile image:', error);
+            console.error('Image upload error:', error);
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Error uploading profile image.',
+                text2: 'Failed to upload image',
             });
+        } finally {
+            setImageLoading(false);
         }
     };
-
-    // console.log("image====>>" , imageUri)
-
 
     return (
         <View style={styles.container}>
@@ -268,17 +266,31 @@ export default function EditProfile({ navigation }) {
                         gap: Metrix.HorizontalSize(20), paddingHorizontal: Metrix.HorizontalSize(20),
                         alignItems: "center"
                     }}>
-                        <TouchableOpacity activeOpacity={0.8} style={styles.profileContainer} onPress={handleImagePicker}>
-                            {
-                                user.profileImage ?
-                                    <Image source={{ uri:imageUri ? imageUri :  user.profileImage }} style={styles.profileImage} />
-                                    :
-                                    <Icon name="user-circle" size={Metrix.HorizontalSize(80)} color="#ccc" />
-
-                            }
-                            <View style={styles.cameraPicker}>
-                                <Image source={Images.cameraIcon} />
-                            </View>
+                        <TouchableOpacity 
+                            style={styles.imagePickerContainer} 
+                            onPress={handleImagePick}
+                            disabled={imageLoading}
+                        >
+                            {profileImage || user.profileImage ? (
+                                <View style={styles.profileContainer}>
+                                    <Image 
+                                        source={{ uri: profileImage || user.profileImage }} 
+                                        style={styles.profileImage}
+                                        resizeMode="cover"
+                                    />
+                                </View>
+                            ) : (
+                                <View style={styles.profileContainer}>
+                                    {imageLoading ? (
+                                        <ActivityIndicator color={Colors.primary} />
+                                    ) : (
+                                        <>
+                                            <Icon name="camera" size={24} color={Colors.grey} />
+                                            <Text style={styles.uploadText}>Upload Photo</Text>
+                                        </>
+                                    )}
+                                </View>
+                            )}
                         </TouchableOpacity>
                         <View style={{ gap: 10, flex: 1 }}>
                             <Text style={[styles.userName, { fontSize: Metrix.FontExtraLarge, }]}>{user?.firstName + " " + user?.lastName}</Text>

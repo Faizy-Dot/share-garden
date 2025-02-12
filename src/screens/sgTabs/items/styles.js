@@ -1,8 +1,10 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import colors from "../../../config/Colors";
 import { Colors, Fonts, Metrix } from "../../../config";
 import fonts from "../../../config/Fonts";
 
+const { width } = Dimensions.get('window');
+const productWidth = (width - (Metrix.HorizontalSize(40))) / 3; // 40 = padding (15+15) + gaps between items (5+5)
 
 const styles = StyleSheet.create({
     container: {
@@ -15,11 +17,14 @@ const styles = StyleSheet.create({
         paddingBottom: Metrix.VerticalSize(25)
     },
     logo: {
-        width: Metrix.HorizontalSize(171),
-        height: Metrix.VerticalSize(43)
+        width: Metrix.HorizontalSize(120),
+        height: Metrix.VerticalSize(40),
+        resizeMode: 'contain',
     },
     header: {
-        marginTop: Metrix.VerticalSize(20)
+        paddingTop: Metrix.VerticalSize(15),
+        paddingHorizontal: Metrix.HorizontalSize(15),
+        alignItems: 'center',
     },
     locationLogo: {
         width: Metrix.HorizontalSize(15),
@@ -137,8 +142,72 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center"
     },
-    
-
-})
+    searchSection: {
+        marginTop: Metrix.VerticalSize(15),
+        gap: Metrix.VerticalSize(10),
+    },
+    categorySection: {
+        marginTop: Metrix.VerticalSize(15),
+        marginBottom: Metrix.VerticalSize(10),
+    },
+    productList: {
+        paddingHorizontal: Metrix.HorizontalSize(15),
+        paddingBottom: Metrix.VerticalSize(20),
+    },
+    productRow: {
+        justifyContent: 'space-between',
+        marginBottom: Metrix.VerticalSize(10),
+    },
+    productContainer: {
+        width: productWidth,
+        backgroundColor: colors.white,
+        borderRadius: Metrix.VerticalSize(8),
+        padding: Metrix.VerticalSize(5),
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    productImage: {
+        width: '100%',
+        height: productWidth,
+        borderRadius: Metrix.VerticalSize(8),
+        resizeMode: 'cover',
+    },
+    productTitle: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterSemiBold,
+        marginTop: Metrix.VerticalSize(5),
+    },
+    productDescription: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.textGray,
+        marginTop: Metrix.VerticalSize(2),
+    },
+    priceIcon: {
+        width: Metrix.HorizontalSize(20),
+        height: Metrix.VerticalSize(20),
+        marginRight: Metrix.HorizontalSize(5),
+    },
+    priceText: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterSemiBold,
+        color: colors.buttonColor,
+    },
+    loader: {
+        marginTop: Metrix.VerticalSize(20),
+    },
+    errorText: {
+        textAlign: 'center',
+        color: colors.redColor,
+        marginTop: Metrix.VerticalSize(20),
+        fontFamily: fonts.InterRegular,
+    },
+});
 
 export default styles;

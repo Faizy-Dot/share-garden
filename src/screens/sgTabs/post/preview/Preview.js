@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Image, Modal, Switch, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, Modal, Switch, Text, TextInput, TouchableOpacity, View, ScrollView } from "react-native";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -12,28 +12,77 @@ import { Images, Metrix } from "../../../../config";
 import styles from "./style";
 import fonts from "../../../../config/Fonts";
 import CustomButton from "../../../../components/Button/Button";
+import axiosInstance from '../../../../config/axios';
 
 
 export default function PostTabScreen({ navigation, route }) {
-  const [days, setDays] = useState(12);
-  const [hours, setHours] = useState(10);
-  const [minutes, setMinutes] = useState(3);
-  const [seconds, setSeconds] = useState(50);
+  const [days, setDays] = useState('');
+  const [hours, setHours] = useState('');
+  const [minutes, setMinutes] = useState('');
+  const [seconds, setSeconds] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [publish, setPublish] = useState(false)
   const [draft, setDraft] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [timeErrors, setTimeErrors] = useState({
+    days: '',
+    hours: '',
+    minutes: '',
+    seconds: ''
+  });
+  const [navigateTimeout, setNavigateTimeout] = useState(null);
 
   const { user } = useSelector((state) => state.login)
 
-  const { title, pointOrCashValue, description, images, sgPoints, cash, checked } = route.params;
+  const { 
+    title, 
+    pointOrCashValue, 
+    description, 
+    images, 
+    isSGPoints,
+    isCash, 
+    condition, 
+    categoryId, 
+    categoryName,
+    onSuccess 
+  } = route.params;
 
   console.log("checked==>>>",images)
+  console.log('Received isSGPoints:', isSGPoints);
   
 
-  const handleInput = (text, setter) => {
+  const handleInput = (text, setter, field) => {
     const numericText = text.replace(/[^0-9]/g, ""); // Allow only numbers
+    
+    // Clear previous error for this field
+    setTimeErrors(prev => ({ ...prev, [field]: '' }));
+
+    if (field === 'days') {
+        if (parseInt(numericText) > 3) {
+            setTimeErrors(prev => ({ ...prev, days: 'Maximum 3 days allowed' }));
+            return;
+        }
+    }
+
     if (numericText.length <= 2) {
-      setter(numericText);
+        setter(numericText);
+        
+        // Additional validations
+        if (field === 'hours') {
+            if (parseInt(numericText) > 23) {
+                setTimeErrors(prev => ({ ...prev, hours: 'Hours cannot exceed 23' }));
+                return;
+            }
+        }
+        if (field === 'minutes' || field === 'seconds') {
+            if (parseInt(numericText) > 59) {
+                setTimeErrors(prev => ({
+                    ...prev,
+                    [field]: `${field.charAt(0).toUpperCase() + field.slice(1)} cannot exceed 59`
+                }));
+                return;
+            }
+        }
     }
   };
 
@@ -51,6 +100,232 @@ export default function PostTabScreen({ navigation, route }) {
   if (!user) {
     return null;
   }
+
+  const handlePublish = async (isDraft = false) => {
+    // Reset all errors
+    setTimeErrors({
+        days: '',
+        hours: '',
+        minutes: '',
+        seconds: ''
+    });
+
+    // Convert to numbers for comparison
+    const daysNum = Number(days) || 0;
+    const hoursNum = Number(hours) || 0;
+    const minutesNum = Number(minutes) || 0;
+    const secondsNum = Number(seconds) || 0;
+
+    // Calculate total seconds
+    const totalSeconds = (daysNum * 24 * 60 * 60) + 
+                        (hoursNum * 60 * 60) + 
+                        (minutesNum * 60) + 
+                        secondsNum;
+
+    if (isSGPoints) {
+        // First validate the bid value
+        if (!pointOrCashValue || pointOrCashValue <= 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Bid Value',
+                text2: 'Please enter a valid minimum bid value',
+            });
+            return;
+        }
+
+        // Validate time inputs - ensure they're not empty or invalid
+        if (!days && !hours && !minutes && !seconds) {
+            Toast.show({
+                type: 'error',
+                text1: 'Missing Duration',
+                text2: 'Please set a bid duration',
+            });
+            return;
+        }
+
+        // If days is 0, hours must not be 0
+        if (daysNum === 0 && hoursNum === 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Duration',
+                text2: 'Hours must not be 0 when days is 0',
+            });
+            return;
+        }
+
+        if (totalSeconds === 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Duration',
+                text2: 'Bid duration cannot be zero',
+            });
+            return;
+        }
+
+        // Check if any time field has validation errors
+        if (Object.values(timeErrors).some(error => error !== '')) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Time',
+                text2: 'Please correct the time inputs',
+            });
+            return;
+        }
+    }
+
+    setLoading(true);
+    try {
+        const formData = new FormData();
+        
+        // Required fields
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('categoryId', categoryId);
+        formData.append('condition', condition);
+        formData.append('isSGPoints', isSGPoints.toString());
+        formData.append('isPublished', (!isDraft).toString());
+
+        // Conditional fields based on payment type
+        if (isSGPoints) {
+            formData.append('minBid', pointOrCashValue.toString());
+            formData.append('bidDuration', totalSeconds.toString());
+        } else {
+            formData.append('price', pointOrCashValue.toString());
+        }
+
+        // Append images
+        images.filter(img => img !== null).forEach((image, index) => {
+            formData.append('images', {
+                uri: image,
+                type: 'image/jpeg',
+                name: `image${index}.jpg`,
+            });
+        });
+
+        // Debug logs
+        console.log('Form Data Contents:', {
+            title,
+            description,
+            categoryId,
+            condition,
+            isSGPoints,
+            isPublished: !isDraft,
+            ...(isSGPoints ? {
+                minBid: pointOrCashValue,
+                bidDuration: totalSeconds
+            } : {
+                price: pointOrCashValue
+            }),
+            imageCount: images.filter(img => img !== null).length
+        });
+
+        const response = await axiosInstance.post(
+            '/api/products/createProduct',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+
+        console.log('API Response:', response.data);
+
+        if (response.status === 201) {
+            setModalVisible(true);
+            if (isDraft) {
+                setDraft(true);
+                setPublish(false);
+            } else {
+                setDraft(false);
+                setPublish(true);
+            }
+
+            const timeout = setTimeout(() => {
+                setModalVisible(false);
+                resetPreviewForm();
+                onSuccess();
+                navigation.reset({
+                    index: 0,
+                    routes: [
+                        { 
+                            name: 'PostList',
+                            params: { refresh: true }
+                        }
+                    ],
+                });
+            }, 2000);
+
+            setNavigateTimeout(timeout);
+        }
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Failed to create product';
+        Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: errorMessage,
+        });
+    } finally {
+        setLoading(false);
+    }
+};
+
+const getDisplayCondition = (apiCondition) => {
+    switch(apiCondition) {
+        case 'FAIRLY_USED':
+            return 'Fairly Used';
+        case 'GOOD':
+            return 'Good';
+        case 'EXCELLENT':
+            return 'Excellent';
+        default:
+            return 'Not specified';
+    }
+};
+
+// Clean up timeout when component unmounts or on error
+useEffect(() => {
+    return () => {
+        if (navigateTimeout) {
+            clearTimeout(navigateTimeout);
+        }
+    };
+}, [navigateTimeout]);
+
+// Reset Preview form fields
+const resetPreviewForm = () => {
+    setDays('');
+    setHours('');
+    setMinutes('');
+    setSeconds('');
+    setTimeErrors({
+        days: '',
+        hours: '',
+        minutes: '',
+        seconds: ''
+    });
+};
+
+// Update handleModalClose to reset both forms
+const handleModalClose = () => {
+    if (navigateTimeout) {
+        clearTimeout(navigateTimeout);
+    }
+    setModalVisible(false);
+    setDraft(false);
+    setPublish(false);
+    resetPreviewForm();
+    onSuccess();
+    navigation.reset({
+        index: 0,
+        routes: [
+            { 
+                name: 'PostList',
+                params: { refresh: true }
+            }
+        ],
+    });
+};
 
   return (
     <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false}>
@@ -96,23 +371,28 @@ export default function PostTabScreen({ navigation, route }) {
           </View>
 
           <View style={styles.sameMiddleBox}>
-            <Text style={styles.itemConditionText}>Category : <Text style={{ fontFamily: fonts.InterRegular }}>Furniture</Text></Text>
+            <Text style={styles.itemConditionText}>Category : <Text style={{ fontFamily: fonts.InterRegular }}>{categoryName}</Text></Text>
           </View>
 
           <View style={[styles.sameMiddleBox, { flexDirection: "row", gap: Metrix.HorizontalSize(5), }]}>
-            <Text style={styles.itemConditionText}>Item Condition : <Text style={{ fontFamily: fonts.InterRegular }}>{checked}</Text> </Text>
-
+            <Text style={styles.itemConditionText}>
+                Item Condition : <Text style={{ fontFamily: fonts.InterRegular }}>
+                    {getDisplayCondition(condition)}
+                </Text>
+            </Text>
           </View>
 
           <View style={[styles.sameMiddleBox, { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
-              <Image source={sgPoints ? Images.bitLogoBig : Images.dollarLogoBig} style={styles.bitLogo} />
-              <Text style={[styles.itemConditionText, { fontFamily: fonts.InterBold }]}>Bid in SG Pts </Text>
+              <Image source={isSGPoints ? Images.bitLogoBig : Images.dollarLogoBig} style={styles.bitLogo} />
+              <Text style={[styles.itemConditionText, { fontFamily: fonts.InterBold }]}>
+                {isSGPoints ? 'Bid in SG Pts' : 'Price'}
+              </Text>
             </View>
-            <Text style={styles.bidsValue}>{cash && "$  "}{pointOrCashValue}</Text>
+            <Text style={styles.bidsValue}>{isCash && "$  "}{pointOrCashValue}</Text>
           </View>
           {
-            sgPoints &&
+            isSGPoints &&
             <>
 
               <View style={[styles.sameMiddleBox, { flexDirection: "row", gap: Metrix.HorizontalSize(29) }]}>
@@ -123,25 +403,31 @@ export default function PostTabScreen({ navigation, route }) {
 
                 <View style={styles.timerRow}>
                   {[
-                    { label: "Days", value: days, setter: setDays },
-                    { label: "Hours", value: hours, setter: setHours },
-                    { label: "Minutes", value: minutes, setter: setMinutes },
-                    { label: "Seconds", value: seconds, setter: setSeconds },
+                    { label: "Days", value: days, setter: setDays, field: 'days' },
+                    { label: "Hours", value: hours, setter: setHours, field: 'hours' },
+                    { label: "Minutes", value: minutes, setter: setMinutes, field: 'minutes' },
+                    { label: "Seconds", value: seconds, setter: setSeconds, field: 'seconds' },
                   ].map((item, index) => (
                     <View key={index} style={styles.inputContainer}>
                       <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <TextInput
-                          style={styles.input}
+                          style={[
+                            styles.input,
+                            timeErrors[item.field] ? styles.inputError : null
+                          ]}
                           keyboardType="numeric"
                           placeholder="00"
                           placeholderTextColor="#000"
                           value={item.value}
-                          onChangeText={(text) => handleInput(text, item.setter)}
+                          onChangeText={(text) => handleInput(text, item.setter, item.field)}
                           maxLength={2}
                         />
                         {index < 3 && <Text style={styles.separator}>:</Text>}
                       </View>
                       <Text style={styles.label}>{item.label}</Text>
+                      {timeErrors[item.field] && (
+                        <Text style={styles.errorText}>{timeErrors[item.field]}</Text>
+                      )}
                     </View>
                   ))}
                 </View>
@@ -158,41 +444,35 @@ export default function PostTabScreen({ navigation, route }) {
       <View style={styles.bottomButtons}>
         <CustomButton
           height={Metrix.VerticalSize(42)}
-          title={"SAVE DRAFT"}
+          title={loading ? "SAVING..." : "SAVE DRAFT"}
           backgroundColor={colors.white}
           color={colors.black}
           borderWidth={1}
           borderColor={colors.borderColor}
           borderRadius={Metrix.VerticalSize(4)}
           flex={1}
-          onPress={() => {
-            setModalVisible(true)
-            setDraft(true)
-            setPublish(false)
-          }}
+          disabled={loading}
+          onPress={() => handlePublish(true)}
         />
 
         <CustomButton
           height={Metrix.VerticalSize(42)}
-          title={"PUBLISH"}
+          title={loading ? "PUBLISHING..." : "PUBLISH"}
           backgroundColor={colors.buttonColor}
           borderRadius={Metrix.VerticalSize(4)}
           flex={1}
-          onPress={() => {
-            setModalVisible(true)
-            setDraft(false)
-            setPublish(true)
-          }} />
+          disabled={loading}
+          onPress={() => handlePublish(false)}
+        />
       </View>
 
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => {
-              setModalVisible(false)
-              setDraft(false)
-              setPublish(false)
-            }}>
+            <TouchableOpacity 
+                style={styles.closeButton} 
+                onPress={handleModalClose}
+            >
               <Image source={Images.crossIcon} />
             </TouchableOpacity>
             <Image source={Images.successIcon} style={styles.successIcon} />

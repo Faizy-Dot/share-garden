@@ -217,7 +217,20 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         alignSelf : "flex-end"
-    }
+    },
+    inputError: {
+        borderColor: colors.redColor,
+    },
+    errorText: {
+        color: colors.redColor,
+        fontSize: Metrix.FontExtraSmall,
+        marginTop: 2,
+        position: 'absolute',
+        bottom: -20,
+        left: 0,
+        width: '100%',
+        textAlign: 'center',
+    },
 })
 
 export default styles;
