@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         height: Metrix.HorizontalSize(64),
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: Metrix.VerticalSize(32)
+        borderRadius: Metrix.HorizontalSize(32)
     },
 
     categoryText: {

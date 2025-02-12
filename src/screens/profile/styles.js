@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     profileContainer: {
         width: Metrix.HorizontalSize(64),
         height: Metrix.HorizontalSize(64),
-        borderRadius: Metrix.VerticalSize(32),  // Half of width/height to make it a circle
+        borderRadius: Metrix.HorizontalSize(32),  // Half of width/height to make it a circle
         overflow: "hidden", // Ensures the image is clipped to the circular shape
         borderWidth: 1,
         borderColor: colors.borderColor,
