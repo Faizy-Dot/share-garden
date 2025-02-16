@@ -90,6 +90,7 @@ const ItemsTabScreen = () => {
                     justifyContent={'space-around'}
                     iconCondition={true}
                     placeholder={"Search items near you"} 
+                    borderRadius={Metrix.VerticalSize(3)}
                 />
             </View>
 
