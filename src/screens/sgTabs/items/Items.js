@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Fonts, Images, Metrix } from "../../../config";
 import styles from "./styles";
-import CustomButton from "../../../components/Button/Button";
 import colors from "../../../config/Colors";
 import NavBar from "../../../components/navBar/NavBar";
 import CustomInput from "../../../components/customInput/CustomInput";
