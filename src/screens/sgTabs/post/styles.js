@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     inputsContainer: {
         marginTop: Metrix.VerticalSize(10),
         gap: Metrix.VerticalSize(10),
-        marginBottom: Metrix.VerticalSize(30)
+        marginBottom: Metrix.VerticalSize(15)
     },
     title: {
         width: "100%",
@@ -213,6 +213,10 @@ const styles = StyleSheet.create({
         marginBottom: Metrix.VerticalSize(35),
         gap: Metrix.VerticalSize(10)
     },
+    SGTipText : {
+        fontFamily: fonts.InterRegular,
+        fontSize: Metrix.FontExtraSmall
+    }
 })
 
 export default styles;

@@ -38,7 +38,6 @@ export default function PostTabScreen({ navigation, route }) {
     const { user } = useSelector((state) => state.login)
 
 
-
     const handleCheckboxChange = (key) => {
         setChecked(key);
     };
@@ -164,9 +163,9 @@ export default function PostTabScreen({ navigation, route }) {
                     },
                 }
             );
-            
+
             console.log('Categories response:', response.data);
-            
+
             // Transform categories for dropdown while preserving all data
             const formattedCategories = response.data.map(cat => ({
                 label: cat.name,
@@ -175,7 +174,7 @@ export default function PostTabScreen({ navigation, route }) {
                 slug: cat.slug,
                 _count: cat._count
             }));
-            
+
             console.log('Formatted categories:', formattedCategories);
             setCategories(formattedCategories);
         } catch (error) {
@@ -229,6 +228,29 @@ export default function PostTabScreen({ navigation, route }) {
     };
 
     const handlePreview = () => {
+        if(activeButton === "SG Tip"){
+            if (!title || !description || !selectedCategory || images.every(img => img === null)) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Missing Fields',
+                    text2: 'Please fill all required fields, select condition and add at least one image',
+                });
+                return;
+            }
+    
+            navigation.navigate("Preview", {
+                title,
+                description,
+                images: images.filter(img => img !== null),
+                categoryId: selectedCategory,
+                categoryName: selectedCategoryName,
+                isSGPoints: sgPoints,
+                onSuccess: resetForm,
+                activeButton : activeButton
+            });
+            return ; 
+        }
+
         if (!title || !description || !selectedCategory || images.every(img => img === null) || !checked) {
             Toast.show({
                 type: 'error',
@@ -248,7 +270,8 @@ export default function PostTabScreen({ navigation, route }) {
             isCash: cash,
             condition: checked,
             pointOrCashValue: pointOrCashValue,
-            onSuccess: resetForm
+            onSuccess: resetForm,
+            activeButton : activeButton
         });
     };
 
@@ -297,32 +320,34 @@ export default function PostTabScreen({ navigation, route }) {
                     </Text>
                 </TouchableOpacity>
             </View>
-
-            <View style={styles.switchingCOntainer}>
-                <View>
-                    <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Trade in</Text>
-                </View>
-
-                <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15) }}>
-                    <View style={styles.Switch}>
-                        <Image source={Images.homeGreenBit} style={styles.logos} />
-                        <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>SG Points</Text>
-                        <Switch value={sgPoints} onValueChange={() => {
-                            setSGPoints(true);
-                            setCash(false);
-                        }} />
+            {
+                activeButton === "SG Item" &&
+                <View style={styles.switchingCOntainer}>
+                    <View>
+                        <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Trade in</Text>
                     </View>
 
-                    <View style={styles.Switch}>
-                        <Image source={Images.homeDollarLogo} style={styles.logos} />
-                        <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>Cash</Text>
-                        <Switch value={cash} onValueChange={() => {
-                            setCash(true);
-                            setSGPoints(false);
-                        }} />
+                    <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15) }}>
+                        <View style={styles.Switch}>
+                            <Image source={Images.homeGreenBit} style={styles.logos} />
+                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>SG Points</Text>
+                            <Switch value={sgPoints} onValueChange={() => {
+                                setSGPoints(true);
+                                setCash(false);
+                            }} />
+                        </View>
+
+                        <View style={styles.Switch}>
+                            <Image source={Images.homeDollarLogo} style={styles.logos} />
+                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>Cash</Text>
+                            <Switch value={cash} onValueChange={() => {
+                                setCash(true);
+                                setSGPoints(false);
+                            }} />
+                        </View>
                     </View>
                 </View>
-            </View>
+            }
 
             <View style={styles.imageUploadContainer}>
                 <TouchableOpacity onPress={handleImagePicker} activeOpacity={0.8} style={{ alignItems: "center", gap: 10 }}>
@@ -361,41 +386,47 @@ export default function PostTabScreen({ navigation, route }) {
                         placeholder="Select category"
                     />
                 </View>
-                <View style={styles.conditionContainer}>
-                    <Text style={styles.heading}>Item Condition</Text>
-                    <View style={{ flexDirection: "row", gap: 10 }}>
+                {
+                    activeButton === "SG Item" &&
+                    <>
+                        <View style={styles.conditionContainer}>
+                            <Text style={styles.heading}>Item Condition</Text>
+                            <View style={{ flexDirection: "row", gap: 10 }}>
 
-                        {
-                            checkBoxNames.map((item, index) => {
-                                return (
-                                    <TouchableOpacity 
-                                        key={index} 
-                                        activeOpacity={0.9} 
-                                        onPress={() => handleCheckboxChange(item.value)} 
-                                        style={[
-                                            styles.checkboxContainer,
-                                            checked === item.value && styles.activeCheckbox
-                                        ]}
-                                    >
-                                        <View style={styles.checkBox}>
-                                            {checked === item.value && (
-                                                <Icon name="check" size={20} color="black" style={{ position: "absolute" }} />
-                                            )}
-                                        </View>
-                                        <Text style={styles.checkboxText}>{item.display}</Text>
-                                    </TouchableOpacity>
-                                )
-                            })
-                        }
-                    </View>
-                </View>
-                <TextInput
-                    placeholderTextColor={colors.black}
-                    placeholder="Enter Point Value or Cash value"
-                    style={styles.title}
-                    value={pointOrCashValue}
-                    onChangeText={setPointOrCashValue}
-                />
+                                {
+                                    checkBoxNames.map((item, index) => {
+                                        return (
+                                            <TouchableOpacity
+                                                key={index}
+                                                activeOpacity={0.9}
+                                                onPress={() => handleCheckboxChange(item.value)}
+                                                style={[
+                                                    styles.checkboxContainer,
+                                                    checked === item.value && styles.activeCheckbox
+                                                ]}
+                                            >
+                                                <View style={styles.checkBox}>
+                                                    {checked === item.value && (
+                                                        <Icon name="check" size={20} color="black" style={{ position: "absolute" }} />
+                                                    )}
+                                                </View>
+                                                <Text style={styles.checkboxText}>{item.display}</Text>
+                                            </TouchableOpacity>
+                                        )
+                                    })
+                                }
+                            </View>
+                        </View>
+                        <TextInput
+                            placeholderTextColor={colors.black}
+                            placeholder="Enter Point Value or Cash value"
+                            style={styles.title}
+                            value={pointOrCashValue}
+                            onChangeText={setPointOrCashValue}
+                        />
+                    </>
+                }
+
                 <TextInput
                     style={styles.description}
                     multiline={true}
@@ -408,6 +439,18 @@ export default function PostTabScreen({ navigation, route }) {
                 />
 
             </View>
+            {
+                activeButton === "SG Tip" &&
+
+                <View style={{ paddingLeft: Metrix.HorizontalSize(15), marginBottom: 15 }}>
+                    <Text style={styles.SGTipText}>How it works:</Text>
+                    <View style={{ paddingLeft: Metrix.HorizontalSize(7) }}>
+                        <Text style={styles.SGTipText}>• Share a tip that helps others in the comments below.</Text>
+                        <Text style={styles.SGTipText}>• Get views, likes and share on your tips</Text>
+                        <Text style={styles.SGTipText}>• Earn 1 point for each view, like and share</Text>
+                    </View>
+                </View>
+            }
 
 
             <View style={styles.bottomButtons}>

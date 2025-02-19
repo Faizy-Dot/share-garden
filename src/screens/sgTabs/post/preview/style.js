@@ -8,9 +8,9 @@ import fonts from "../../../../config/Fonts";
 const styles = StyleSheet.create({
 
     postContainer: {
-        padding: Metrix.VerticalSize(10),
         flex: 1,
         backgroundColor: colors.white,
+       
     }
     ,
     buttonsContainer: {
@@ -85,10 +85,11 @@ const styles = StyleSheet.create({
     bottomButtons: {
         flexDirection: "row",
         gap: Metrix.HorizontalSize(10),
-        paddingVertical : Metrix.VerticalSize(20)
+        paddingVertical : Metrix.VerticalSize(20),
+        paddingHorizontal : Metrix.HorizontalSize(10)
     },
     middleContainer: {
-        marginTop: Metrix.VerticalSize(10),
+        paddingHorizontal: Metrix.VerticalSize(10),
         gap: Metrix.VerticalSize(15)
     },
     middleBox: {
@@ -104,6 +105,15 @@ const styles = StyleSheet.create({
     updateImage: {
         width: Metrix.HorizontalSize(100),
         height: Metrix.HorizontalSize(100),
+    },
+    SGTipimageContainer:{
+        width: Metrix.HorizontalSize(100),
+        height: Metrix.HorizontalSize(70),
+        backgroundColor : colors.borderColor
+    },
+    SGTipupdateImage:{
+        width: Metrix.HorizontalSize(100),
+        height: Metrix.HorizontalSize(70),
     },
     middleHeading: {
         fontSize: Metrix.FontRegular,

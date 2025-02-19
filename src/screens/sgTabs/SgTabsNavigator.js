@@ -33,6 +33,10 @@ function PostStackScreen() {
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
         <ItemsStack.Screen name="MyBids" component={MyBids} />
+        <ItemsStack.Screen name="MySGTips" component={MySGTips} />
+         <ItemsStack.Screen name="Reviews" component={Reviews} />
+         <ItemsStack.Screen name="Settings" component={Settings} />
+         <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
         <ItemsStack.Screen name="Preview" component={Preview} />
       </ItemsStack.Navigator>
     );
