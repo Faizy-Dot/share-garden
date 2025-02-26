@@ -12,6 +12,8 @@ import { login } from '../../../redux/Actions/authActions/loginAction';
 import fonts from '../../../config/Fonts';
 import Toast from 'react-native-toast-message';
 import getDeviceDetails from '../../../config/DeviceDetails';
+import { signIn, testGoogleSignIn } from './GoogleAuthentication';
+
 
 const Login = ({ navigation }) => {
 
@@ -125,12 +127,13 @@ const Login = ({ navigation }) => {
                 <CustomButton
                     title={"Continue With Google"}
                     icon={<FontAwesome name="google" color="#fff" style={styles.socialButtonIcon}
-                    />}
+                    />}z
                     backgroundColor='#F8443E'
                     width={Metrix.HorizontalSize(300)}
                     height={Metrix.VerticalSize(50)}
                     fontSize={Metrix.FontExtraSmall}
                     fontFamily={fonts.InterRegular}
+                    onPress={signIn}
                 />
 
                 <CustomButton
@@ -168,4 +171,4 @@ const Login = ({ navigation }) => {
     )
 }
 
-export default Login
+export default Login;

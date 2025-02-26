@@ -2,10 +2,12 @@ plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
     id "com.facebook.react"
+    id "com.google.gms.google-services"
 }
 
 react {
     // Keep your existing react configuration
+    //  autolinkLibrariesWithApp()
 }
 
 def enableProguardInReleaseBuilds = false
@@ -59,6 +61,14 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation project(':react-native-splash-screen')
 
+    implementation project(':@react-native-google-signin_google-signin') 
+      implementation platform('com.google.firebase:firebase-bom:32.7.2')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation project(':@react-native-firebase_app')
+    implementation project(':@react-native-firebase_auth')
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
@@ -77,6 +87,7 @@ implementation project(':react-native-image-picker')
     implementation 'com.facebook.react:react-native:+'
 implementation project(':react-native-device-info')
 implementation project(':react-native-date-picker')
+ 
 
    
 }

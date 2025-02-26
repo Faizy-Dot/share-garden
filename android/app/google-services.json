@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "743643897751",
+    "project_id": "share-garden-2025",
+    "storage_bucket": "share-garden-2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743643897751:android:7b1b279e242d8561c7eed2",
+        "android_client_info": {
+          "package_name": "com.awesomeproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "743643897751-fc2n4n97qapkrpt155dbl0ngr0trt7uc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.awesomeproject",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "743643897751-v8oalgv56b1erejcqpksokcvblcqqlsc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz5DKbjXfheSJznBKjF8PHvbmAem5oyFs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "743643897751-v8oalgv56b1erejcqpksokcvblcqqlsc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
