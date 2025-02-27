@@ -83,11 +83,10 @@ dependencies {
     implementation project(':react-native-safe-area-context')
     implementation project(':react-native-screens')
     implementation project(':react-native-vector-icons')
-implementation project(':react-native-image-picker')
+    implementation project(':react-native-image-picker')
     implementation 'com.facebook.react:react-native:+'
-implementation project(':react-native-device-info')
-implementation project(':react-native-date-picker')
- 
-
-   
+    implementation project(':react-native-device-info')
+    implementation project(':react-native-date-picker')
+  
 }
+apply plugin: 'com.google.gms.google-services' // <- Add this line
