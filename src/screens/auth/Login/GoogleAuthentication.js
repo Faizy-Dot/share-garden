@@ -1,48 +1,36 @@
 import auth from '@react-native-firebase/auth';
 import {
   GoogleSignin,
-  statusCodes,
 } from '@react-native-google-signin/google-signin';
+import { useEffect } from 'react';
 
-// Configure Google Sign In
-GoogleSignin.configure({
-  webClientId: '743643897751-v8oalgv56b1erejcqpksokcvblcqqlsc.apps.googleusercontent.com',
-  offlineAccess: false,
-});
+ // const checkToken = async () => {
+  //   try {
+  //     const userInfo = await GoogleSignin.signInSilently();
+  //     console.log("User Info:", userInfo);
+  //   } catch (error) {
+  //     console.error("Silent Sign-In Error:", error.message);
+  //   }
+  // };
+  // useEffect(() => { checkToken(); }, []);
+  
+  
 
-export const signIn = async () => {
-  try {
-    // Check if Play Services are available
-    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-
-    // Get user ID token
-    const { idToken } = await GoogleSignin.signIn();
-
-    // Create a Google credential with the token
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-
-    // Sign-in the user with the credential
-    const userCredential = await auth().signInWithCredential(googleCredential);
-    
-    console.log("Firebase User:", userCredential.user);
-    return userCredential.user;
-
-  } catch (error) {
-    console.error('Detailed error:', error);
-
-    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-      console.log('User cancelled the login flow');
-    } else if (error.code === statusCodes.IN_PROGRESS) {
-      console.log('Operation already in progress');
-    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-      console.log('Play services not available or outdated');
-    } else {
-      console.log('Other error occurred:', error.message);
+  export const onGoogleButtonPress = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+  
+     const userInfo = await GoogleSignin.signIn();
+  
+  
+      const googleCredential = auth.GoogleAuthProvider.credential(userInfo.data.idToken);
+      const userCredential = await auth().signInWithCredential(googleCredential);
+  
+      console.log("Firebase User:", userCredential.user._user);
+    } catch (error) {
+      console.error("Google Sign-In Error:", error.message);
     }
-
-    throw error;
-  }
-};
+  };
 
 // Sign out function
 export const signOut = async () => {

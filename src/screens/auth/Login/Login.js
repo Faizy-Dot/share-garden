@@ -1,5 +1,5 @@
 import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Images from '../../../config/Images';
@@ -12,10 +12,29 @@ import { login } from '../../../redux/Actions/authActions/loginAction';
 import fonts from '../../../config/Fonts';
 import Toast from 'react-native-toast-message';
 import getDeviceDetails from '../../../config/DeviceDetails';
-import { signIn, testGoogleSignIn } from './GoogleAuthentication';
+import { onGoogleButtonPress, signIn, testGoogleSignIn } from './GoogleAuthentication';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 
 const Login = ({ navigation }) => {
+
+    useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: '743643897751-ua9nc05ikmvksl0hkid4t5asdvk6d7gj.apps.googleusercontent.com',
+            offlineAccess: true, // Needed for ID token
+            forceCodeForRefreshToken: true,
+        });
+    }, []);
+
+    const checkToken = async () => {
+        try {
+            const userInfo = await GoogleSignin.signInSilently();
+            console.log("User Info:", userInfo);
+        } catch (error) {
+            console.error("Silent Sign-In Error:", error.message);
+        }
+    };
+    useEffect(() => { checkToken(); }, []);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -96,7 +115,7 @@ const Login = ({ navigation }) => {
                 />
             </View>
 
-            <TouchableOpacity activeOpacity={0.8} onPress={()=> navigation.navigate('ForgotPassword')}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('ForgotPassword')}>
                 <Text style={styles.forgotPassword}>Forgot Password?</Text>
             </TouchableOpacity>
 
@@ -127,13 +146,13 @@ const Login = ({ navigation }) => {
                 <CustomButton
                     title={"Continue With Google"}
                     icon={<FontAwesome name="google" color="#fff" style={styles.socialButtonIcon}
-                    />}z
+                    />} z
                     backgroundColor='#F8443E'
                     width={Metrix.HorizontalSize(300)}
                     height={Metrix.VerticalSize(50)}
                     fontSize={Metrix.FontExtraSmall}
                     fontFamily={fonts.InterRegular}
-                    onPress={signIn}
+                    onPress={onGoogleButtonPress}
                 />
 
                 <CustomButton
