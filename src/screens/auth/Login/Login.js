@@ -14,6 +14,8 @@ import Toast from 'react-native-toast-message';
 import getDeviceDetails from '../../../config/DeviceDetails';
 import { onGoogleButtonPress, signIn, testGoogleSignIn } from './GoogleAuthentication';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { getMessaging, getToken } from '@react-native-firebase/messaging';
+import Logo from '../../../assets/svg/Logo';
 
 
 const Login = ({ navigation }) => {
@@ -26,15 +28,6 @@ const Login = ({ navigation }) => {
         });
     }, []);
 
-    const checkToken = async () => {
-        try {
-            const userInfo = await GoogleSignin.signInSilently();
-            console.log("User Info:", userInfo);
-        } catch (error) {
-            console.error("Silent Sign-In Error:", error.message);
-        }
-    };
-    useEffect(() => { checkToken(); }, []);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -42,6 +35,54 @@ const Login = ({ navigation }) => {
     const { loading } = useSelector((state) => state.login)
 
     const dispatch = useDispatch();
+
+    const getFcmToken = async () => {
+        try {
+            // Request permission for iOS
+            if (Platform.OS === 'ios') {
+                const messaging = getMessaging();
+                const authStatus = await messaging.requestPermission();
+                const enabled =
+                    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+                if (!enabled) {
+                    console.log('Notification permission denied');
+                    return;
+                }
+            }
+
+            // Get FCM token using the modular API
+            const messaging = getMessaging();
+            const token = await getToken(messaging);
+            console.log('FCM Token:', token);
+            return token;
+        } catch (error) {
+            console.error('Error getting FCM token:', error);
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        getFcmToken()
+    }, [])
+
+    // useEffect(() => {
+    //     // Foreground notifications
+    //     const unsubscribe = messaging().onMessage(async remoteMessage => {
+    //         console.log('Received in foreground:', remoteMessage);
+    //         Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+    //     });
+
+    //     // Background & Quit state notifications
+    //     messaging().setBackgroundMessageHandler(async remoteMessage => {
+    //         console.log('Received in background:', remoteMessage);
+    //     });
+
+    //     return unsubscribe;
+    // }, []);
+
+
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -94,10 +135,9 @@ const Login = ({ navigation }) => {
             justifyContent: 'center',
             paddingBottom: Metrix.VerticalSize(25)
         }}>
-            <Image
-                source={Images.logo}
-                style={styles.logo}
-            />
+            <View style={styles.logo}>
+                <Logo />
+            </View>
 
             {/* Input Fields */}
             <View style={styles.inputContainer}>

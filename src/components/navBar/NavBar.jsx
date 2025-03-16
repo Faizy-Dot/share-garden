@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from "react-native-toast-message";
 import colors from "../../config/Colors";
+import CheckBell from "../../assets/svg/CheckBell";
 
 
 
@@ -54,6 +55,7 @@ export default function NavBar({
                     }
                 }} activeOpacity={0.8}>
                     <Image source={Images.homeBellIcon} style={styles.bellIcon} />
+                    <CheckBell />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                     if (user) {

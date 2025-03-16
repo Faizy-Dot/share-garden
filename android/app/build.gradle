@@ -7,7 +7,7 @@ plugins {
 
 react {
     // Keep your existing react configuration
-    //  autolinkLibrariesWithApp()
+     autolinkLibrariesWithApp()
 }
 
 def enableProguardInReleaseBuilds = false
@@ -68,6 +68,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
     implementation project(':@react-native-firebase_app')
     implementation project(':@react-native-firebase_auth')
+    implementation 'com.google.firebase:firebase-messaging'
+      implementation project(':@react-native-firebase_messaging')
+       implementation project(':react-native-svg')
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

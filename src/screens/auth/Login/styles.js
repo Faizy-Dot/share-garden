@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
     logo: {
         width: Metrix.HorizontalSize(156),
         height: Metrix.VerticalSize(96),
-        resizeMode: 'contain',
         marginTop: Metrix.VerticalSize(65)
     },
     inputContainer: {

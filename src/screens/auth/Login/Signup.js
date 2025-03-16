@@ -40,7 +40,8 @@ export default function SignUpScreen({ navigation }) {
         phonenumber1: '',
         phonenumber2: '',
     });
-
+    
+    
     const [isSGMember, setIsSGMember] = useState(true);
     const [isMerchant, setIsMerchant] = useState(false);
 
@@ -61,6 +62,8 @@ export default function SignUpScreen({ navigation }) {
             setEmailError('');
         }
     };
+
+    console.log(form.password)
 
     const handleSubmit = async () => {
         try {
@@ -202,20 +205,20 @@ export default function SignUpScreen({ navigation }) {
                         ]}
                         onChangeText={(text) => handleInputChange('emailaddress', text)} 
                     />
-                    {emailError ? (
+                    {emailError ? 
                         <Text style={styles.errorText}>{emailError}</Text>
-                    ) : null}
+                     : null}
                 </View>
 
                 <TextInput
                     placeholder="Password"
-                    style={[styles.input, { width: "100%" }]}
+                    style={[styles.input, { width: "100%" }, form.password === form.confirmpassword && form.password.length > 6 && {color:"green"}]}
                     secureTextEntry
                     onChangeText={(text) => handleInputChange('password', text)}
                 />
                 <TextInput
                     placeholder="Confirm Password"
-                    style={[styles.input, { width: "100%" }]}
+                    style={[styles.input, { width: "100%",color:"red" }]}
                     secureTextEntry
                     onChangeText={(text) => handleInputChange('confirmpassword', text)}
                 />

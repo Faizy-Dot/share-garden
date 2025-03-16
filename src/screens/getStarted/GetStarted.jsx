@@ -2,16 +2,13 @@ import { Image, StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Images, Metrix } from "../../config";
 import CustomButton from "../../components/Button/Button";
 import colors from "../../config/Colors";
+import DescriptionLogo from "../../assets/svg/DescriptionLogo";
 
 export default function GetStartedScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image
-          source={Images.descriptionLogo}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+      <DescriptionLogo/>
       </View>
 
       <View style={styles.buttonContainer}>

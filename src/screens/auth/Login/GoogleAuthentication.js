@@ -2,7 +2,6 @@ import auth from '@react-native-firebase/auth';
 import {
   GoogleSignin,
 } from '@react-native-google-signin/google-signin';
-import { useEffect } from 'react';
 
  // const checkToken = async () => {
   //   try {
