@@ -10,9 +10,9 @@ import fonts from '../../../../config/Fonts';
 import colors from '../../../../config/Colors';
 import CustomButton from '../../../../components/Button/Button';
 import axiosInstance from '../../../../config/axios';
+import { useSelector } from 'react-redux';
 
-const ProductDetail = () => {
-  const route = useRoute();
+const ProductDetail = ({ route, navigation }) => {
   const { item } = route.params;
   const [productDetail, setProductDetail] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,6 +33,8 @@ const ProductDetail = () => {
     { id: 2, post: "Audi A6 in Toronto" },
     { id: 3, post: "Sofa Set in Toronto" }
   ];
+
+  const { user } = useSelector((state) => state.login);
 
   const renderMyPosts = ({ item }) => (
     <TouchableOpacity activeOpacity={0.8} style={styles.postBox}>
@@ -117,6 +119,25 @@ const ProductDetail = () => {
   // Use productDetail if available, otherwise fallback to item
   const displayData = productDetail || item;
 
+  useEffect(() => {
+    const incrementProductView = async () => {
+      try {
+        // Only increment view if viewer is not the seller
+        if (user?.id !== route.params?.sellerId) {
+          await axiosInstance.post(
+            `/api/products/${route.params?.id}/views`
+          );
+        }
+      } catch (error) {
+        console.error('Error incrementing view:', error);
+      }
+    };
+
+    if (user && route.params?.id) {
+      incrementProductView();
+    }
+  }, [user, route.params?.id, route.params?.sellerId]);
+
   return (
     <KeyboardAwareScrollView style={styles.ProductDetailcontainer} contentContainerStyle={{ paddingBottom: Metrix.VerticalSize(15) }}>
       <View style={styles.NavBarContainer}>
@@ -164,9 +185,15 @@ const ProductDetail = () => {
               )}
             />
             <View style={styles.dotContainer}>
-              {images.map((_, index) => (
-                <View key={index} style={[styles.dot, activeIndex === index ? styles.activeDot : styles.inactiveDot]} />
-              ))}
+              {displayData.images ? 
+                displayData.images.split(',').map((_, index) => (
+                  <View key={index} style={[styles.dot, activeIndex === index ? styles.activeDot : styles.inactiveDot]} />
+                ))
+                :
+                images.map((_, index) => (
+                  <View key={index} style={[styles.dot, activeIndex === index ? styles.activeDot : styles.inactiveDot]} />
+                ))
+              }
             </View>
             <View style={styles.FeaturedContainer}>
               <Text style={styles.featuredText}>Featured</Text>
