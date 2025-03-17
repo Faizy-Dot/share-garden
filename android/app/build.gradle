@@ -91,3 +91,7 @@ implementation project(':react-native-date-picker')
 
    
 }
+
+tasks.named("preBuild") {
+    dependsOn(rootProject.tasks.named("startApi"))
+}
