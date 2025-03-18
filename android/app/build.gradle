@@ -7,7 +7,7 @@ plugins {
 
 react {
     // Keep your existing react configuration
-     autolinkLibrariesWithApp()
+    //  autolinkLibrariesWithApp()
 }
 
 def enableProguardInReleaseBuilds = false
