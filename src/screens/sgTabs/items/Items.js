@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import axiosInstance from '../../../config/axios';
 import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import { BlackBitIcon, CashIcon, CategoryMobileIcon, HomeLogo } from "../../../assets/svg";
 
 const popularListings = [
     { id: "1", title: "Single Bed", location: "First Floor Maya Apartments", price: "8.5", image: Images.homePopularListing, bit: true, dollarLogo: false },
@@ -67,7 +68,7 @@ const ItemsTabScreen = () => {
     const ListHeaderComponent = () => (
         <>
             <View style={styles.header}>
-                <Image source={Images.homeLogo} style={styles.logo} />
+                <HomeLogo />
             </View>
 
             {user ? (
@@ -85,10 +86,10 @@ const ItemsTabScreen = () => {
             )}
 
             <View style={{ marginTop: Metrix.VerticalSize(20) }}>
-                <CustomInput 
+                <CustomInput
                     justifyContent={'space-around'}
                     iconCondition={true}
-                    placeholder={"Search items near you"} 
+                    placeholder={"Search items near you"}
                     borderRadius={Metrix.VerticalSize(3)}
                 />
             </View>
@@ -97,31 +98,32 @@ const ItemsTabScreen = () => {
                 <View style={{ marginTop: Metrix.VerticalSize(15) }}>
                     <CategoryFlatList />
                 </View>
+            
             </View>
         </>
     );
 
     const renderProduct = ({ item }) => (
-        <TouchableOpacity 
-            activeOpacity={0.8} 
+        <TouchableOpacity
+            activeOpacity={0.8}
             style={styles.productContainer}
             onPress={() => navigation.navigate('ProductDetail', { item })}
         >
-            <Image 
-                source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing} 
-                style={styles.productImage} 
+            <Image
+                source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
+                style={styles.productImage}
             />
             <Text style={styles.productTitle} numberOfLines={1}>{item.title}</Text>
             <Text style={styles.productDescription} numberOfLines={2}>{item.description}</Text>
             <View style={styles.priceContainer}>
                 {item.isSGPoints ? (
                     <>
-                        <Image source={Images.homeBitLogo} style={styles.priceIcon} />
+                        <BlackBitIcon />
                         <Text style={styles.priceText}>{item.minBid}</Text>
                     </>
                 ) : (
                     <>
-                        <Image source={Images.homeDollarLogo} style={styles.priceIcon} />
+                        <CashIcon />
                         <Text style={styles.priceText}>{item.price}</Text>
                     </>
                 )}

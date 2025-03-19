@@ -10,6 +10,7 @@ import TipsTabScreen from "./tips/Tips";
 import { Images, Metrix } from "../../config";
 import colors from "../../config/Colors";
 import { AdsStackScreen, ItemsStackScreen, PostStackScreen, RewardsStackScreen, TipsStackScreen } from './SgTabsNavigator';
+import { AdsGreenTabIcon, AdsTabIcon, ItemsGreenTabIcon, ItemsTabIcon, PostGreenTabIcon, PostTabIcon, RewardsGreenTabIcon, RewardsTabIcon, TipsGreenTabIcon, TipsTabIcon } from '../../assets/svg';
 
 const Tab = createBottomTabNavigator();
 
@@ -25,27 +26,18 @@ export default function SgTabNavigator() {
           let iconSource;
 
           if (route.name === "Post") {
-            iconSource = focused ? Images.postGreenTab : Images.postBlackTab;
+            iconSource = focused ? <PostGreenTabIcon /> : <PostTabIcon />;
           } else if (route.name === "Tips") {
-            iconSource = focused ? Images.tipsGreenTab : Images.tipsBlackTab;
+            iconSource = focused ? <TipsGreenTabIcon/> : <TipsTabIcon/>;
           } else if (route.name === "Items") {
-            iconSource = focused ? Images.itemsGreenTab : Images.itemsBlackTab;
+            iconSource = focused ? <ItemsGreenTabIcon/> : <ItemsTabIcon/>;
           } else if (route.name === "Rewards") {
-            iconSource = focused ? Images.rewardsGreenTab : Images.rewardsBlackTab;
+            iconSource = focused ? <RewardsGreenTabIcon/> : <RewardsTabIcon/>;
           } else if (route.name === "Ads") {
-            iconSource = focused ? Images.adsGreenTab : Images.adsBlackTab;
+            iconSource = focused ? <AdsGreenTabIcon/> : <AdsTabIcon/>;
           }
 
-          return (
-            <Image
-              source={iconSource}
-              style={{
-                width: Metrix.HorizontalSize(28),
-                height: Metrix.VerticalSize(28),
-                resizeMode: "contain",
-              }}
-            />
-          );
+          return iconSource
         },
         tabBarActiveTintColor: colors.buttonColor,
         tabBarInactiveTintColor: colors.black,

@@ -33,6 +33,8 @@ export default function CategoryFlatList() {
         }
     };
 
+    console.log(categories)
+
     const getCategoryIcon = (slug) => {
         switch (slug?.toLowerCase()) {
             case 'mobile': return Images.homeCategoryMobile;

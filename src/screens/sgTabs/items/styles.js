@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center"
     },
-   
+
     popularListingsContainer: {
         paddingHorizontal: Metrix.HorizontalSize(15),
         // marginTop: Metrix.VerticalSize(15)
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     categoryContainer: {
         paddingHorizontal: Metrix.HorizontalSize(15),
     },
-    
+
     categoryList: {
         gap: Metrix.HorizontalSize(10),
         alignItems: "center",
@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.InterRegular,
         color: colors.textGray,
         marginTop: Metrix.VerticalSize(2),
+        height: Metrix.VerticalSize(30)
     },
     priceIcon: {
         width: Metrix.HorizontalSize(20),

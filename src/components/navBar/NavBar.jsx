@@ -6,27 +6,27 @@ import { useSelector } from "react-redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from "react-native-toast-message";
 import colors from "../../config/Colors";
-import CheckBell from "../../assets/svg/CheckBell";
+import { BellIcon, GreenBitIcon, NotificationIcon } from "../../assets/svg";
 
 
 
-export default function NavBar({ 
+export default function NavBar({
     title,
     fontSize = Metrix.normalize(20),
-    fontFamily= fonts.InterBold,
+    fontFamily = fonts.InterBold,
     color,
- }) {
+}) {
     const { user } = useSelector((state) => state.login);
 
     const navigation = useNavigation()
     return (
         <View style={styles.userDetail}>
-            <Text style={{ fontSize,fontFamily , color  }}>{title}</Text>
+            <Text style={{ fontSize, fontFamily, color }}>{title}</Text>
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(18) }}>
                 <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5), alignItems: "center" }}>
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>{user?.points || 0}</Text>
-                    <Image source={Images.homeGreenBit} style={styles.greenBit} />
+                    <GreenBitIcon />
                 </View>
                 <TouchableOpacity onPress={() => {
                     if (user) {
@@ -40,7 +40,7 @@ export default function NavBar({
                         });
                     }
                 }} activeOpacity={0.8}>
-                    <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
+                    <NotificationIcon />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                     if (user) {
@@ -54,8 +54,7 @@ export default function NavBar({
                         });
                     }
                 }} activeOpacity={0.8}>
-                    <Image source={Images.homeBellIcon} style={styles.bellIcon} />
-                    <CheckBell />
+                    <BellIcon />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                     if (user) {
@@ -117,11 +116,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    
+
     profileImage: {
         width: "100%",
         height: "100%",
-        borderRadius:  Metrix.VerticalSize(16), // Ensures the image itself is also rounded
+        borderRadius: Metrix.VerticalSize(16), // Ensures the image itself is also rounded
     },
 
 })

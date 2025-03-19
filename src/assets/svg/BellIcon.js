@@ -1,7 +1,7 @@
 import * as React from "react"
 import Svg, { Path } from "react-native-svg"
 import { Metrix } from "../../config"
-const CheckBell = (props) => (
+const BellIcon = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
     width={Metrix.HorizontalSize(17)}
@@ -20,4 +20,4 @@ const CheckBell = (props) => (
     />
   </Svg>
 )
-export default CheckBell
+export default BellIcon;
