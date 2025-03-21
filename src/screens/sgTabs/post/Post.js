@@ -472,12 +472,12 @@ export default function PostTabScreen({ navigation, route }) {
                     onPress={handlePreview}
                 />
 
-                <CustomButton
+                {/* <CustomButton
                     height={Metrix.VerticalSize(42)}
                     title={"PUBLISH"}
                     backgroundColor={colors.buttonColor}
                     borderRadius={Metrix.VerticalSize(4)}
-                    flex={1} />
+                    flex={1} /> */}
             </View>
         </KeyboardAwareScrollView>
     );
