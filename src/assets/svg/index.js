@@ -30,6 +30,7 @@ import LogoutIcon from "./LogoutIcon";
 import RightArrowIcon from "./RightArrowIcon";
 import UploadImgIcon from "./UploadImgIcon";
 
+import HandShake from "./HandShake";
 
 
 
@@ -55,16 +56,6 @@ export{
     ItemsGreenTabIcon,
     RewardsGreenTabIcon,
     AdsGreenTabIcon,
-    CategoryMobileIcon,
-    SgPtsIcon,
-    SgItemsIcon,
-    SgBidIcon,
-    SgTipsIcon,
-    SgReviewsIcon,
-    SgSettings,
-    SgProfileLogo,
-    LogoutIcon,
-    RightArrowIcon,
-    UploadImgIcon
+    CategoryMobileIcon
 
 }

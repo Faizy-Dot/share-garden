@@ -84,7 +84,6 @@ const Images = {
     likeWhiteIcon : require('../assets/images/home/likeWhiteIcon.png'),
     shareWhiteIcon : require('../assets/images/home/shareWhiteIcon.png'),
     soundIcon : require('../assets/images/items/soundIcon.png'),
-    callIcon : require('../assets/images/items/callIcon.png'),
 
 }
 

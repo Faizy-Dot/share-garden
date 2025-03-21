@@ -172,7 +172,7 @@ const Login = ({ navigation }) => {
             {/* Social Media Buttons with Icons */}
             <View style={{ gap: 12 }}>
 
-                <CustomButton
+                {/* <CustomButton
                     title={"Continue With Facebook"}
                     icon={<FontAwesome name="facebook" color="#fff" style={styles.socialButtonIcon}
                     />}
@@ -181,7 +181,7 @@ const Login = ({ navigation }) => {
                     height={Metrix.VerticalSize(50)}
                     fontSize={Metrix.FontExtraSmall}
                     fontFamily={fonts.InterRegular}
-                />
+                /> */}
 
                 <CustomButton
                     title={"Continue With Google"}
@@ -195,7 +195,7 @@ const Login = ({ navigation }) => {
                     onPress={onGoogleButtonPress}
                 />
 
-                <CustomButton
+                {/* <CustomButton
                     title={"Continue With Apple"}
                     icon={<FontAwesome name="apple" color="#fff" style={styles.socialButtonIcon}
                     />}
@@ -204,7 +204,7 @@ const Login = ({ navigation }) => {
                     height={Metrix.VerticalSize(50)}
                     fontSize={Metrix.FontExtraSmall}
                     fontFamily={fonts.InterRegular}
-                />
+                /> */}
             </View>
 
             <View style={{ marginTop: Metrix.VerticalSize(30) }}>

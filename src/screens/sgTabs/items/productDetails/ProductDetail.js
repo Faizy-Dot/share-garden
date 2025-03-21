@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, FlatList, Dimensions, TextInput, TouchableOpacity } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { View, Text, Image, FlatList, Dimensions, TextInput, TouchableOpacity, Linking, StyleSheet } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { Images, Metrix } from '../../../../config';
 import styles from './style';
 import BackArrowIcon from '../../../../components/backArrowIcon/BackArrowIcon';
@@ -262,13 +262,20 @@ const ProductDetail = ({ route, navigation }) => {
           )}
 
           <View style={{ paddingHorizontal: Metrix.HorizontalSize(15), marginTop: Metrix.VerticalSize(18) }}>
-            <CustomButton 
-              title={displayData.isSGPoints ? "PLACE BID" : "I WANT TO PURCHASE THIS"}
-              height={Metrix.VerticalSize(46)}
-              width={"100%"}
-              borderRadius={Metrix.VerticalSize(3)}
-              fontSize={Metrix.FontSmall} 
-            />
+            {user?.id === displayData.seller?.id ? (
+              <Text style={styles.ownerMessage}>
+                This is your product listing
+              </Text>
+            ) : (
+              <CustomButton 
+                title={displayData.isSGPoints ? "PLACE BID" : "I WANT TO PURCHASE THIS"}
+                height={Metrix.VerticalSize(46)}
+                width={"100%"}
+                borderRadius={Metrix.VerticalSize(3)}
+                fontSize={Metrix.FontSmall}
+                onPress={handlePurchasePress}
+              />
+            )}
           </View>
         </View>
 
@@ -317,7 +324,12 @@ const ProductDetail = ({ route, navigation }) => {
           </View>
 
           <Image source={Images.homeMessageIcon} />
-          <Image source={Images.callIcon} />
+          <TouchableOpacity 
+            onPress={() => handleCall(displayData.seller?.phoneNumber)}
+            activeOpacity={0.7}
+          >
+            <Image source={Images.callIcon} />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -333,6 +345,44 @@ const ProductDetail = ({ route, navigation }) => {
           contentContainerStyle={styles.myPost}
         />
       </View>
+
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={() => setIsModalVisible(false)}
+        style={styles.modal}
+      >
+        <View style={styles.modalContent}>
+          <TouchableOpacity 
+            style={styles.closeButton} 
+            onPress={() => setIsModalVisible(false)}
+          >
+            <Text style={{ fontSize: 20, color: '#000' }}>×</Text>
+          </TouchableOpacity>
+
+          <HandShakeIcon  />
+          
+          <Text style={styles.modalTitle}>Thank you for your interest.</Text>
+          
+          <Text style={styles.modalText}>
+            You can make payment and Pick up arrangements by contacting seller via chat
+          </Text>
+
+          <CustomButton 
+            title="START CHAT"
+            height={Metrix.VerticalSize(46)}
+            width={"100%"}
+            borderRadius={Metrix.VerticalSize(3)}
+            fontSize={Metrix.FontSmall}
+            onPress={handleStartChat}
+            icon={<NotificationIcon stroke="#fff" style={{ marginLeft: 10 }} />}
+            iconPosition="right"
+          />
+
+          <Text style={styles.modalFooter}>
+            Thanks for using <Text style={styles.brandText}>ShareGarden</Text>.
+          </Text>
+        </View>
+      </Modal>
     </KeyboardAwareScrollView>
   );
 };

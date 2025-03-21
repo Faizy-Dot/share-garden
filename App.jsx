@@ -55,7 +55,7 @@ function AppNavigator() {
         ) : (
           // Unauthenticated user screens
           <>
-          <Stack.Screen name="SgTabs" component={SgTabNavigator} />
+            <Stack.Screen name="SgTabs" component={SgTabNavigator} />
             <Stack.Screen name="OnBoarding" component={OnboardingScreen} />
             <Stack.Screen name="GetStarted" component={GetStarted} />
             <Stack.Screen name="Login" component={Login} />
