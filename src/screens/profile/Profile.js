@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/Actions/authActions/loginAction';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { BellIcon, GreenBitIcon, LogoutIcon, NotificationIcon, RightArrowIcon, SgBidIcon, SgItemsIcon, SgProfileLogo, SgPtsIcon, SgReviewsIcon, SgSettings, SgTipsIcon } from '../../assets/svg';
 
 
 
@@ -18,49 +19,49 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 const profileData = [
     {
         id: 1,
-        image: Images.earnCoinIcon,
+        icon: <SgPtsIcon />,
         title: "How to earn SG Pts",
         description: "how it works to earn points",
         navigationPath: "EarnSGpts"
     },
     {
         id: 2,
-        image: Images.sgItemsIcon,
+        icon: <SgItemsIcon />,
         title: "My SG Items",
         description: "View my posted, draft & favorite items.",
         navigationPath: "MySGItems"
     },
     {
         id: 3,
-        image: Images.bidsIcon,
+        icon: < SgBidIcon />,
         title: "My Bids",
         description: "view the status of bids offered by me",
         navigationPath: "MyBids"
     },
     {
         id: 4,
-        image: Images.tipsBlackTab,
+        icon: <SgTipsIcon />,
         title: "My SG Tips",
         description: "view my posted tips, draft & favorite tips.",
         navigationPath: "MySGTips"
     },
     {
         id: 6,
-        image: Images.reviewsIcon,
+        icon: <SgReviewsIcon />,
         title: "Reviews",
         description: "Check SG ratings & reviews on your profile",
         navigationPath: "Reviews"
     },
     {
         id: 7,
-        image: Images.settingsIcon,
+        icon: <SgSettings />,
         title: "Settings",
         description: "Privacy & manage account",
         navigationPath: "Settings"
     },
     {
         id: 8,
-        image: Images.profileAppLogo,
+        icon: <SgProfileLogo />,
         title: "Help & Support Share Garden",
         description: "Help centre and legal terms",
         borders: true,
@@ -68,7 +69,7 @@ const profileData = [
     },
     {
         id: 9,
-        image: Images.logoutIcon,
+        icon: <LogoutIcon />,
         title: "Logout",
         description: ""
     },
@@ -99,7 +100,7 @@ export default function Profile({ navigation }) {
         return (
             <TouchableOpacity activeOpacity={0.8} onPress={() => handleItemPress(item)}>
                 <View style={[styles.profileDataContainer, item.borders && styles.helpBox]}>
-                    <Image source={item.image} style={{ resizeMode: "contain", width: Metrix.HorizontalSize(30) }} />
+                    {item.icon}
                     <View style={{ gap: Metrix.VerticalSize(5), marginLeft: 20, flex: 1 }}>
                         <Text style={styles.title}>{item.title}</Text>
                         {
@@ -107,7 +108,7 @@ export default function Profile({ navigation }) {
                             <Text style={styles.description}>{item.description}</Text>
                         }
                     </View>
-                    <Image source={Images.rightArrowIcon} />
+                    <RightArrowIcon />
                 </View>
             </TouchableOpacity>
         )
@@ -119,6 +120,7 @@ export default function Profile({ navigation }) {
                 <View style={{ marginTop: Metrix.VerticalSize(13), paddingHorizontal: Metrix.HorizontalSize(15), }}>
                     <BackArrowIcon />
                 </View>
+
 
                 <View style={styles.navBar}>
                     <View style={styles.profileContainer}>
@@ -139,7 +141,7 @@ export default function Profile({ navigation }) {
                         </View>
                         <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5) }}>
                             <Text>{user?.points || 0}</Text>
-                            <Image source={Images.homeGreenBit} style={styles.geenBitImg} />
+                            <GreenBitIcon />
                         </View>
                         <TouchableOpacity onPress={() => {
                             if (user) {
@@ -153,7 +155,7 @@ export default function Profile({ navigation }) {
                                 });
                             }
                         }} activeOpacity={0.8}>
-                            <Image source={Images.homeMessageIcon} style={styles.messageIcon} />
+                            <NotificationIcon />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {
                             if (user) {
@@ -167,7 +169,7 @@ export default function Profile({ navigation }) {
                                 });
                             }
                         }} activeOpacity={0.8}>
-                            <Image source={Images.homeBellIcon} style={styles.bellIcon} />
+                            <BellIcon />
                         </TouchableOpacity>
                     </View>
 

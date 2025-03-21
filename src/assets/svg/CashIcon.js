@@ -7,6 +7,7 @@ const CashIcon = (props) => (
     height={18}
     fill="none"
     {...props}
+      viewBox="0 0 18 18"
   >
     <Path
       fill="#FFC202"

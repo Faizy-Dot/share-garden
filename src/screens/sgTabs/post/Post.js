@@ -15,6 +15,9 @@ import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import Axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
+import GreenBitIcon from "../../../assets/svg/GreenBitIcon.js";
+import CashIcon from "../../../assets/svg/CashIcon.js";
+import UploadImgIcon from "../../../assets/svg/UploadImgIcon.js";
 
 
 export default function PostTabScreen({ navigation, route }) {
@@ -228,7 +231,7 @@ export default function PostTabScreen({ navigation, route }) {
     };
 
     const handlePreview = () => {
-        if(activeButton === "SG Tip"){
+        if (activeButton === "SG Tip") {
             if (!title || !description || !selectedCategory || images.every(img => img === null)) {
                 Toast.show({
                     type: 'error',
@@ -237,7 +240,7 @@ export default function PostTabScreen({ navigation, route }) {
                 });
                 return;
             }
-    
+
             navigation.navigate("Preview", {
                 title,
                 description,
@@ -246,9 +249,9 @@ export default function PostTabScreen({ navigation, route }) {
                 categoryName: selectedCategoryName,
                 isSGPoints: sgPoints,
                 onSuccess: resetForm,
-                activeButton : activeButton
+                activeButton: activeButton
             });
-            return ; 
+            return;
         }
 
         if (!title || !description || !selectedCategory || images.every(img => img === null) || !checked) {
@@ -271,7 +274,7 @@ export default function PostTabScreen({ navigation, route }) {
             condition: checked,
             pointOrCashValue: pointOrCashValue,
             onSuccess: resetForm,
-            activeButton : activeButton
+            activeButton: activeButton
         });
     };
 
@@ -329,7 +332,8 @@ export default function PostTabScreen({ navigation, route }) {
 
                     <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15) }}>
                         <View style={styles.Switch}>
-                            <Image source={Images.homeGreenBit} style={styles.logos} />
+                            <GreenBitIcon width={16}
+                                height={16} />
                             <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>SG Points</Text>
                             <Switch value={sgPoints} onValueChange={() => {
                                 setSGPoints(true);
@@ -338,7 +342,8 @@ export default function PostTabScreen({ navigation, route }) {
                         </View>
 
                         <View style={styles.Switch}>
-                            <Image source={Images.homeDollarLogo} style={styles.logos} />
+                            <CashIcon width={16}
+                                height={16} />
                             <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>Cash</Text>
                             <Switch value={cash} onValueChange={() => {
                                 setCash(true);
@@ -351,7 +356,7 @@ export default function PostTabScreen({ navigation, route }) {
 
             <View style={styles.imageUploadContainer}>
                 <TouchableOpacity onPress={handleImagePicker} activeOpacity={0.8} style={{ alignItems: "center", gap: 10 }}>
-                    <Image source={Images.uploadImageIcon} />
+                    <UploadImgIcon />
                     <Text style={{ textAlign: "center", fontSize: Metrix.FontSmall, fontFamily: fonts.InterRegular }}>
                         Upload items images {"\n"} up to 3 images
                     </Text>
@@ -406,10 +411,10 @@ export default function PostTabScreen({ navigation, route }) {
                                                 ]}
                                             >
                                                 <View style={styles.checkBox}>
-                                                    {checked === item.value && (
-                                                        <Icon name="check" size={20} color="black" style={{ position: "absolute" }} />
-                                                    )}
                                                 </View>
+                                                    {checked === item.value && (
+                                                        <Icon name="check" size={22} color="black" style={{ position: "absolute",bottom:Metrix.VerticalSize(2) }} />
+                                                    )}
                                                 <Text style={styles.checkboxText}>{item.display}</Text>
                                             </TouchableOpacity>
                                         )

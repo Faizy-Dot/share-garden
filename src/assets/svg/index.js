@@ -19,6 +19,16 @@ import ItemsGreenTabIcon from "./ItemsGreenTabIcon";
 import RewardsGreenTabIcon from "./RewardsGreenTabIcon";
 import AdsGreenTabIcon from "./AdsGreenTabIcon";
 import CategoryMobileIcon from "./CategoryMobileIcon";
+import SgPtsIcon from "./SgPtsIcon";
+import SgItemsIcon from "./SgItemsIcon";
+import SgBidIcon from "./SgBidsIcon";
+import SgTipsIcon from "./SgTipsIcon";
+import SgReviewsIcon from "./SgReviewsIcon";
+import SgSettings from "./SgSettingsIcon";
+import SgProfileLogo from "./SgProfileLogo";
+import LogoutIcon from "./LogoutIcon";
+import RightArrowIcon from "./RightArrowIcon";
+import UploadImgIcon from "./UploadImgIcon";
 
 
 
@@ -45,6 +55,16 @@ export{
     ItemsGreenTabIcon,
     RewardsGreenTabIcon,
     AdsGreenTabIcon,
-    CategoryMobileIcon
+    CategoryMobileIcon,
+    SgPtsIcon,
+    SgItemsIcon,
+    SgBidIcon,
+    SgTipsIcon,
+    SgReviewsIcon,
+    SgSettings,
+    SgProfileLogo,
+    LogoutIcon,
+    RightArrowIcon,
+    UploadImgIcon
 
 }
