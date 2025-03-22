@@ -427,6 +427,7 @@ export default function PostTabScreen({ navigation, route }) {
                             placeholder="Enter Point Value or Cash value"
                             style={styles.title}
                             value={pointOrCashValue}
+                            keyboardType="numeric"
                             onChangeText={setPointOrCashValue}
                         />
                     </>

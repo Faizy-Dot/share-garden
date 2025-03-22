@@ -13,7 +13,7 @@ import styles from "./style";
 import fonts from "../../../../config/Fonts";
 import CustomButton from "../../../../components/Button/Button";
 import axiosInstance from '../../../../config/axios';
-import { BlackBitIcon, CashIcon, TimeIcon } from "../../../../assets/svg";
+import { BlackBitIcon, CashIcon, CrossIcon, ModalInfoIcon, ModalSuccessLogo, TimeIcon } from "../../../../assets/svg";
 
 
 export default function PostTabScreen({ navigation, route }) {
@@ -410,7 +410,7 @@ export default function PostTabScreen({ navigation, route }) {
 
                   <View style={[styles.sameMiddleBox, { flexDirection: "row", gap: Metrix.HorizontalSize(29) }]}>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(15) }}>
-                      <TimeIcon width={12} height={12} stroke="#5A5A5A"/>
+                      <TimeIcon width={12} height={12} stroke="#5A5A5A" />
                       <Text style={styles.bidEndsText}>Bid Ends</Text>
                     </View>
 
@@ -543,9 +543,9 @@ export default function PostTabScreen({ navigation, route }) {
               style={styles.closeButton}
               onPress={handleModalClose}
             >
-              <Image source={Images.crossIcon} />
+              <CrossIcon />
             </TouchableOpacity>
-            <Image source={Images.successIcon} style={styles.successIcon} />
+            <ModalSuccessLogo />
             {
               draft ?
                 <Text style={styles.modalTitle}>Your SG item has been saved in drafts</Text>
@@ -558,7 +558,7 @@ export default function PostTabScreen({ navigation, route }) {
             }
 
             <View style={styles.bottomModalContainer}>
-              <Image source={Images.infoIcon} />
+              <ModalInfoIcon />
               <Text style={styles.modalDescription}>You can access your {publish ? "posted" : "drafts"} item under <Text style={{ color: colors.redColor }}>Profile {">"} My posted items.</Text></Text>
             </View>
           </View>

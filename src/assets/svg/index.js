@@ -36,6 +36,11 @@ import SuccessLogoIcon from "./SuccessLogoIcon";
 import SpeakerIcon from "./SpeakerIcon";
 import CallIcon from "./CallIcon";
 import CameraIcon from "./CameraIcon";
+import ModalInfoIcon from "./ModalInfoIcon";
+import CrossIcon from "./CrossIcon";
+import ModalSuccessLogo from "./ModalSuccessLogo";
+
+
 
 export{
     BellIcon,
@@ -75,6 +80,9 @@ export{
     SuccessLogoIcon,
     SpeakerIcon,
     CallIcon,
-    CameraIcon
+    CameraIcon,
+    ModalInfoIcon,
+    CrossIcon,
+    ModalSuccessLogo
 
 }
