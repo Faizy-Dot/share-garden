@@ -7,10 +7,10 @@ import ItemsTabScreen from "./items/Items";
 import RewardsTabScreen from "./rewards/Rewards";
 import AdsTabScreen from "./ads/Ads";
 import TipsTabScreen from "./tips/Tips";
-import { Images, Metrix } from "../../config";
+import {  Images, Metrix } from "../../config";
 import colors from "../../config/Colors";
 import { AdsStackScreen, ItemsStackScreen, PostStackScreen, RewardsStackScreen, TipsStackScreen } from './SgTabsNavigator';
-import { AdsGreenTabIcon, AdsTabIcon, ItemsGreenTabIcon, ItemsTabIcon, PostGreenTabIcon, PostTabIcon, RewardsGreenTabIcon, RewardsTabIcon, TipsGreenTabIcon, TipsTabIcon } from '../../assets/svg';
+import {  AdsTabIcon, ItemsTabIcon, PostTabIcon, RewardsTabIcon, TipsTabIcon } from '../../assets/svg';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,15 +26,15 @@ export default function SgTabNavigator() {
           let iconSource;
 
           if (route.name === "Post") {
-            iconSource = focused ? <PostGreenTabIcon /> : <PostTabIcon />;
+            iconSource = focused ? <PostTabIcon color={colors.buttonColor}/> : <PostTabIcon />;
           } else if (route.name === "Tips") {
-            iconSource = focused ? <TipsGreenTabIcon/> : <TipsTabIcon/>;
+            iconSource = focused ?  <TipsTabIcon color={colors.buttonColor}/> : <TipsTabIcon/>;
           } else if (route.name === "Items") {
-            iconSource = focused ? <ItemsGreenTabIcon/> : <ItemsTabIcon/>;
+            iconSource = focused ? <ItemsTabIcon color={colors.buttonColor}/> : <ItemsTabIcon/>;
           } else if (route.name === "Rewards") {
-            iconSource = focused ? <RewardsGreenTabIcon/> : <RewardsTabIcon/>;
+            iconSource = focused ?  <RewardsTabIcon color={colors.buttonColor}/>: <RewardsTabIcon/>;
           } else if (route.name === "Ads") {
-            iconSource = focused ? <AdsGreenTabIcon/> : <AdsTabIcon/>;
+            iconSource = focused ? <AdsTabIcon color={colors.buttonColor}/> : <AdsTabIcon/>;
           }
 
           return iconSource

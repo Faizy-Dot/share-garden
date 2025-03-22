@@ -11,13 +11,14 @@ import colors from '../../../../config/Colors';
 import CustomButton from '../../../../components/Button/Button';
 import axiosInstance from '../../../../config/axios';
 import { useSelector } from 'react-redux';
+import { BlackBitIcon, CallIcon, CashIcon, LikesIcon, NotificationIcon, ShareIcon, SpeakerIcon, TimeIcon } from '../../../../assets/svg';
 
 const ProductDetail = ({ route, navigation }) => {
   const { item } = route.params;
   const [productDetail, setProductDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
-  
+
   // Initialize time states with 0
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(0);
@@ -38,13 +39,13 @@ const ProductDetail = ({ route, navigation }) => {
 
   const renderMyPosts = ({ item }) => (
     <TouchableOpacity activeOpacity={0.8} style={styles.postBox}>
-      <Image source={Images.homePostVector} style={{ width: Metrix.VerticalSize(14), height: Metrix.VerticalSize(14) }} />
+<TimeIcon width={12} height={12} stroke={colors.black}/>
       <Text style={{ fontSize: Metrix.customFontSize(10), fontFamily: fonts.InterLight }}>{item.post}</Text>
     </TouchableOpacity>
   );
 
   const getDisplayCondition = (condition) => {
-    switch(condition) {
+    switch (condition) {
       case 'FAIRLY_USED':
         return 'Fairly Used';
       case 'GOOD':
@@ -72,7 +73,7 @@ const ProductDetail = ({ route, navigation }) => {
         setProductDetail(response.data);
 
         console.log("Product Detail response", response.data);
-        
+
         // Update time if it's a bidding product
         if (response.data.isSGPoints && response.data.bidDuration) {
           const timeRemaining = calculateTimeRemaining(response.data.bidDuration);
@@ -152,10 +153,8 @@ const ProductDetail = ({ route, navigation }) => {
       <View style={styles.HeaderContainer}>
         <Text style={styles.title}>{displayData.title}</Text>
         <View style={styles.PriceContainer}>
-          <Image 
-            source={displayData.isSGPoints ? Images.bitLogoBig : Images.dollarLogoBig} 
-            style={styles.bitLogo} 
-          />
+          {displayData.isSGPoints ? <BlackBitIcon width={25} height={26} /> : <CashIcon width={25} height={26} />}
+
           <Text style={styles.price}>
             {displayData.isSGPoints ? displayData.minBid : displayData.price}
           </Text>
@@ -178,14 +177,14 @@ const ProductDetail = ({ route, navigation }) => {
               }}
               style={styles.imageSlider}
               renderItem={({ item: imageUrl }) => (
-                <Image 
-                  source={typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl} 
-                  style={styles.productImage} 
+                <Image
+                  source={typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl}
+                  style={styles.productImage}
                 />
               )}
             />
             <View style={styles.dotContainer}>
-              {displayData.images ? 
+              {displayData.images ?
                 displayData.images.split(',').map((_, index) => (
                   <View key={index} style={[styles.dot, activeIndex === index ? styles.activeDot : styles.inactiveDot]} />
                 ))
@@ -198,8 +197,8 @@ const ProductDetail = ({ route, navigation }) => {
             <View style={styles.FeaturedContainer}>
               <Text style={styles.featuredText}>Featured</Text>
               <View style={styles.IconContainer}>
-                <Image source={Images.likeWhiteIcon} />
-                <Image source={Images.shareWhiteIcon} />
+                <LikesIcon stroke={colors.white} />
+                <ShareIcon stroke={colors.white} />
               </View>
             </View>
           </View>
@@ -222,11 +221,11 @@ const ProductDetail = ({ route, navigation }) => {
               <View style={styles.middleTopBottomContainer}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(20) }}>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(8) }}>
-                    <Image source={Images.soundIcon} style={{ width: Metrix.HorizontalSize(14), height: Metrix.HorizontalSize(14) }} />
+                    <SpeakerIcon />
                     <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold }}>Place a bid</Text>
                   </View>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(8) }}>
-                    <Image source={Images.homePostVector} style={{ width: Metrix.HorizontalSize(14), height: Metrix.HorizontalSize(14) }} />
+                    <TimeIcon stroke={colors.black} width={12} height={12} />
                     <Text style={{ fontSize: Metrix.FontMedium, fontFamily: fonts.InterSemiBold }}>Bid ends</Text>
                   </View>
                 </View>
@@ -262,12 +261,12 @@ const ProductDetail = ({ route, navigation }) => {
           )}
 
           <View style={{ paddingHorizontal: Metrix.HorizontalSize(15), marginTop: Metrix.VerticalSize(18) }}>
-            <CustomButton 
+            <CustomButton
               title={displayData.isSGPoints ? "PLACE BID" : "I WANT TO PURCHASE THIS"}
               height={Metrix.VerticalSize(46)}
               width={"100%"}
               borderRadius={Metrix.VerticalSize(3)}
-              fontSize={Metrix.FontSmall} 
+              fontSize={Metrix.FontSmall}
             />
           </View>
         </View>
@@ -299,9 +298,9 @@ const ProductDetail = ({ route, navigation }) => {
 
         <View style={styles.middleBottomContainer}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(8) }}>
-            <Image 
-              source={displayData.seller?.profileImage ? { uri: displayData.seller.profileImage } : Images.homeProfile} 
-              style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64), borderRadius: Metrix.HorizontalSize(32) }} 
+            <Image
+              source={displayData.seller?.profileImage ? { uri: displayData.seller.profileImage } : Images.homeProfile}
+              style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64), borderRadius: Metrix.HorizontalSize(32) }}
             />
             <View>
               <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>
@@ -315,9 +314,8 @@ const ProductDetail = ({ route, navigation }) => {
               </Text>
             </View>
           </View>
-
-          <Image source={Images.homeMessageIcon} />
-          <Image source={Images.callIcon} />
+          <NotificationIcon />
+          <CallIcon />
         </View>
       </View>
 

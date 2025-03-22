@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     userName: {
         fontSize: Metrix.FontSmall,
         fontFamily: fonts.InterBold,
-        
+
     },
     topInputContainer: {
         marginTop: Metrix.VerticalSize(30),
@@ -90,27 +90,27 @@ const styles = StyleSheet.create({
     },
     socialButtonIcon: {
         fontSize: Metrix.normalize(25),
-        marginRight : 20
+        marginRight: 20
     },
-    dropdown:{
+    dropdown: {
         borderWidth: 1,
         borderColor: colors.borderColor,
         borderRadius: Metrix.VerticalSize(3),
         backgroundColor: "#F3F3F3",
         height: Metrix.VerticalSize(40),
-      paddingHorizontal: Metrix.HorizontalSize(15),
-      width : "100%"
+        paddingHorizontal: Metrix.HorizontalSize(15),
+        width: "100%"
     },
     item: {
         padding: 5,
-        paddingHorizontal : 15,
+        paddingHorizontal: 15,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottomWidth : 1,
-        borderColor : colors.borderColor
-      },
-  
+        borderBottomWidth: 1,
+        borderColor: colors.borderColor
+    },
+
     placeholderStyle: {
         fontFamily: fonts.InterRegular,
     },
@@ -120,19 +120,28 @@ const styles = StyleSheet.create({
     profileContainer: {
         width: Metrix.HorizontalSize(80),
         height: Metrix.HorizontalSize(80),
-        borderRadius: Metrix.HorizontalSize(40),  // Half of width/height to make it a circle
-        borderWidth: 1,
-        borderColor: colors.borderColor,
+        // borderRadius: Metrix.HorizontalSize(40),  // Half of width/height to make it a circle
         justifyContent: "center",
         alignItems: "center",
     },
-    
+
     profileImage: {
         width: Metrix.HorizontalSize(80),
         height: Metrix.HorizontalSize(80),
         borderRadius: Metrix.HorizontalSize(40),
-        borderWidth: 1,
-        borderColor: colors.borderColor,
+        borderWidth: 2,
+        borderColor: colors.buttonColor,
+    },
+    camerIconConatiner: {
+        backgroundColor: colors.buttonColor,
+        height: Metrix.VerticalSize(33),
+        width: Metrix.VerticalSize(33),
+        borderRadius: Metrix.VerticalSize(16.5),
+        justifyContent: "center",
+        alignItems: "center",
+        position: "absolute",
+        bottom: Metrix.VerticalSize(-5),
+        right: Metrix.HorizontalSize(-5)
     },
 
     imagePickerContainer: {

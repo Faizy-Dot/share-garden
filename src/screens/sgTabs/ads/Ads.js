@@ -6,6 +6,7 @@ import CustomInput from "../../../components/customInput/CustomInput";
 import CategoryFlatList from "../../../components/categoryFlatList/CategoryFlatList";
 import { Images, Metrix } from "../../../config";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { AdsLocationIcon, AdsStickerIcon } from "../../../assets/svg";
 
 
 
@@ -43,13 +44,12 @@ export default function AdsTabScreen() {
                 <View style={styles.textContainer}>
                     <Text style={styles.title}>{item.title}</Text>
                     <Text style={styles.description}>{item.description}</Text>
-                    <View style = {styles.locationContainer}>
-                        <View style={{flexDirection : "row",alignItems :"center",gap:Metrix.HorizontalSize(5)}}>
-                            <Image source={Images.locationIcon} />
+                    <View style={styles.locationContainer}>
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5) }}>
+                            <AdsLocationIcon />
                             <Text style={styles.locationText}>{item.location}</Text>
                         </View>
-                        <Image source={Images.adsSticker} />
-
+                        <AdsStickerIcon />
                     </View>
                 </View>
             </View>
@@ -84,7 +84,7 @@ export default function AdsTabScreen() {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.adsDataStyle} />
-                    
+
                 <FlatList data={adsData}
                     keyExtractor={(item) => item.id}
                     renderItem={renderAdsData}

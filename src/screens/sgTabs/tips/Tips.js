@@ -7,6 +7,7 @@ import CustomInput from "../../../components/customInput/CustomInput";
 import DropdownComponent from "../../../components/dropDown/DropDownInput";
 import fonts from "../../../config/Fonts";
 import colors from "../../../config/Colors";
+import { LikesIcon, ShareIcon, TimeIcon, ViewsIcon } from "../../../assets/svg";
 
 export default function TipsTabScreen() {
 
@@ -77,19 +78,19 @@ export default function TipsTabScreen() {
 
                 <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
                     <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Image source={Images.eyeIcon} />
+                        <ViewsIcon />
                         <Text>{item.views} Views</Text>
                     </View>
                     <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Image source={Images.likeIcon} />
+                        <LikesIcon />
                         <Text>{item.likes} Likes</Text>
                     </View>
                     <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Image source={Images.shareIcon} />
+                        <ShareIcon />
                         <Text>{item.shared} Shared</Text>
                     </View>
                     <View style={{ flexDirection: "row", gap: 5 }}>
-                        <Image source={Images.timeIcon} />
+                        <TimeIcon />
                         <Text>{item.time} h</Text>
                     </View>
                 </View>

@@ -13,11 +13,6 @@ import TipsTabIcon from "./TipsTabIcon";
 import RewardsTabIcon from "./RewardsTabIcon";
 import AdsTabIcon from "./AdsTabIcon";
 import ItemsTabIcon from "./ItemsTabIcon";
-import PostGreenTabIcon from "./PostGreenTabIcon";
-import TipsGreenTabIcon from "./TipsGreenTabIcon";
-import ItemsGreenTabIcon from "./ItemsGreenTabIcon";
-import RewardsGreenTabIcon from "./RewardsGreenTabIcon";
-import AdsGreenTabIcon from "./AdsGreenTabIcon";
 import CategoryMobileIcon from "./CategoryMobileIcon";
 import SgPtsIcon from "./SgPtsIcon";
 import SgItemsIcon from "./SgItemsIcon";
@@ -29,10 +24,18 @@ import SgProfileLogo from "./SgProfileLogo";
 import LogoutIcon from "./LogoutIcon";
 import RightArrowIcon from "./RightArrowIcon";
 import UploadImgIcon from "./UploadImgIcon";
-
-
-
-
+import ViewsIcon from "./ViewsIcon";
+import LikesIcon from "./LikesIcon";
+import ShareIcon from "./ShareIcon";
+import TimeIcon from "./TimeIcon";
+import StarIcon from "./StarIcon";
+import PointsEarnIcon from "./PointsEarnIcon";
+import AdsLocationIcon from "./AdsLocationIcon";
+import AdsStickerIcon from "./AdsStickerIcon";
+import SuccessLogoIcon from "./SuccessLogoIcon";
+import SpeakerIcon from "./SpeakerIcon";
+import CallIcon from "./CallIcon";
+import CameraIcon from "./CameraIcon";
 
 export{
     BellIcon,
@@ -50,11 +53,6 @@ export{
     RewardsTabIcon,
     AdsTabIcon,
     ItemsTabIcon,
-    PostGreenTabIcon,
-    TipsGreenTabIcon,
-    ItemsGreenTabIcon,
-    RewardsGreenTabIcon,
-    AdsGreenTabIcon,
     CategoryMobileIcon,
     SgPtsIcon,
     SgItemsIcon,
@@ -65,6 +63,18 @@ export{
     SgProfileLogo,
     LogoutIcon,
     RightArrowIcon,
-    UploadImgIcon
+    UploadImgIcon,
+    ViewsIcon,
+    LikesIcon,
+    ShareIcon,
+    TimeIcon,
+    StarIcon,
+    PointsEarnIcon,
+    AdsLocationIcon,
+    AdsStickerIcon,
+    SuccessLogoIcon,
+    SpeakerIcon,
+    CallIcon,
+    CameraIcon
 
 }

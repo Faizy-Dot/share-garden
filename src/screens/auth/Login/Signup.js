@@ -21,6 +21,8 @@ import getDeviceDetails from "../../../config/DeviceDetails";
 import DeviceInfo from "react-native-device-info";
 import Toast from 'react-native-toast-message';
 import { signUp } from "../../../redux/Actions/authActions/signupAction";
+import fonts from "../../../config/Fonts";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,10 +42,12 @@ export default function SignUpScreen({ navigation }) {
         phonenumber1: '',
         phonenumber2: '',
     });
-    
-    
+
+
     const [isSGMember, setIsSGMember] = useState(true);
     const [isMerchant, setIsMerchant] = useState(false);
+    const [isPasswordVisible, setPasswordVisible] = useState(false);
+    const [isConfirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
     const dispatch = useDispatch();
     const { loading, error, user } = useSelector((state) => state.auth);
@@ -63,7 +67,6 @@ export default function SignUpScreen({ navigation }) {
         }
     };
 
-    console.log(form.password)
 
     const handleSubmit = async () => {
         try {
@@ -72,6 +75,14 @@ export default function SignUpScreen({ navigation }) {
                     type: 'error',
                     text1: 'Error',
                     text2: 'Passwords do not match!',
+                });
+                return;
+            }
+            if (form.password.length < 6) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Password must be at least 6 characters!',
                 });
                 return;
             }
@@ -110,7 +121,7 @@ export default function SignUpScreen({ navigation }) {
             }
 
             const res = await dispatch(signUp(userData)).unwrap();
-            console.log("response==>>",res)
+            console.log("response==>>", res)
 
             Toast.show({
                 type: 'success',
@@ -142,6 +153,7 @@ export default function SignUpScreen({ navigation }) {
             });
         }
     }
+
 
     return (
         <KeyboardAwareScrollView style={styles.container} contentContainerStyle={{
@@ -196,32 +208,62 @@ export default function SignUpScreen({ navigation }) {
                     />
                 </View>
                 <View>
-                    <TextInput 
+                    <TextInput
                         placeholder="Email"
                         style={[
-                            styles.input, 
+                            styles.input,
                             { width: "100%" },
                             emailError ? styles.inputError : null
                         ]}
-                        onChangeText={(text) => handleInputChange('emailaddress', text)} 
+                        onChangeText={(text) => handleInputChange('emailaddress', text)}
                     />
-                    {emailError ? 
+                    {emailError ?
                         <Text style={styles.errorText}>{emailError}</Text>
-                     : null}
+                        : null}
                 </View>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <TextInput
+                        placeholder="Password"
+                        style={[styles.input, { width: "100%" },]}
+                        secureTextEntry={!isPasswordVisible}
+                        onChangeText={(text) => handleInputChange('password', text)}
+                    />
+                    <TouchableOpacity
+                        onPress={() => setPasswordVisible(!isPasswordVisible)}
+                        style={styles.eyeIcon}
+                    >
+                        <Icon
+                            name={isPasswordVisible ? "visibility" : "visibility-off"}
+                            size={20}
+                            color={isPasswordVisible ? colors.buttonColor : "#ccc"}
+                        />
+                    </TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <TextInput
+                        placeholder="Confirm Password"
+                        style={[styles.input, { width: "100%" }]}
+                        secureTextEntry={!isConfirmPasswordVisible}
+                        onChangeText={(text) => handleInputChange('confirmpassword', text)}
+                    />
+                    <TouchableOpacity
+                        onPress={() => setConfirmPasswordVisible(!isConfirmPasswordVisible)}
+                        style={styles.eyeIcon}
+                    >
+                        <Icon
+                            name={isConfirmPasswordVisible ? "visibility" : "visibility-off"}
+                            size={20}
+                            color={isConfirmPasswordVisible ? colors.buttonColor : "#ccc"}
+                        />
+                    </TouchableOpacity>
 
-                <TextInput
-                    placeholder="Password"
-                    style={[styles.input, { width: "100%" }, form.password === form.confirmpassword && form.password.length > 6 && {color:"green"}]}
-                    secureTextEntry
-                    onChangeText={(text) => handleInputChange('password', text)}
-                />
-                <TextInput
-                    placeholder="Confirm Password"
-                    style={[styles.input, { width: "100%",color:"red" }]}
-                    secureTextEntry
-                    onChangeText={(text) => handleInputChange('confirmpassword', text)}
-                />
+                </View>
+                {form.password.length < 6 && (
+                    <Text style={styles.isPasswordMatching}>Password must be at least 6 characters</Text>
+                )}
+                {form.password !== form.confirmpassword && form.password.length >= 6 && (
+                    <Text style={styles.isPasswordMatching}>Passwords do not match!</Text>
+                )}
                 <View style={styles.row}>
                     <TextInput
                         placeholder="+1"
@@ -296,15 +338,16 @@ const styles = StyleSheet.create({
     },
     toggleLabel: {
         fontSize: Metrix.FontExtraSmall,
-        fontWeight: "500",
+        fontFamily: fonts.InterRegular,
     },
     toggleDesc: {
         fontSize: Metrix.normalize(9),
-        fontWeight: "500",
+        fontFamily: fonts.InterRegular,
     },
     form: {
         width: "90%",
-        marginTop: Metrix.VerticalSize(20)
+        marginTop: Metrix.VerticalSize(20),
+        gap: Metrix.VerticalSize(10)
     },
     row: {
         flexDirection: "row",
@@ -314,7 +357,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#EAEAEA",
         borderRadius: Metrix.HorizontalSize(4),
-        marginBottom: Metrix.VerticalSize(10),
+        // marginBottom: Metrix.VerticalSize(10),
         width: "48%",
         height: Metrix.VerticalSize(40),
         padding: Metrix.HorizontalSize(10),
@@ -327,8 +370,8 @@ const styles = StyleSheet.create({
         width: "76%",
     },
     terms: {
-        fontSize: 10,
-        fontWeight: "500",
+        fontSize: Metrix.normalize(9),
+        fontFamily: fonts.InterRegular,
         color: colors.black,
         textAlign: "center",
         marginVertical: Metrix.VerticalSize(15),
@@ -345,10 +388,18 @@ const styles = StyleSheet.create({
         borderColor: 'red',
     },
     errorText: {
-        color: 'red',
-        fontSize: 12,
-        marginTop: -8,
-        marginBottom: 10,
+        color: colors.redColor,
+        fontSize: Metrix.FontExtraSmall,
         marginLeft: 4,
     },
+    isPasswordMatching: {
+        fontSize: Metrix.FontExtraSmall,
+        color: colors.redColor,
+        fontFamily: fonts.InterRegular
+
+    },
+    eyeIcon: {
+        position: "absolute",
+        right: Metrix.HorizontalSize(10)
+    }
 });

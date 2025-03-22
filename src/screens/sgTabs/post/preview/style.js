@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     },
     input: {
         width: Metrix.HorizontalSize(30),
-        height: Metrix.VerticalSize(40),
+        height: Metrix.VerticalSize(44),
         fontSize: Metrix.FontRegular,
         fontFamily: fonts.InterBold,
         paddingLeft: 0,

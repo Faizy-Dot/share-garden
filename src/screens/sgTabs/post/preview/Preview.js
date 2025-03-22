@@ -13,6 +13,7 @@ import styles from "./style";
 import fonts from "../../../../config/Fonts";
 import CustomButton from "../../../../components/Button/Button";
 import axiosInstance from '../../../../config/axios';
+import { BlackBitIcon, CashIcon, TimeIcon } from "../../../../assets/svg";
 
 
 export default function PostTabScreen({ navigation, route }) {
@@ -396,7 +397,7 @@ export default function PostTabScreen({ navigation, route }) {
 
               <View style={[styles.sameMiddleBox, { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
-                  <Image source={isSGPoints ? Images.bitLogoBig : Images.dollarLogoBig} style={styles.bitLogo} />
+                  {isSGPoints ? <BlackBitIcon width={32} height={32} /> : <CashIcon width={32} height={32} />}
                   <Text style={[styles.itemConditionText, { fontFamily: fonts.InterBold }]}>
                     {isSGPoints ? 'Bid in SG Pts' : 'Price'}
                   </Text>
@@ -409,7 +410,7 @@ export default function PostTabScreen({ navigation, route }) {
 
                   <View style={[styles.sameMiddleBox, { flexDirection: "row", gap: Metrix.HorizontalSize(29) }]}>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(15) }}>
-                      <Image source={Images.homePostVector} style={styles.timeIcon} />
+                      <TimeIcon width={12} height={12} stroke="#5A5A5A"/>
                       <Text style={styles.bidEndsText}>Bid Ends</Text>
                     </View>
 
@@ -469,7 +470,7 @@ export default function PostTabScreen({ navigation, route }) {
 
             <View style={{ paddingHorizontal: Metrix.HorizontalSize(10), gap: Metrix.VerticalSize(10), marginTop: Metrix.VerticalSize(7) }}>
               <View style={{ borderWidth: 1, borderColor: colors.borderColor, padding: Metrix.VerticalSize(20), borderRadius: Metrix.VerticalSize(3) }}>
-                <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular}}>{description}</Text>
+                <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular }}>{description}</Text>
 
                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: Metrix.VerticalSize(15) }}>
                   <View style={styles.SGTipimageContainer}>
@@ -494,11 +495,11 @@ export default function PostTabScreen({ navigation, route }) {
 
               </View>
 
-              <View style={{ borderWidth: 1, borderColor: colors.borderColor, padding: Metrix.VerticalSize(20), borderRadius: Metrix.VerticalSize(3),flexDirection : "row",alignItems :"center",gap : Metrix.HorizontalSize(10) }}>
+              <View style={{ borderWidth: 1, borderColor: colors.borderColor, padding: Metrix.VerticalSize(20), borderRadius: Metrix.VerticalSize(3), flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
                 <Image source={{ uri: user?.profileImage }} style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64), borderRadius: 32 }} />
                 <View>
                   <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>Posted by | SG Member</Text>
-                  <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterRegular,color : colors.buttonColor }}>{user.firstName + " "+ user.lastName}</Text>
+                  <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterRegular, color: colors.buttonColor }}>{user.firstName + " " + user.lastName}</Text>
                   <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular }}>Published on 23 April 2024</Text>
                 </View>
               </View>
@@ -549,11 +550,11 @@ export default function PostTabScreen({ navigation, route }) {
               draft ?
                 <Text style={styles.modalTitle}>Your SG item has been saved in drafts</Text>
                 :
-                
-                  activeButton === "SG Item" ? 
+
+                activeButton === "SG Item" ?
                   <Text style={styles.modalTitle}>Your SG item has been posted on <Text style={{ color: colors.buttonColor }}>SG marketplace</Text></Text>
                   :
-                  <Text style={[styles.modalTitle,{width :"100%"}]}>Your SG Tips has been posted. </Text>
+                  <Text style={[styles.modalTitle, { width: "100%" }]}>Your SG Tips has been posted. </Text>
             }
 
             <View style={styles.bottomModalContainer}>

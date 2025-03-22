@@ -17,6 +17,7 @@ import { Alert } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { updateUserProfile } from '../../../redux/Actions/authActions/loginAction';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { CameraIcon } from '../../../assets/svg';
 
 
 var baseUrl = 'https://api.sharegarden.ca';
@@ -278,6 +279,9 @@ export default function EditProfile({ navigation }) {
                                         style={styles.profileImage}
                                         resizeMode="cover"
                                     />
+                                    <View style={styles.camerIconConatiner}>
+                                        <CameraIcon/>
+                                    </View>
                                 </View>
                             ) : (
                                 <View style={styles.profileContainer}>

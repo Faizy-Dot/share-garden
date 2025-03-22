@@ -8,10 +8,11 @@ import { Images, Metrix } from "../../../config";
 import fonts from "../../../config/Fonts";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
+import { BlackBitIcon, PointsEarnIcon, StarIcon } from "../../../assets/svg";
 
-export default function RewardsTabScreen({navigation}) {
+export default function RewardsTabScreen({ navigation }) {
 
-    const {user} = useSelector((state)=> state.login)
+    const { user } = useSelector((state) => state.login)
     const [buttons, setButtons] = useState({
         sgPoints: true,
         sgCoupons: false
@@ -23,41 +24,42 @@ export default function RewardsTabScreen({navigation}) {
         { key: 'sgCoupons', label: 'SG Coupons', color: colors.yellowColor },
     ];
 
- const results = [
-    { title: "Offic Chair", itemId: 20243, bit: 300, id: 1 },
-    { title: "Offic Chair", itemId: 20243, bit: 1800, id: 2 },
-    { title: "Offic Chair", itemId: 20243, bit: 750, id: 3 },
-    { title: "Offic Chair", itemId: 20243, bit: 2250, id: 4 },
-    { title: "Offic Chair", itemId: 20243, bit: 1230, id: 5 },
-    { title: "Offic Chair", itemId: 20243, bit: 250, id: 6 },
-    { title: "Offic Chair", itemId: 20243, bit: 97, id: 7 },
-]
+    const results = [
+        { title: "Offic Chair", itemId: 20243, bit: 300, id: 1 },
+        { title: "Offic Chair", itemId: 20243, bit: 1800, id: 2 },
+        { title: "Offic Chair", itemId: 20243, bit: 750, id: 3 },
+        { title: "Offic Chair", itemId: 20243, bit: 2250, id: 4 },
+        { title: "Offic Chair", itemId: 20243, bit: 1230, id: 5 },
+        { title: "Offic Chair", itemId: 20243, bit: 250, id: 6 },
+        { title: "Offic Chair", itemId: 20243, bit: 97, id: 7 },
+    ]
 
     const renderResults = ({ item }) => {
         return (
-                <View style={styles.resultsContainer}>
-                    <View>
-                        <Text style={styles.titleText}>{item.title}</Text>
-                        <Text style={styles.itemsIdText}>itemID #{item.itemId}</Text>
-                    </View>
-                    <View style={styles.bitContainer}>
-                        <Image source={Images.homeBitLogo} style={styles.bitImg}/>
-                        <Text style={[styles.bitText , item.bit > 1000 ? {color : colors.redColor} : {color :colors.buttonColor}]}>{item.bit}</Text>
-                    </View>
+            <View style={styles.resultsContainer}>
+                <View>
+                    <Text style={styles.titleText}>{item.title}</Text>
+                    <Text style={styles.itemsIdText}>itemID #{item.itemId}</Text>
                 </View>
+                <View style={styles.bitContainer}>
+                    <BlackBitIcon width={16}
+                        height={16} />
+                    <Text style={[styles.bitText, item.bit > 1000 ? { color: colors.redColor } : { color: colors.buttonColor }]}>{item.bit}</Text>
+                </View>
+            </View>
         )
     }
 
-    
+
     useEffect(() => {
         if (!user) {
-                navigation.navigate("Login")
-                  Toast.show({
-                                type: 'error',
-                                text1: 'Login or Signup',
-                                text2: 'First Login plz',
-                            });
-            }
+            navigation.navigate("Login")
+            Toast.show({
+                type: 'error',
+                text1: 'Login or Signup',
+                text2: 'First Login plz',
+            });
+        }
     }, [user, navigation]);
 
     if (!user) {
@@ -99,11 +101,11 @@ export default function RewardsTabScreen({navigation}) {
                 <Text style={styles.sameText2}>Ashley Simson</Text>
 
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-                    <Image source={Images.starGreen} style={styles.starImg}/>
-                    <Image source={Images.starGreen} style={styles.starImg}/>
-                    <Image source={Images.starGreen} style={styles.starImg}/>
-                    <Image source={Images.starGreen} style={styles.starImg}/>
-                    <Image source={Images.starWhite} style={styles.starImg}/>
+                    <StarIcon fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
+                    <StarIcon fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
+                    <StarIcon fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
+                    <StarIcon fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
+                    <StarIcon />
                     <Text style={styles.ratingText}>4.5</Text>
                 </View>
 
@@ -113,7 +115,7 @@ export default function RewardsTabScreen({navigation}) {
                 </View>
 
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image source={Images.earnArrowIcon} style={styles.arrowImg}/>
+                    <PointsEarnIcon />
                     <Text style={[styles.sameText1, { marginLeft: Metrix.HorizontalSize(10) }]}>Points earned<Text style={{ fontFamily: fonts.InterBold }}> +300</Text> from last sales</Text>
                 </View>
 
@@ -123,8 +125,8 @@ export default function RewardsTabScreen({navigation}) {
                 <FlatList data={results}
                     renderItem={renderResults}
                     showsVerticalScrollIndicator={false}
-                    keyExtractor={(item) => item.id} 
-                    />
+                    keyExtractor={(item) => item.id}
+                />
             </View>
 
         </View>
