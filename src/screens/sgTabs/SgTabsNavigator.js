@@ -8,6 +8,7 @@ import Profile from "../profile/Profile";
 import EditProfile from "../profile/editProfile/EditProfile";
 import SgUserNotification from "../sgUserNotifcation/SgUserNotification";
 import SgUserChat from "../sgUserChat/SgUserChat";
+import ChatDetail from "../sgUserChat/ChatDetail";
 import EarnSGpts from "../profile/earnSGpts/EarnSGpts";
 import MySGItems from "../profile/mySGItems/MySGItems";
 import MyBids from "../profile/myBids/MyBids";
@@ -30,6 +31,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="ChatDetail" component={ChatDetail} options={{ headerShown: false }} /> 
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
         <ItemsStack.Screen name="MyBids" component={MyBids} />
@@ -49,6 +51,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="ChatDetail" component={ChatDetail} options={{ headerShown: false }} /> 
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
          <ItemsStack.Screen name="MyBids" component={MyBids} />
@@ -68,6 +71,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="ChatDetail" component={ChatDetail} options={{ headerShown: false }} /> 
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
          <ItemsStack.Screen name="MyBids" component={MyBids} />
@@ -86,6 +90,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="ChatDetail" component={ChatDetail} options={{ headerShown: false }} /> 
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
          <ItemsStack.Screen name="MyBids" component={MyBids} />
@@ -104,6 +109,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />
         <ItemsStack.Screen name="SgUserChat" component={SgUserChat} />
+        <ItemsStack.Screen name="ChatDetail" component={ChatDetail} options={{ headerShown: false }} /> 
         <ItemsStack.Screen name="EarnSGpts" component={EarnSGpts} />
         <ItemsStack.Screen name="MySGItems" component={MySGItems} />
          <ItemsStack.Screen name="MyBids" component={MyBids} />

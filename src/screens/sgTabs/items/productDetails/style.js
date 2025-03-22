@@ -205,7 +205,62 @@ postBox: {
   justifyContent: "center",
   alignItems: "center"
 },
-
+ownerMessage: {
+    textAlign: 'center',
+    fontSize: Metrix.FontRegular,
+    fontFamily: fonts.InterMedium,
+    color: colors.textGray,
+    paddingVertical: Metrix.VerticalSize(10),
+},
+modal: {
+  margin: 0,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContent: {
+  backgroundColor: colors.white,
+  borderRadius: Metrix.VerticalSize(8),
+  padding: Metrix.VerticalSize(20),
+  width: '90%',
+  alignItems: 'center',
+},
+closeButton: {
+  alignSelf: 'flex-end',
+  padding: Metrix.VerticalSize(5),
+},
+closeIcon: {
+  width: Metrix.HorizontalSize(24),
+  height: Metrix.VerticalSize(24),
+},
+modalLogo: {
+  width: Metrix.HorizontalSize(80),
+  height: Metrix.VerticalSize(80),
+  marginBottom: Metrix.VerticalSize(20),
+},
+modalTitle: {
+  fontSize: Metrix.FontLarge,
+  fontFamily: fonts.InterBold,
+  color: colors.buttonColor,
+  marginBottom: Metrix.VerticalSize(10),
+  textAlign: 'center',
+},
+modalText: {
+  fontSize: Metrix.FontRegular,
+  fontFamily: fonts.InterRegular,
+  color: colors.textGray,
+  textAlign: 'center',
+  marginBottom: Metrix.VerticalSize(20),
+},
+modalFooter: {
+  fontSize: Metrix.FontSmall,
+  fontFamily: fonts.InterRegular,
+  color: colors.textGray,
+  marginTop: Metrix.VerticalSize(15),
+},
+brandText: {
+  color: colors.buttonColor,
+  fontFamily: fonts.InterBold,
+},
 });
 
 export default styles;

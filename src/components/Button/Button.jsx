@@ -17,7 +17,8 @@ export default function CustomButton({
     borderWidth ,
     borderColor,
     flex,
-    icon
+    icon,
+    iconPosition = "left"
 }) {
     return (
         <TouchableOpacity  style={[styles.customButton, {
@@ -31,11 +32,14 @@ export default function CustomButton({
         }]} activeOpacity={0.8} onPress={onPress}>
             
             {
-                icon && icon
+                icon && iconPosition === "left" && icon
             }
             <Text style={{ color, fontSize,fontFamily }}>
                 {title}
             </Text>
+            {
+                icon && iconPosition === "right" && icon
+            }
         </TouchableOpacity>
     )
 }

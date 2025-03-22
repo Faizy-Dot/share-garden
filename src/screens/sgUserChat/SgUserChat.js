@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TextInput, Image, FlatList } from 'react-native';
+import { View, Text, TextInput, Image, FlatList, TouchableOpacity } from 'react-native';
 import styles from './style';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../components/navBar/NavBar';
 import { Images, Metrix } from '../../config';
+import { useNavigation } from '@react-navigation/native';
 
 
 const chatData = [
@@ -51,28 +52,42 @@ const chatData = [
   },
 ]
 
-const renderChatData = ({ item }) => {
-  return (
-    <View style={styles.chatBox}>
-      <View style={{flexDirection : "row" , gap : Metrix.HorizontalSize(15)}}>
-        <Image source={item.image} style={styles.chatImage} />
-        <View>
-          <Text style={styles.nameText}>{item.name}</Text>
-          <Text style={styles.lastMessageText}>{item.lastMessage}
-            <Text>{"  "}<View style={styles.dot}></View>{"  "}{item.timeAgo}</Text>
-          </Text>
+export default function SgUserChat() {
+  const navigation = useNavigation();
+
+  const renderChatData = ({ item }) => {
+    return (
+      <TouchableOpacity 
+        style={styles.chatBox}
+        onPress={() => navigation.navigate('ChatDetail', {
+          chatUser: {
+            name: item.name,
+            image: item.image
+          },
+          productInfo: {
+            title: 'Gaming Chair',
+            price: '180',
+            image: Images.homePopularListing
+          }
+        })}
+      >
+        <View style={{flexDirection: "row", gap: Metrix.HorizontalSize(15)}}>
+          <Image source={item.image} style={styles.chatImage} />
+          <View>
+            <Text style={styles.nameText}>{item.name}</Text>
+            <Text style={styles.lastMessageText}>{item.lastMessage}
+              <Text>{"  "}<View style={styles.dot}></View>{"  "}{item.timeAgo}</Text>
+            </Text>
+          </View>
         </View>
 
-      </View>
+        <View style={styles.messageCount}>
+          <Text style={styles.count}>1</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
-      <View style = {styles.messageCount}>
-        <Text style={styles.count}>1</Text>
-      </View>
-    </View>
-  )
-}
-
-export default function SgUserChat() {
   return (
     <View style={styles.chatContainer}>
       <View style={styles.topContainer}>
@@ -89,10 +104,12 @@ export default function SgUserChat() {
           <TextInput style={styles.searchInput} placeholder='Search for...' />
         </View>
 
-        <FlatList data={chatData}
-          renderItem={renderChatData} 
+        <FlatList 
+          data={chatData}
+          renderItem={renderChatData}
           keyExtractor={(item)=> item.id}
-          showsVerticalScrollIndicator={false}/>
+          showsVerticalScrollIndicator={false}
+        />
       </View>
     </View>
   );

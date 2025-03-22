@@ -21,12 +21,34 @@ import getDeviceDetails from "../../../config/DeviceDetails";
 import DeviceInfo from "react-native-device-info";
 import Toast from 'react-native-toast-message';
 import { signUp } from "../../../redux/Actions/authActions/signupAction";
-import fonts from "../../../config/Fonts";
-import Icon from "react-native-vector-icons/MaterialIcons";
 
 const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+};
+
+const isValidPassword = (password) => {
+    // If password is empty/null, return all false
+    if (!password) {
+        return {
+            isValid: false,
+            minLength: false,
+            hasUpperCase: false,
+            hasSymbol: false
+        };
+    }
+
+    const minLength = password.length >= 6;
+    const hasUpperCase = /[A-Z]/.test(password);
+    // Update the symbol regex to be more specific and escape special characters
+    const hasSymbol = /[-!@#$%^&*()_+|~=`{}\[\]:";'<>?,./]/.test(password);
+    
+    return {
+        isValid: minLength && hasUpperCase && hasSymbol,
+        minLength,
+        hasUpperCase,
+        hasSymbol
+    };
 };
 
 export default function SignUpScreen({ navigation }) {
@@ -60,16 +82,50 @@ export default function SignUpScreen({ navigation }) {
 
     const [emailError, setEmailError] = useState('');
 
+    // Add state for password
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    // In your component, add state for password
+    const [passwordValidation, setPasswordValidation] = useState({
+        minLength: false,
+        hasUpperCase: false,
+        hasSymbol: false
+    });
+
     const handleInputChange = (key, value) => {
-        setForm((prev) => ({ ...prev, [key]: value }));
+        // First update the form state
+        setForm(prev => ({ ...prev, [key]: value }));
+        
+        // Then handle specific validations
         if (key === 'emailaddress') {
             setEmailError('');
+        }
+        
+        if (key === 'password') {
+            // Only run validation if there's a value
+            const validation = isValidPassword(value);
+            setPasswordValidation({
+                minLength: validation.minLength,
+                hasUpperCase: validation.hasUpperCase,
+                hasSymbol: validation.hasSymbol
+            });
         }
     };
 
 
     const handleSubmit = async () => {
         try {
+            // Add password validation check
+            if (!passwordValidation.isValid) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Please ensure password meets all requirements',
+                });
+                return;
+            }
+
             if (form.password !== form.confirmpassword) {
                 Toast.show({
                     type: 'error',
@@ -156,9 +212,16 @@ export default function SignUpScreen({ navigation }) {
 
 
     return (
-        <KeyboardAwareScrollView style={styles.container} contentContainerStyle={{
-            alignItems: "center",
-        }}>
+        <KeyboardAwareScrollView 
+            style={styles.container} 
+            contentContainerStyle={{
+                alignItems: "center",
+                paddingBottom: Metrix.VerticalSize(30),
+            }}
+            enableOnAndroid={true}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+        >
             <View style={styles.logoContainer}>
                 <Image
                     source={Images.logo}
@@ -221,49 +284,19 @@ export default function SignUpScreen({ navigation }) {
                         <Text style={styles.errorText}>{emailError}</Text>
                         : null}
                 </View>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <TextInput
-                        placeholder="Password"
-                        style={[styles.input, { width: "100%" },]}
-                        secureTextEntry={!isPasswordVisible}
-                        onChangeText={(text) => handleInputChange('password', text)}
-                    />
-                    <TouchableOpacity
-                        onPress={() => setPasswordVisible(!isPasswordVisible)}
-                        style={styles.eyeIcon}
-                    >
-                        <Icon
-                            name={isPasswordVisible ? "visibility" : "visibility-off"}
-                            size={20}
-                            color={isPasswordVisible ? colors.buttonColor : "#ccc"}
-                        />
-                    </TouchableOpacity>
-                </View>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <TextInput
-                        placeholder="Confirm Password"
-                        style={[styles.input, { width: "100%" }]}
-                        secureTextEntry={!isConfirmPasswordVisible}
-                        onChangeText={(text) => handleInputChange('confirmpassword', text)}
-                    />
-                    <TouchableOpacity
-                        onPress={() => setConfirmPasswordVisible(!isConfirmPasswordVisible)}
-                        style={styles.eyeIcon}
-                    >
-                        <Icon
-                            name={isConfirmPasswordVisible ? "visibility" : "visibility-off"}
-                            size={20}
-                            color={isConfirmPasswordVisible ? colors.buttonColor : "#ccc"}
-                        />
-                    </TouchableOpacity>
 
-                </View>
-                {form.password.length < 6 && (
-                    <Text style={styles.isPasswordMatching}>Password must be at least 6 characters</Text>
-                )}
-                {form.password !== form.confirmpassword && form.password.length >= 6 && (
-                    <Text style={styles.isPasswordMatching}>Passwords do not match!</Text>
-                )}
+                <TextInput
+                    placeholder="Password"
+                    style={[styles.input, { width: "100%" }, form.password === form.confirmpassword && form.password.length > 6 && {color:"green"}]}
+                    secureTextEntry
+                    onChangeText={(text) => handleInputChange('password', text)}
+                />
+                <TextInput
+                    placeholder="Confirm Password"
+                    style={[styles.input, { width: "100%",color:"red" }]}
+                    secureTextEntry
+                    onChangeText={(text) => handleInputChange('confirmpassword', text)}
+                />
                 <View style={styles.row}>
                     <TextInput
                         placeholder="+1"
@@ -314,7 +347,7 @@ export default function SignUpScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
+        flex: 1,
         backgroundColor: colors.white,
     },
     logoContainer: {
@@ -376,6 +409,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginVertical: Metrix.VerticalSize(15),
         width: "90%",
+        marginBottom: Metrix.VerticalSize(20),
     },
     link: {
         color: colors.buttonColor,
@@ -392,14 +426,4 @@ const styles = StyleSheet.create({
         fontSize: Metrix.FontExtraSmall,
         marginLeft: 4,
     },
-    isPasswordMatching: {
-        fontSize: Metrix.FontExtraSmall,
-        color: colors.redColor,
-        fontFamily: fonts.InterRegular
-
-    },
-    eyeIcon: {
-        position: "absolute",
-        right: Metrix.HorizontalSize(10)
-    }
 });

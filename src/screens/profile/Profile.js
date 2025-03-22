@@ -124,13 +124,11 @@ export default function Profile({ navigation }) {
 
                 <View style={styles.navBar}>
                     <View style={styles.profileContainer}>
-
                         {
                             user?.profileImage ?
                                 <Image source={{ uri: user.profileImage }} style={styles.profileImage} />
                                 :
                                 <Icon name="user-circle" size={Metrix.HorizontalSize(64)} color="#ccc" />
-
                         }
                     </View>
 
