@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
         height: Metrix.HorizontalSize(64),
         borderRadius: Metrix.HorizontalSize(32),  // Half of width/height to make it a circle
         overflow: "hidden", // Ensures the image is clipped to the circular shape
-        borderWidth: 1,
-        borderColor: colors.borderColor,
+        borderWidth: 2,
+        borderColor: colors.buttonColor,
         justifyContent: "center",
         alignItems: "center",
     },

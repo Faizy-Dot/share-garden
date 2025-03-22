@@ -16,6 +16,8 @@ import { onGoogleButtonPress, signIn, testGoogleSignIn } from './GoogleAuthentic
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { getMessaging, getToken } from '@react-native-firebase/messaging';
 import Logo from '../../../assets/svg/Logo';
+import Icon from "react-native-vector-icons/MaterialIcons";
+import colors from '../../../config/Colors';
 
 
 const Login = ({ navigation }) => {
@@ -31,6 +33,7 @@ const Login = ({ navigation }) => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
     const { loading } = useSelector((state) => state.login)
 
@@ -146,13 +149,25 @@ const Login = ({ navigation }) => {
                     placeholderTextColor="#999"
                     onChangeText={setEmail}
                 />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor="#999"
-                    secureTextEntry
-                    onChangeText={setPassword}
-                />
+                <View style={{flexDirection : "row" , alignItems:"center"}}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Password"
+                        placeholderTextColor="#999"
+                        secureTextEntry={!isPasswordVisible}
+                        onChangeText={setPassword}
+                    />
+                    <TouchableOpacity
+                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        style={{position : "absolute" , right:Metrix.HorizontalSize(10), paddingBottom : Metrix.VerticalSize(10)}}
+                    >
+                        <Icon
+                            name={isPasswordVisible ? "visibility" : "visibility-off"}
+                            size={20}
+                            color={isPasswordVisible ? colors.buttonColor : "#ccc"}
+                        />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('ForgotPassword')}>

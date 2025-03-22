@@ -21,6 +21,8 @@ import getDeviceDetails from "../../../config/DeviceDetails";
 import DeviceInfo from "react-native-device-info";
 import Toast from 'react-native-toast-message';
 import { signUp } from "../../../redux/Actions/authActions/signupAction";
+import fonts from "../../../config/Fonts";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -42,7 +44,7 @@ const isValidPassword = (password) => {
     const hasUpperCase = /[A-Z]/.test(password);
     // Update the symbol regex to be more specific and escape special characters
     const hasSymbol = /[-!@#$%^&*()_+|~=`{}\[\]:";'<>?,./]/.test(password);
-    
+
     return {
         isValid: minLength && hasUpperCase && hasSymbol,
         minLength,
@@ -96,12 +98,12 @@ export default function SignUpScreen({ navigation }) {
     const handleInputChange = (key, value) => {
         // First update the form state
         setForm(prev => ({ ...prev, [key]: value }));
-        
+
         // Then handle specific validations
         if (key === 'emailaddress') {
             setEmailError('');
         }
-        
+
         if (key === 'password') {
             // Only run validation if there's a value
             const validation = isValidPassword(value);
@@ -212,8 +214,8 @@ export default function SignUpScreen({ navigation }) {
 
 
     return (
-        <KeyboardAwareScrollView 
-            style={styles.container} 
+        <KeyboardAwareScrollView
+            style={styles.container}
             contentContainerStyle={{
                 alignItems: "center",
                 paddingBottom: Metrix.VerticalSize(30),
@@ -284,19 +286,49 @@ export default function SignUpScreen({ navigation }) {
                         <Text style={styles.errorText}>{emailError}</Text>
                         : null}
                 </View>
+                <View style={styles.eyeContainer}>
+                    <TextInput
+                        placeholder="Password"
+                        style={[styles.input, { width: "100%" }]}
+                        secureTextEntry={!isPasswordVisible}
+                        onChangeText={(text) => handleInputChange('password', text)}
+                    />
+                    <TouchableOpacity
+                        onPress={() => setPasswordVisible(!isPasswordVisible)}
+                        style={styles.eyeIcon}
+                    >
+                        <Icon
+                            name={isPasswordVisible ? "visibility" : "visibility-off"}
+                            size={20}
+                            color={isPasswordVisible ? colors.buttonColor : "#ccc"}
+                        />
+                    </TouchableOpacity>
 
-                <TextInput
-                    placeholder="Password"
-                    style={[styles.input, { width: "100%" }, form.password === form.confirmpassword && form.password.length > 6 && {color:"green"}]}
-                    secureTextEntry
-                    onChangeText={(text) => handleInputChange('password', text)}
-                />
-                <TextInput
-                    placeholder="Confirm Password"
-                    style={[styles.input, { width: "100%",color:"red" }]}
-                    secureTextEntry
-                    onChangeText={(text) => handleInputChange('confirmpassword', text)}
-                />
+                </View>
+                <View style={styles.eyeContainer}>
+                    <TextInput
+                        placeholder="Confirm Password"
+                        style={[styles.input, { width: "100%" }]}
+                        secureTextEntry={!isConfirmPasswordVisible}
+                        onChangeText={(text) => handleInputChange('confirmpassword', text)}
+                    />
+                    <TouchableOpacity
+                        onPress={() => setConfirmPasswordVisible(!isConfirmPasswordVisible)}
+                        style={styles.eyeIcon}
+                    >
+                        <Icon
+                            name={isConfirmPasswordVisible ? "visibility" : "visibility-off"}
+                            size={20}
+                            color={isConfirmPasswordVisible ? colors.buttonColor : "#ccc"}
+                        />
+                    </TouchableOpacity>
+                </View>
+                {form.password.length < 6 && (
+                    <Text style={styles.errorText}>Password must be at least 6 characters</Text>
+                )}
+                {form.password !== form.confirmpassword && form.password.length >= 6 && (
+                    <Text style={styles.errorText}>Passwords do not match!</Text>
+                )}
                 <View style={styles.row}>
                     <TextInput
                         placeholder="+1"
@@ -318,7 +350,7 @@ export default function SignUpScreen({ navigation }) {
                         onChangeText={(text) => handleInputChange('address1', text)} />
                 </View>
                 <View>
-                    <TextInput placeholder="Address" style={[styles.input, { width: "100%" }]}
+                    <TextInput placeholder="Country,State" style={[styles.input, { width: "100%" }]}
                         onChangeText={(text) => handleInputChange('address2', text)} />
                 </View>
             </View>
@@ -425,5 +457,14 @@ const styles = StyleSheet.create({
         color: colors.redColor,
         fontSize: Metrix.FontExtraSmall,
         marginLeft: 4,
+        bottom : Metrix.VerticalSize(8)
     },
+    eyeContainer: {
+        flexDirection: "row",
+        alignItems: "center"
+    },
+    eyeIcon: {
+        position: "absolute",
+        right: Metrix.HorizontalSize(10)
+    }
 });
