@@ -13,13 +13,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: Metrix.HorizontalSize(15),
         gap: Metrix.VerticalSize(5),
         borderBottomWidth: 1,
-        borderColor: colors.borderColor,
+        borderColor: "#C4C4C4",
         paddingBottom: Metrix.VerticalSize(30)
     },
     renderMyBidsContainer: {
         flexDirection: "row",
         borderBottomWidth: 1,
-        borderColor: colors.borderColor,
+        borderColor: "#C4C4C4",
         paddingVertical : Metrix.VerticalSize(15),
         paddingHorizontal : Metrix.VerticalSize(30),
         justifyContent : "space-between",

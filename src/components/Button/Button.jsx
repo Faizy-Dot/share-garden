@@ -18,7 +18,8 @@ export default function CustomButton({
     borderColor,
     flex,
     icon,
-    iconPosition = "left"
+    iconPosition = "left",
+    disabled
 }) {
     return (
         <TouchableOpacity  style={[styles.customButton, {
@@ -28,8 +29,9 @@ export default function CustomButton({
             borderRadius,
             borderWidth,
             borderColor,
-            flex,   
-        }]} activeOpacity={0.8} onPress={onPress}>
+            flex, 
+              
+        }]} activeOpacity={0.8} onPress={onPress} disabled={disabled}>
             
             {
                 icon && iconPosition === "left" && icon

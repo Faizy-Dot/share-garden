@@ -39,8 +39,8 @@ import CameraIcon from "./CameraIcon";
 import ModalInfoIcon from "./ModalInfoIcon";
 import CrossIcon from "./CrossIcon";
 import ModalSuccessLogo from "./ModalSuccessLogo";
-
-
+import HandShakeIcon from "./HandShakeIcon";
+import BidTitleIcon from "./BidTitleIcon";
 
 export{
     BellIcon,
@@ -83,6 +83,8 @@ export{
     CameraIcon,
     ModalInfoIcon,
     CrossIcon,
-    ModalSuccessLogo
+    ModalSuccessLogo,
+    HandShakeIcon,
+    BidTitleIcon
 
 }

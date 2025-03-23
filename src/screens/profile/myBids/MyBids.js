@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, FlatList, Image } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import styles from './style';
 import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../../components/navBar/NavBar';
 import { Images, Metrix } from '../../../config';
 import fonts from '../../../config/Fonts';
 import colors from '../../../config/Colors';
+import { BidTitleIcon, NotificationIcon, SgBidIcon } from '../../../assets/svg';
+import { useNavigation } from '@react-navigation/native';
 
 const myBidsData = [
     {
@@ -56,34 +58,34 @@ const myBidsData = [
 
 
 export default function MyBids() {
-
+const navigation = useNavigation()
 
     const renderMyBids = ({ item }) => {
         return (
-            <View style={styles.renderMyBidsContainer}>
+            <TouchableOpacity activeOpacity={0.7} style={styles.renderMyBidsContainer} onPress={()=> navigation.navigate("BidsReview")}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(20) }}>
                     {
                         item.declined ?
-                            <Image source={Images.redBidsIcon} style={styles.bidIcon} />
+                            <SgBidIcon stroke={colors.redColor} />
                             :
-                            <Image source={Images.bidsIcon} style={styles.bidIcon} />
+                            <SgBidIcon />
                     }
                     <View style={{ width: Metrix.HorizontalSize(220) }}>
                         <View>
                             <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5) }}>
                                 <Text style={styles.title}>{item.title}</Text>
-                                <Image source={Images.myBidsTitleIcon} />
+                                <BidTitleIcon />
                             </View>
                         </View>
-                        <Text style={[styles.description,item.declined && {color : colors.redColor}]}>{item.description}</Text>
+                        <Text style={[styles.description, item.declined && { color: colors.redColor }]}>{item.description}</Text>
                         {
                             item.declined &&
-                            <Text style={[styles.description,{fontFamily : fonts.InterBold}]}>You can place your bid again</Text>
+                            <Text style={[styles.description, { fontFamily: fonts.InterBold }]}>You can place your bid again</Text>
                         }
                     </View>
                 </View>
-                <Image source={Images.homeMessageIcon} style={styles.messageIcon}/>
-            </View>
+                <NotificationIcon />
+            </TouchableOpacity>
         )
     }
 

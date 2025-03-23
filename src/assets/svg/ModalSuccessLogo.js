@@ -1,15 +1,16 @@
 import * as React from "react"
 import Svg, { Path } from "react-native-svg"
-const ModalSuccessLogo = (props) => (
+const ModalSuccessLogo = ({checkColor = "#F8443E",...props}) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
     width={50}
     height={51}
     fill="none"
     {...props}
+    viewBox="0 0 50 51"
   >
     <Path
-      fill="#F8443E"
+      fill={checkColor}
       d="M14.672 23.56a1.768 1.768 0 0 0-2.499 2.5l8.144 8.143c.345.345.776.517 1.25.517h.086a1.97 1.97 0 0 0 1.293-.646L43.327 9.642c.604-.733.518-1.853-.215-2.5-.733-.603-1.853-.517-2.5.216L21.438 30.325l-6.765-6.765Z"
     />
     <Path

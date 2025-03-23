@@ -11,7 +11,9 @@ import colors from '../../../../config/Colors';
 import CustomButton from '../../../../components/Button/Button';
 import axiosInstance from '../../../../config/axios';
 import { useSelector } from 'react-redux';
-import { BlackBitIcon, CallIcon, CashIcon, LikesIcon, NotificationIcon, ShareIcon, SpeakerIcon, TimeIcon } from '../../../../assets/svg';
+import { BlackBitIcon, CallIcon, CashIcon, CrossIcon, HandShakeIcon, LikesIcon, NotificationIcon, ShareIcon, SpeakerIcon, TimeIcon } from '../../../../assets/svg';
+import { Modal } from 'react-native';
+
 
 const ProductDetail = ({ route, navigation }) => {
   const { item } = route.params;
@@ -24,6 +26,7 @@ const ProductDetail = ({ route, navigation }) => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
   const images = [Images.homePopularListing, Images.homeProfile, Images.homePopularListing,]
 
@@ -39,7 +42,7 @@ const ProductDetail = ({ route, navigation }) => {
 
   const renderMyPosts = ({ item }) => (
     <TouchableOpacity activeOpacity={0.8} style={styles.postBox}>
-<TimeIcon width={12} height={12} stroke={colors.black}/>
+      <TimeIcon width={12} height={12} stroke={colors.black} />
       <Text style={{ fontSize: Metrix.customFontSize(10), fontFamily: fonts.InterLight }}>{item.post}</Text>
     </TouchableOpacity>
   );
@@ -261,12 +264,12 @@ const ProductDetail = ({ route, navigation }) => {
           )}
 
           <View style={{ paddingHorizontal: Metrix.HorizontalSize(15), marginTop: Metrix.VerticalSize(18) }}>
-            <CustomButton 
+            <CustomButton
               title={displayData.isSGPoints ? "PLACE BID" : "I WANT TO PURCHASE THIS"}
               height={Metrix.VerticalSize(46)}
               width={"100%"}
               borderRadius={Metrix.VerticalSize(3)}
-              fontSize={Metrix.FontSmall} 
+              fontSize={Metrix.FontSmall}
             />
           </View>
         </View>
@@ -334,33 +337,33 @@ const ProductDetail = ({ route, navigation }) => {
       </View>
 
       <Modal
-        isVisible={isModalVisible}
+        visible={isModalVisible} transparent animationType="fade"
         onBackdropPress={() => setIsModalVisible(false)}
         style={styles.modal}
       >
         <View style={styles.modalContent}>
-          <TouchableOpacity 
-            style={styles.closeButton} 
+          <TouchableOpacity
+            style={styles.closeButton}
             onPress={() => setIsModalVisible(false)}
           >
-            <Text style={{ fontSize: 20, color: '#000' }}>×</Text>
+            <CrossIcon />
           </TouchableOpacity>
 
-          <HandShakeIcon  />
-          
+          <HandShakeIcon />
+
           <Text style={styles.modalTitle}>Thank you for your interest.</Text>
-          
+
           <Text style={styles.modalText}>
             You can make payment and Pick up arrangements by contacting seller via chat
           </Text>
 
-          <CustomButton 
+          <CustomButton
             title="START CHAT"
             height={Metrix.VerticalSize(46)}
             width={"100%"}
             borderRadius={Metrix.VerticalSize(3)}
             fontSize={Metrix.FontSmall}
-            onPress={handleStartChat}
+            // onPress={handleStartChat}
             icon={<NotificationIcon stroke="#fff" style={{ marginLeft: 10 }} />}
             iconPosition="right"
           />
