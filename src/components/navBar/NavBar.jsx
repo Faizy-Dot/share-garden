@@ -25,7 +25,7 @@ export default function NavBar({
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(18) }}>
                 <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5), alignItems: "center" }}>
-                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>{user?.points || 0}</Text>
+                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>{user?.sgPoints || 0}</Text>
                     <GreenBitIcon />
                 </View>
                 <TouchableOpacity onPress={() => {
@@ -111,8 +111,6 @@ const styles = StyleSheet.create({
         height: Metrix.HorizontalSize(32),
         borderRadius: Metrix.HorizontalSize(16),  // Half of width/height to make it a circle
         overflow: "hidden", // Ensures the image is clipped to the circular shape
-        borderWidth: 1,
-        borderColor: colors.borderColor,
         justifyContent: "center",
         alignItems: "center",
     },
@@ -121,6 +119,8 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
         borderRadius: Metrix.VerticalSize(16), // Ensures the image itself is also rounded
+        borderWidth: 1,
+        borderColor: colors.buttonColor,
     },
 
 })

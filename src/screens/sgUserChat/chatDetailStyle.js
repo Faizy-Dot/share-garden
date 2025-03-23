@@ -59,14 +59,24 @@ export default StyleSheet.create({
   },
   messageText: {
     fontSize: Metrix.FontSmall,
-    color: props => props.isSender ? '#fff' : '#000',
     fontFamily: fonts.InterRegular,
+  },
+  senderText: {
+    color: '#fff',
+  },
+  receiverText: {
+    color: '#000',
   },
   messageTime: {
     fontSize: Metrix.FontExtraSmall,
-    color: '#888',
     marginTop: 4,
     alignSelf: 'flex-end',
+  },
+  senderTime: {
+    color: '#fff',
+  },
+  receiverTime: {
+    color: '#888',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -96,5 +106,24 @@ export default StyleSheet.create({
     width: 20,
     height: 20,
     tintColor: '#fff',
+  },
+  scrollButton: {
+    position: 'absolute',
+    bottom: 80, // Adjust based on your input container height
+    right: 20,
+    backgroundColor: '#007AFF',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+        width: 0,
+        height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 }); 

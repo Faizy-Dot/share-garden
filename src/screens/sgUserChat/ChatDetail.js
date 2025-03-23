@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, Image, FlatList, TouchableOpacity } from 'react-native';
 import { Images, Metrix } from '../../config';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './chatDetailStyle';
 import fonts from '../../config/Fonts';
 
@@ -53,14 +54,47 @@ const messages = [
 const ChatDetail = ({ route, navigation }) => {
   const { chatUser, productInfo } = route.params;
   const [message, setMessage] = useState('');
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [userScrolled, setUserScrolled] = useState(false);
+  const flatListRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  };
+
+  const handleScroll = (event) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
+    
+    // If user has scrolled up more than 50 pixels from bottom
+    if (distanceFromBottom > 50) {
+      setShowScrollButton(true);
+      setUserScrolled(true);
+    } else {
+      setShowScrollButton(false);
+      setUserScrolled(false);
+    }
+  };
 
   const renderMessage = ({ item }) => (
     <View style={[
       styles.messageContainer,
       item.isSender ? styles.senderMessage : styles.receiverMessage
     ]}>
-      <Text style={styles.messageText}>{item.text}</Text>
-      <Text style={styles.messageTime}>{item.time}</Text>
+      <Text style={[
+        styles.messageText,
+        item.isSender ? styles.senderText : styles.receiverText
+      ]}>
+        {item.text}
+      </Text>
+      <Text style={[
+        styles.messageTime,
+        item.isSender ? styles.senderTime : styles.receiverTime
+      ]}>
+        {item.time}
+      </Text>
     </View>
   );
 
@@ -84,11 +118,29 @@ const ChatDetail = ({ route, navigation }) => {
       </View>
 
       <FlatList
+        ref={flatListRef}
         data={messages}
         renderItem={renderMessage}
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.messagesList}
+        onContentSizeChange={() => {
+          if (!userScrolled) {
+            scrollToBottom();
+          }
+        }}
+        onLayout={() => scrollToBottom()}
+        onScroll={handleScroll}
+        scrollEventThrottle={400}
       />
+
+      {showScrollButton && (
+        <TouchableOpacity 
+          style={styles.scrollButton}
+          onPress={scrollToBottom}
+        >
+          <Icon name="arrow-downward" size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
 
       <View style={styles.inputContainer}>
         <TextInput

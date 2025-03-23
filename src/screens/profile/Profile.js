@@ -138,7 +138,7 @@ export default function Profile({ navigation }) {
                             <Text onPress={() => navigation.navigate("EditProfile")} style={styles.editProfile}>Edit Profile</Text>
                         </View>
                         <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5) }}>
-                            <Text>{user?.points || 0}</Text>
+                            <Text>{user?.sgPoints || 0}</Text>
                             <GreenBitIcon />
                         </View>
                         <TouchableOpacity onPress={() => {
