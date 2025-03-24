@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#C4C4C4",
         width: "100%",
+        height: Metrix.VerticalSize(160),
         justifyContent: "center",
         alignItems: "center",
         paddingVertical: Metrix.VerticalSize(15),
@@ -140,6 +141,7 @@ const styles = StyleSheet.create({
     confirmInfoText: {
         fontSize: Metrix.FontSmall,
         fontFamily: fonts.InterSemiBold,
+
     },
     closeButton: {
         alignSelf: "flex-end"
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     modalBox: {
-        marginTop : Metrix.VerticalSize(180),
+        marginTop: Metrix.VerticalSize(180),
         backgroundColor: colors.white,
         borderRadius: Metrix.VerticalSize(15),
         alignItems: "center",
@@ -161,6 +163,22 @@ const styles = StyleSheet.create({
         height: Metrix.VerticalSize(330),
         padding: Metrix.VerticalSize(20),
     },
+    tradeProgress: {
+        fontSize: Metrix.FontLarge,
+        fontFamily: fonts.InterBold,
+        color: colors.buttonColor
+    },
+    modalContentWrapper: { marginTop: Metrix.VerticalSize(25), alignItems: 'center', gap: Metrix.VerticalSize(10) },
+    modalSmallText: { fontSize: Metrix.FontSmall, fontFamily: fonts.InterRegular },
+    modalRegularText: { fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold, textAlign: 'center' },
+    modalSmallBoldText: { fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold, textAlign: 'center' },
+    tradeIdText: { fontSize: Metrix.FontMedium, fontFamily: fonts.InterBold },
+    tradeIdHighlight: { color: colors.buttonColor },
+    modalCenterText: { textAlign: 'center', fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold },
+    modalGap: { gap: Metrix.VerticalSize(10) },
+    transferText: { fontSize: Metrix.FontMedium, fontFamily: fonts.InterBold, textAlign: 'center' },
+    modalSmallCenterText: { fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold, textAlign: 'center' },
+    thanksText: { fontSize: Metrix.FontMedium, fontFamily: fonts.InterBold },
 })
 
 export default styles; 
