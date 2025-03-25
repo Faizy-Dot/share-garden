@@ -1,12 +1,13 @@
 import * as React from "react"
 import Svg, { Path } from "react-native-svg"
-const NotificationIcon = (props) => (
+const NotificationIcon = ({stroke = "#1E1E1E",...props}) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
     width={21}
     height={20}
     fill="none"
-    stroke="#1E1E1E"
+    stroke={stroke}
+     viewBox="0 0 21 20"
     {...props}
   >
     <Path

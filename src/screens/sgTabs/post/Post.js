@@ -20,6 +20,8 @@ import CashIcon from "../../../assets/svg/CashIcon.js";
 import UploadImgIcon from "../../../assets/svg/UploadImgIcon.js";
 
 
+
+
 export default function PostTabScreen({ navigation, route }) {
     const [activeButton, setActiveButton] = useState("SG Item");
     const [sgPoints, setSGPoints] = useState(true);
@@ -40,7 +42,19 @@ export default function PostTabScreen({ navigation, route }) {
 
     const { user } = useSelector((state) => state.login)
 
-
+    const resetForm = () => {
+        setActiveButton("SG Item");
+        setSGPoints(true);
+        setCash(false);
+        setImages([null, null, null]);
+        setTitle("");
+        setPointOrCashValue("");
+        setDescription("");
+        setChecked("");
+        setSelectedCategory(null);
+        setSelectedCategoryName('');
+    };
+    
     const handleCheckboxChange = (key) => {
         setChecked(key);
     };
@@ -217,18 +231,7 @@ export default function PostTabScreen({ navigation, route }) {
         return null;
     }
 
-    const resetForm = () => {
-        setTitle("");
-        setPointOrCashValue("");
-        setDescription("");
-        setChecked("");
-        setImages([null, null, null]);
-        setSelectedCategory(null);
-        setSelectedCategoryName('');
-        setSGPoints(true);
-        setCash(false);
-        setActiveButton("SG Item");
-    };
+   
 
     const handlePreview = () => {
         if (activeButton === "SG Tip") {

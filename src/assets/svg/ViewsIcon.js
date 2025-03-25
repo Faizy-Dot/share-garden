@@ -7,6 +7,7 @@ const ViewsIcon = (props) => (
     height={18}
     fill="none"
     {...props}
+    viewBox="0 0 25 18"
   >
     <Path
       fill="#fff"

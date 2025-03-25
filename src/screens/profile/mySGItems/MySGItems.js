@@ -9,6 +9,7 @@ import colors from '../../../config/Colors';
 import fonts from '../../../config/Fonts';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../../config/axios';
+import { BlackBitIcon, CashIcon, LikesIcon, ShareIcon, TimeIcon, ViewsIcon } from '../../../assets/svg';
 
 const postedItemsData = [
     {
@@ -87,7 +88,7 @@ export default function MySGItems({ navigation }) {
             key={item.id} 
             style={styles.itemsContainer}
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('ProductDetail', { item })}
+            onPress={() => navigation.navigate('PreviewPostedSgItems', { item })}
         >
             <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(10), paddingHorizontal: Metrix.HorizontalSize(10) }}>
                 <Image 
@@ -99,12 +100,12 @@ export default function MySGItems({ navigation }) {
                         <Text style={styles.title}>{item.title}</Text>
                         {item.isSGPoints ? (
                             <View style={styles.amount}>
-                                <Image source={Images.homeBitLogo} />
+<BlackBitIcon/>
                                 <Text>{item.minBid}</Text>
                             </View>
                         ) : (
                             <View style={styles.amount}>
-                                <Image source={Images.homeDollarLogo} />
+<CashIcon/>
                                 <Text>{item.price}</Text>
                             </View>
                         )}
@@ -129,19 +130,19 @@ export default function MySGItems({ navigation }) {
             )}
             <View style={styles.bottomContainer}>
                 <View style={styles.bottomIcon}>
-                    <Image source={Images.timeIcon} />
+<TimeIcon/>
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.bidDuration ? `${Math.floor(item.bidDuration / (24 * 3600))} d` : "N/A"}</Text>
                 </View>
                 <View style={styles.bottomIcon}>
-                    <Image source={Images.eyeIcon} />
+<ViewsIcon/>
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.views || 0} views</Text>
                 </View>
                 <View style={styles.bottomIcon}>
-                    <Image source={Images.likeIcon} />
+<LikesIcon/>
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.likes || 0} likes</Text>
                 </View>
                 <View style={styles.bottomIcon}>
-                    <Image source={Images.shareIcon} />
+<ShareIcon/>
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.shares || 0}</Text>
                 </View>
             </View>
@@ -218,12 +219,12 @@ export default function MySGItems({ navigation }) {
                             <Text style={styles.title}>{item.title}</Text>
                             {item.bids ? (
                                 <View style={styles.amount}>
-                                    <Image source={Images.homeBitLogo} />
+<BlackBitIcon/>
                                     <Text>{item.bids}</Text>
                                 </View>
                             ) : (
                                 <View style={styles.amount}>
-                                    <Image source={Images.homeDollarLogo} />
+<CashIcon/>
                                     <Text>{item.dollar}</Text>
                                 </View>
                             )}

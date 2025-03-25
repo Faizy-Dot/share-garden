@@ -23,7 +23,7 @@ export default function NavBar({
         <View style={styles.userDetail}>
             <Text style={{ fontSize, fontFamily, color }}>{title}</Text>
 
-            <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(18) }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(15) }}>
                 <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(5), alignItems: "center" }}>
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold }}>{user?.sgPoints || 0}</Text>
                     <GreenBitIcon />

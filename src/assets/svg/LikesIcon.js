@@ -7,6 +7,7 @@ const LikesIcon = ({stroke = "#009D89",...props}) => (
     height={20}
     fill="none"
     {...props}
+    viewBox="0 0 20 20"
   >
     <Path
       stroke={stroke}

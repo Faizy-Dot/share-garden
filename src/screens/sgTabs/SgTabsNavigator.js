@@ -19,6 +19,7 @@ import HelpAndSupport from "../profile/helpAndsupport/HelpAndSupport";
 import Preview from "./post/preview/Preview";
 import ProductDetail from "./items/productDetails/ProductDetail";
 import BidsReview from "../profile/myBids/bidsReview/BidsReview";
+import PreviewPostedSgItems from "../profile/mySGItems/previewPostedSGItems/PreviewPostedSgItems";
 
 
 
@@ -42,6 +43,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
         <ItemsStack.Screen name="Preview" component={Preview} />
         <ItemsStack.Screen name="BidsReview" component={BidsReview} />
+        <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
       </ItemsStack.Navigator>
     );
   }
@@ -62,6 +64,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="Settings" component={Settings} />
          <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
          <ItemsStack.Screen name="BidsReview" component={BidsReview} />
+         <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
       </ItemsStack.Navigator>
     );
   }
@@ -83,6 +86,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="Settings" component={Settings} />
          <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
          <ItemsStack.Screen name="BidsReview" component={BidsReview} />
+         <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
       </ItemsStack.Navigator>
     );
   }
@@ -103,6 +107,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="Settings" component={Settings} />
          <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
          <ItemsStack.Screen name="BidsReview" component={BidsReview} />
+         <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
       </ItemsStack.Navigator>
     );
   }
@@ -123,6 +128,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="Settings" component={Settings} />
          <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
          <ItemsStack.Screen name="BidsReview" component={BidsReview} />
+         <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
       </ItemsStack.Navigator>
     );
   }

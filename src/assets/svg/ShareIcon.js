@@ -7,6 +7,7 @@ const ShareIcon = ({stroke="#009D89",...props}) => (
     height={22}
     fill="none"
     {...props}
+      viewBox="0 0 17 22"
   >
     <Path
       fill={stroke}

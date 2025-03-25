@@ -41,6 +41,7 @@ import CrossIcon from "./CrossIcon";
 import ModalSuccessLogo from "./ModalSuccessLogo";
 import HandShakeIcon from "./HandShakeIcon";
 import BidTitleIcon from "./BidTitleIcon";
+import DownArrowIcon from "./DownArrowIcon";
 
 export{
     BellIcon,
@@ -85,6 +86,7 @@ export{
     CrossIcon,
     ModalSuccessLogo,
     HandShakeIcon,
-    BidTitleIcon
+    BidTitleIcon,
+    DownArrowIcon
 
 }
