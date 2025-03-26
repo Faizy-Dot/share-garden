@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, TextInput, FlatList } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, TouchableOpacity, Image, TextInput, FlatList, Modal } from 'react-native';
 import { styles } from './style';
 import BackArrowIcon from '../../../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../../../components/navBar/NavBar';
-import { BlackBitIcon, DownArrowIcon, LikesIcon, NotificationIcon, RightArrowIcon, ShareIcon, TimeIcon, ViewsIcon } from '../../../../assets/svg';
+import { BlackBitIcon, CrossIcon, DownArrowIcon, LikesIcon, ModalInfoIcon, NotificationIcon, RightArrowIcon, ShareIcon, TimeIcon, ViewsIcon } from '../../../../assets/svg';
 import { Colors, Images, Metrix } from '../../../../config';
 import fonts from '../../../../config/Fonts';
 import colors from '../../../../config/Colors';
@@ -37,45 +37,118 @@ export default function PreviewPostedSgItems({ navigation, route }) {
     const [hours, setHours] = useState('');
     const [minutes, setMinutes] = useState('');
     const [seconds, setSeconds] = useState('');
+    const [acceptState, setAcceptState] = useState({})
+    const [declineState, setDeclineState] = useState({});
+    const [tradeId, setTradeId] = useState(false)
+    const [modalVisible, setModalVisible] = useState(false)
 
+    console.log("accept state==>", acceptState)
+
+    const handleDeclinePress = useCallback((idx) => {
+        setDeclineState((prevState) => ({
+            ...prevState,
+            [idx]: true,
+        }));
+    }, []);
+
+    const handleAcceptPress = useCallback((idx) => {
+        setAcceptState((prevState) => ({
+            ...prevState,
+            [idx]: true,
+        }));
+    }, []);
 
     const renderRequestBitData = (item, index) => {
         return (
-
-            <View key={index} style={{ width: "100%", height: Metrix.VerticalSize(108), borderWidth: 1, borderColor: colors.borderColor, borderRadius: Metrix.VerticalSize(3), paddingHorizontal: Metrix.HorizontalSize(8) }}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: Metrix.VerticalSize(5) }}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5), paddingVertical: Metrix.VerticalSize(7) }}>
-                        <Image source={Images.homeProfile} style={{ width: Metrix.HorizontalSize(40), height: Metrix.HorizontalSize(40) }} />
+            <View key={index} style={[styles.container, acceptState[index] && styles.containerAccepted]}>
+                <View style={styles.header}>
+                    <View style={styles.userInfo}>
+                        <Image source={Images.homeProfile} style={styles.profileImage} />
                         <View>
-                            <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold }}>Bid by</Text>
-                            <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold, color: colors.buttonColor }}>{item.name}</Text>
+                            <Text style={styles.bidText}>Bid by</Text>
+                            <Text style={styles.bidName}>{item.name}</Text>
                         </View>
                     </View>
-
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(15) }}>
+    
+                    <View style={styles.notificationContainer}>
                         <NotificationIcon stroke={colors.buttonColor} width={24} height={24} />
-                        <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(8) }}>
+                        <View style={styles.bidAmountContainer}>
                             <BlackBitIcon width={24} height={24} />
-                            <Text style={{ fontSize: Metrix.FontMedium, fontFamily: fonts.InterSemiBold }}>{item.amount}</Text>
+                            <Text style={styles.bidAmount}>{item.amount}</Text>
                         </View>
                     </View>
                 </View>
-
-                <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(10) }}>
-                    <CustomButton height={Metrix.VerticalSize(36)} flex={1} borderRadius={Metrix.VerticalSize(4)}
-                        title={"DECLINE"}
-                        backgroundColor={colors.yellowColor}
-                        fontSize={Metrix.FontSmall} />
-                    <CustomButton height={Metrix.VerticalSize(36)} flex={1} borderRadius={Metrix.VerticalSize(4)}
-                        title={"ACCEPT"}
-                        fontSize={Metrix.FontSmall} />
+    
+                <View style={[styles.actionContainer, acceptState[index] && styles.actionContainerAccepted]}>
+                    {declineState[index] ? (
+                        <CustomButton
+                            height={Metrix.VerticalSize(36)}
+                            flex={1}
+                            borderRadius={Metrix.VerticalSize(4)}
+                            title={"DECLINED"}
+                            backgroundColor={colors.redColor}
+                            fontSize={Metrix.FontSmall}
+                        />
+                    ) : (
+                        <>
+                            {acceptState[index] ? (
+                                <View style={styles.statusContainer}>
+                                    <Text style={styles.bidStatus}>
+                                        Bid Status: <Text style={styles.statusAccepted}>Accepted</Text>
+                                    </Text>
+                                    <CustomButton
+                                        title={"COPY TRADE ID"}
+                                        fontSize={Metrix.FontSmall}
+                                        fontFamily={fonts.InterBold}
+                                        color={tradeId ? colors.white : '#A39696'}
+                                        width={Metrix.HorizontalSize(144)}
+                                        height={Metrix.VerticalSize(36)}
+                                        backgroundColor={!tradeId ? "#C4C4C4" : colors.yellowColor}
+                                        borderRadius={Metrix.VerticalSize(4)}
+                                    />
+                                </View>
+                            ) : (
+                                <>
+                                    <CustomButton
+                                        height={Metrix.VerticalSize(36)}
+                                        flex={1}
+                                        borderRadius={Metrix.VerticalSize(4)}
+                                        title={"DECLINE"}
+                                        backgroundColor={colors.yellowColor}
+                                        fontSize={Metrix.FontSmall}
+                                        onPress={() => handleDeclinePress(index)}
+                                    />
+                                    <CustomButton
+                                        height={Metrix.VerticalSize(36)}
+                                        flex={1}
+                                        borderRadius={Metrix.VerticalSize(4)}
+                                        title={"ACCEPT"}
+                                        fontSize={Metrix.FontSmall}
+                                        onPress={() => {
+                                            handleAcceptPress(index);
+                                            setTimeout(() => {
+                                                setTradeId(true);
+                                            }, 3000);
+                                        }}
+                                    />
+                                </>
+                            )}
+                        </>
+                    )}
                 </View>
+    
+                {acceptState[index] && (
+                    <View style={styles.infoContainer}>
+                        <ModalInfoIcon width={24} height={24} outerStroke={colors.redColor} />
+                        <Text style={styles.awaitingText}>Awaiting for the buyer to share trade id with you.</Text>
+                    </View>
+                )}
             </View>
-        )
-    }
+        );
+    };
 
     console.log("item==>>>", item)
-    console.log(viewItemsDetails)
+
     return (
         <View style={styles.previewPostedSgItemsConatiner}>
             <View style={styles.topContainer}>
@@ -84,7 +157,8 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                     fontSize={Metrix.FontMedium} />
             </View>
 
-            <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+            <KeyboardAwareScrollView showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled">
 
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: Metrix.VerticalSize(20) }}>
                     <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>{item.title}</Text>
@@ -114,12 +188,29 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                         <CustomButton title={"MARK AS SOLD"}
                             fontSize={Metrix.FontSmall}
                             fontFamily={fonts.InterBold}
-                            color='#A39696'
+                            color={tradeId ? colors.white : '#A39696'}
                             width={Metrix.HorizontalSize(144)}
                             height={Metrix.VerticalSize(36)}
-                            backgroundColor="#C4C4C4"
-                            borderRadius={Metrix.VerticalSize(4)} />
+                            backgroundColor={!tradeId ? "#C4C4C4" : colors.buttonColor}
+                            borderRadius={Metrix.VerticalSize(4)}
+                            disabled={tradeId ? false : true}
+                            onPress={() => setModalVisible(true)} />
+
                     </View>
+
+                    {
+                        Object.values(acceptState).some(value => value) && (
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5), flex: 1 }}>
+                                <ModalInfoIcon outerStroke={colors.redColor} height={24} width={24} />
+                                <Text style={{ fontSize: Metrix.normalize(10), fontFamily: fonts.InterSemiBold, color: "#646464", flex: 1 }}>
+                                    To claim SG Points you need to “
+                                    <Text style={{ fontFamily: fonts.InterBold, color: colors.buttonColor }}>
+                                        Mark As Sold
+                                    </Text>” using the SG Id sent by buyer.
+                                </Text>
+                            </View>
+                        )
+                    }
 
                     <View style={[!viewItemsDetails ? { height: Metrix.VerticalSize(48), backgroundColor: colors.buttonColor } : {
                         backgroundColor: colors.white, borderColor: colors.borderColor, borderWidth: 1, paddingTop: Metrix.VerticalSize(10)
@@ -217,9 +308,13 @@ export default function PreviewPostedSgItems({ navigation, route }) {
 
                     </View>
 
-                    {/* <FlatList data={requestBuyData}
+
+                    {/* <FlatList
+                    data={requestBuyData}
                     renderItem={renderRequestBitData}
-                    contentContainerStyle={{gap:Metrix.VerticalSize(7)}} /> */}
+                    keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={{ gap: Metrix.VerticalSize(7) }}
+                /> */}
                     {
                         requestBuyData.map((item, index) => {
                             return (
@@ -231,6 +326,39 @@ export default function PreviewPostedSgItems({ navigation, route }) {
 
                 </View>
             </KeyboardAwareScrollView>
+
+            <Modal visible={modalVisible} transparent animationType="fade">
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalBox}>
+                        <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() => setModalVisible(!modalVisible)}
+                        >
+                            <CrossIcon />
+                        </TouchableOpacity>
+
+                        <View style={{marginTop : Metrix.VerticalSize(20) ,gap:Metrix.VerticalSize(30),alignItems :"center"}}>
+                            <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold }}>Kindly enter SG ID, to mark as sold.</Text>
+                            <View style={{alignItems :"center" ,gap:Metrix.VerticalSize(20)}}>
+                                <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
+                                    <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold }}>SG ID:</Text>
+                                    <TextInput style={styles.modalInput} />
+                                </View>
+                                <CustomButton title={"SUBMIT"}
+                                    width={Metrix.HorizontalSize(144)}
+                                    height={Metrix.VerticalSize(36)}
+                                    borderRadius={Metrix.VerticalSize(35)}
+                                    fontSize={Metrix.FontSmall}
+                                     />
+                            </View>
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10),paddingHorizontal :Metrix.HorizontalSize(40) }}>
+                                <ModalInfoIcon outerStroke={colors.redColor} width={24} height={24}/>
+                                <Text style={{ fontSize: Metrix.normalize(11), fontFamily: fonts.InterRegular,color :"#646464" }}>Go back to your trade screen and copy trade Id to submit here</Text>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
         </View>
     );

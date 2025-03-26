@@ -7,6 +7,7 @@ const ModalInfoIcon = ({IstrokeColor ="#F8443E",outerStroke = "#1E1E1E" ,...prop
     height={26}
     fill="none"
     {...props}
+    viewBox="0 0 26 26"
   >
     <Path
       stroke={outerStroke}
