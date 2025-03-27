@@ -401,9 +401,17 @@ const ProductDetail = ({ route, navigation }) => {
 
           <TouchableOpacity 
             onPress={() => navigation.navigate('ChatDetail', { 
-              sellerId: displayData.seller?.id,
-              productId: displayData.id,
-              productTitle: displayData.title
+              chatUser: {
+                id: displayData.seller?.id,
+                name: `${displayData.seller?.firstName || ''} ${displayData.seller?.lastName || ''}`,
+                image: displayData.seller?.profileImage
+              },
+              productInfo: {
+                id: displayData.id,
+                title: displayData.title,
+                price: displayData.price,
+                image: displayData.images ? displayData.images.split(',')[0] : null, // Get first image from comma-separated string
+              }
             })}
           >
             <NotificationIcon />

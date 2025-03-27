@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     chatImage: {
         height: Metrix.HorizontalSize(32),
         width: Metrix.HorizontalSize(32),
+        borderRadius: Metrix.HorizontalSize(20),
     },
     chatBox: {
         flexDirection: "row",

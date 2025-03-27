@@ -129,4 +129,33 @@ export default StyleSheet.create({
   sendButtonDisabled: {
     opacity: 0.7
   },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Metrix.VerticalSize(10),
+  },
+  userImage: {
+    width: Metrix.HorizontalSize(40),
+    height: Metrix.HorizontalSize(40),
+    borderRadius: Metrix.HorizontalSize(20),
+    marginRight: Metrix.HorizontalSize(10),
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyMessageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    marginTop: 50,
+  },
+  emptyMessageText: {
+    fontFamily: fonts.InterRegular,
+    fontSize: Metrix.FontRegular,
+    color: colors.lightGrey,
+    textAlign: 'center',
+  },
 }); 

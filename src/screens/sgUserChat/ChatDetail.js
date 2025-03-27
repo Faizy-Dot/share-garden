@@ -1,13 +1,18 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Images, Metrix } from '../../config';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './chatDetailStyle';
 import fonts from '../../config/Fonts';
-import { useDispatch } from 'react-redux';
+import colors from '../../config/Colors';
+import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage } from '../../store/actions/chatActions';
 import moment from 'moment';
+import { ChevronRightIcon } from '../../assets/svg';
+import axiosInstance from '../../config/axios';
+import io from 'socket.io-client';
+import { BASE_URL } from '../../config/constants';
 
 const messages = [
   {
@@ -54,15 +59,56 @@ const messages = [
   }
 ];
 
+const getInitialLetter = (name) => {
+  return name ? name.charAt(0).toUpperCase() : '?';
+};
+
 const ChatDetail = ({ route, navigation }) => {
   const { chatUser, productInfo } = route.params;
   const [message, setMessage] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [userScrolled, setUserScrolled] = useState(false);
   const flatListRef = useRef(null);
-  const dispatch = useDispatch();
+  const socketRef = useRef(null);
+  const { user } = useSelector(state => state.login);
   const [messages, setMessages] = useState([]);
   const [isSending, setIsSending] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(true);
+
+  useEffect(() => {
+    socketRef.current = io(BASE_URL, {
+      transports: ['websocket'],
+      path: '/socket.io',
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
+
+    socketRef.current.emit('authenticate', { userId: user.id });
+
+    socketRef.current.on('private message', (newMessage) => {
+      if (newMessage.otherPerson.id === chatUser.id) {
+        const formattedMessage = {
+          id: newMessage.id,
+          text: newMessage.message,
+          time: moment(newMessage.createdAt).format('h:mm A'),
+          isSender: newMessage.isSentByMe
+        };
+        
+        setMessages(prevMessages => [...prevMessages, formattedMessage]);
+        
+        if (!userScrolled) {
+          scrollToBottom();
+        }
+      }
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, [chatUser.id, user.id]);
 
   const scrollToBottom = () => {
     if (flatListRef.current) {
@@ -74,7 +120,6 @@ const ChatDetail = ({ route, navigation }) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
     const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
     
-    // If user has scrolled up more than 50 pixels from bottom
     if (distanceFromBottom > 50) {
       setShowScrollButton(true);
       setUserScrolled(true);
@@ -83,6 +128,36 @@ const ChatDetail = ({ route, navigation }) => {
       setUserScrolled(false);
     }
   };
+
+  console.log("Chat User ID", chatUser.id);
+
+  const fetchChatHistory = async () => {
+    try {
+      setIsLoadingMessages(true);
+      const response = await axiosInstance.get(`/api/chat/${chatUser.id}`);
+      
+      const formattedMessages = response.data.map(msg => ({
+        id: msg.id,
+        text: msg.message,
+        time: moment(msg.createdAt).format('h:mm A'),
+        isSender: msg.isSentByMe
+      }));
+      
+      formattedMessages.sort((a, b) => 
+        moment(a.createdAt).valueOf() - moment(b.createdAt).valueOf()
+      );
+      
+      setMessages(formattedMessages);
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
+    } finally {
+      setIsLoadingMessages(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchChatHistory();
+  }, [chatUser.id]);
 
   const handleSendMessage = async () => {
     if (!message.trim() || isSending) return;
@@ -93,19 +168,26 @@ const ChatDetail = ({ route, navigation }) => {
         text: message.trim(),
         time: moment().format('h:mm A'),
         isSender: true,
+        id: new Date().getTime(),
       };
-
-      await dispatch(sendMessage({
-        message: newMessage.text,
-        chatId: chatUser.id,
-        productId: productInfo.id,
-        timestamp: new Date().toISOString(),
-      }));
 
       setMessages(prevMessages => [...prevMessages, newMessage]);
       setMessage('');
       if (!userScrolled) {
         scrollToBottom();
+      }
+
+      const response = await axiosInstance.post('/api/chat/send', {
+        receiverId: chatUser.id,
+        message: newMessage.text
+      });
+      
+      if (response.data.id) {
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === newMessage.id ? { ...msg, id: response.data.id } : msg
+          )
+        );
       }
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -141,40 +223,81 @@ const ChatDetail = ({ route, navigation }) => {
           <BackArrowIcon />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
-          <Text style={styles.headerTitle}>Chat</Text>
+          <View style={styles.userInfo}>
+            {chatUser?.image ? (
+              <Image 
+                source={{ uri: chatUser.image }} 
+                style={styles.userImage} 
+              />
+            ) : (
+              <View style={{
+                width: Metrix.HorizontalSize(40),
+                height: Metrix.HorizontalSize(40),
+                borderRadius: Metrix.HorizontalSize(20),
+                backgroundColor: '#E8F3FF',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: Metrix.HorizontalSize(10)
+              }}>
+                <Text style={{
+                  fontSize: Metrix.FontMedium,
+                  fontFamily: fonts.InterBold,
+                  color: colors.buttonColor,
+                }}>
+                  {getInitialLetter(chatUser?.name?.split(' ')[0])}
+                </Text>
+              </View>
+            )}
+            <Text style={styles.headerTitle}>{chatUser?.name || 'Chat'}</Text>
+          </View>
           <View style={styles.productInfo}>
             <Image 
-              source={productInfo?.image || Images.homePopularListing} 
+              source={
+                productInfo?.image 
+                  ? { uri: productInfo.image } 
+                  : Images.homePopularListing
+              } 
               style={styles.productImage} 
             />
-            <Text style={styles.productTitle}>{productInfo?.title || 'Gaming Chair'}</Text>
-            <Text style={styles.productPrice}>$ {productInfo?.price || '180'}</Text>
+            <Text style={styles.productTitle}>{productInfo?.title || 'Product'}</Text>
+            <Text style={styles.productPrice}>$ {productInfo?.price || '0'}</Text>
           </View>
         </View>
       </View>
 
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.messagesList}
-        onContentSizeChange={() => {
-          if (!userScrolled) {
-            scrollToBottom();
-          }
-        }}
-        onLayout={() => scrollToBottom()}
-        onScroll={handleScroll}
-        scrollEventThrottle={400}
-      />
+      {isLoadingMessages ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.buttonColor} />
+        </View>
+      ) : (
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={styles.messagesList}
+          onContentSizeChange={() => {
+            if (!userScrolled) {
+              scrollToBottom();
+            }
+          }}
+          onLayout={() => scrollToBottom()}
+          onScroll={handleScroll}
+          scrollEventThrottle={400}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyMessageContainer}>
+              <Text style={styles.emptyMessageText}>No messages yet. Start a conversation!</Text>
+            </View>
+          )}
+        />
+      )}
 
       {showScrollButton && (
         <TouchableOpacity 
           style={styles.scrollButton}
           onPress={scrollToBottom}
         >
-          <Icon name="arrow-downward" size={24} color="#fff" />
+          <Text style={{ fontSize: 20, color: colors.black }}>›</Text>
         </TouchableOpacity>
       )}
 
@@ -194,7 +317,7 @@ const ChatDetail = ({ route, navigation }) => {
           {isSending ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Image source={Images.callIcon} style={styles.callIcon} />
+            <Icon name="chevron-right" size={20} color={colors.black} />
           )}
         </TouchableOpacity>
       </View>

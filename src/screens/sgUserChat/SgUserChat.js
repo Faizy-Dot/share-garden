@@ -1,88 +1,90 @@
-import React from 'react';
-import { View, Text, TextInput, Image, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import styles from './style';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../components/navBar/NavBar';
 import { Images, Metrix } from '../../config';
+import colors from '../../config/Colors';
 import { useNavigation } from '@react-navigation/native';
-
-
-const chatData = [
-  {
-    id: 1,
-    image: Images.homeProfile,
-    name: "Ashley Simpson",
-    lastMessage: "I want to ask...",
-    timeAgo: "10m ago"
-  },
-  {
-    id: 2,
-    image: Images.homeProfile,
-    name: "Tery Lance",
-    lastMessage: "Ok Thanks.",
-    timeAgo: "1h ago"
-  },
-  {
-    id: 3,
-    image: Images.homeProfile,
-    name: "Stephen",
-    lastMessage: "You: Great.",
-    timeAgo: "23h ago"
-  },
-  {
-    id: 4,
-    image: Images.homeProfile,
-    name: "Ashley Simpson",
-    lastMessage: "Ok Thanks.",
-    timeAgo: "10m ago"
-  },
-  {
-    id: 5,
-    image: Images.homeProfile,
-    name: "Harryson",
-    lastMessage: "Ok Thanks.",
-    timeAgo: "23h ago"
-  },
-  {
-    id: 6,
-    image: Images.homeProfile,
-    name: "Ashley Simpson",
-    lastMessage: "You: Not yet.",
-    timeAgo: "10m ago"
-  },
-]
+import axiosInstance from '../../config/axios';
+import Toast from 'react-native-toast-message';
+import fonts from '../../config/Fonts';
 
 export default function SgUserChat() {
   const navigation = useNavigation();
+  const [chats, setChats] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchChats = async () => {
+    try {
+      const response = await axiosInstance.get('/api/chat/list');
+      setChats(response.data);
+    } catch (error) {
+      console.error('Error fetching chats:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to load chats'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchChats();
+  }, []);
+
+  console.log("chats:=>", chats);
+
+  const getInitialLetter = (name) => {
+    return name ? name.charAt(0).toUpperCase() : '?';
+  };
 
   const renderChatData = ({ item }) => {
     return (
       <TouchableOpacity 
         style={styles.chatBox}
         onPress={() => navigation.navigate('ChatDetail', {
+          chatId: item.id,
           chatUser: {
-            name: item.name,
-            image: item.image
-          },
-          productInfo: {
-            title: 'Gaming Chair',
-            price: '180',
-            image: Images.homePopularListing
+            id: item.otherUser.id,
+            name: `${item.otherUser.firstName} ${item.otherUser.lastName}`,
+            image: item.otherUser.profileImage
           }
         })}
       >
         <View style={{flexDirection: "row", gap: Metrix.HorizontalSize(15)}}>
-          <Image source={item.image} style={styles.chatImage} />
+          {item.otherUser.profileImage ? (
+            <Image 
+              source={{ uri: item.otherUser.profileImage }} 
+              style={styles.chatImage} 
+            />
+          ) : (
+            <View style={{
+              width: Metrix.HorizontalSize(32),
+              height: Metrix.HorizontalSize(32),
+              borderRadius: Metrix.HorizontalSize(20),
+              backgroundColor: '#E8F3FF', // Light blue background
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Text style={{
+                fontSize: Metrix.FontLarge,
+                fontFamily: fonts.InterBold,
+                color: colors.buttonColor, // Using theme's button color
+              }}>
+                {getInitialLetter(item.otherUser.firstName)}
+              </Text>
+            </View>
+          )}
           <View>
-            <Text style={styles.nameText}>{item.name}</Text>
-            <Text style={styles.lastMessageText}>{item.lastMessage}
-              <Text>{"  "}<View style={styles.dot}></View>{"  "}{item.timeAgo}</Text>
+            <Text style={styles.nameText}>{`${item.otherUser.firstName} ${item.otherUser.lastName}`}</Text>
+            <Text style={styles.lastMessageText}>
+              {item.message}
+              <Text>{"  "}<View style={styles.dot}></View>{"  "}{item.lastMessageTime}</Text>
             </Text>
           </View>
-        </View>
-
-        <View style={styles.messageCount}>
-          <Text style={styles.count}>1</Text>
         </View>
       </TouchableOpacity>
     );
@@ -104,12 +106,18 @@ export default function SgUserChat() {
           <TextInput style={styles.searchInput} placeholder='Search for...' />
         </View>
 
-        <FlatList 
-          data={chatData}
-          renderItem={renderChatData}
-          keyExtractor={(item)=> item.id}
-          showsVerticalScrollIndicator={false}
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color={colors.buttonColor} style={{ marginTop: 20 }} />
+        ) : (
+          <FlatList 
+            data={chats}
+            renderItem={renderChatData}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            onRefresh={fetchChats}
+            refreshing={loading}
+          />
+        )}
       </View>
     </View>
   );
