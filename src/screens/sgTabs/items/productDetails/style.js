@@ -217,16 +217,24 @@ modal: {
   justifyContent: 'center',
   alignItems: 'center',
 },
+modalContainer: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: Metrix.HorizontalSize(20)
+},
 modalContent: {
   backgroundColor: colors.white,
-  borderRadius: Metrix.VerticalSize(8),
+  borderRadius: Metrix.VerticalSize(10),
   padding: Metrix.VerticalSize(20),
-  width: '90%',
-  alignItems: 'center',
+  width: '100%',
+  alignItems: 'center'
 },
 closeButton: {
-  alignSelf: 'flex-end',
-  padding: Metrix.VerticalSize(5),
+  position: 'absolute',
+  right: Metrix.HorizontalSize(15),
+  top: Metrix.VerticalSize(15)
 },
 closeIcon: {
   width: Metrix.HorizontalSize(24),
@@ -240,16 +248,13 @@ modalLogo: {
 modalTitle: {
   fontSize: Metrix.FontLarge,
   fontFamily: fonts.InterBold,
-  color: colors.buttonColor,
-  marginBottom: Metrix.VerticalSize(10),
-  textAlign: 'center',
+  marginVertical: Metrix.VerticalSize(15)
 },
 modalText: {
   fontSize: Metrix.FontRegular,
   fontFamily: fonts.InterRegular,
-  color: colors.textGray,
   textAlign: 'center',
-  marginBottom: Metrix.VerticalSize(20),
+  marginVertical: Metrix.VerticalSize(15)
 },
 modalFooter: {
   fontSize: Metrix.FontSmall,
@@ -260,6 +265,34 @@ modalFooter: {
 brandText: {
   color: colors.buttonColor,
   fontFamily: fonts.InterBold,
+},
+searchInputContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  width: "100%",
+  justifyContent : "space-around"
+},
+searchIcon: {
+  width: Metrix.HorizontalSize(25),
+  height: Metrix.VerticalSize(27),
+  position: "absolute",
+  left: Metrix.HorizontalSize(23),
+  zIndex: 1
+},
+searchInput: {
+  width: Metrix.HorizontalSize(300),
+  height: Metrix.VerticalSize(60),
+  backgroundColor: colors.inputBackgroundColor,
+  borderColor: "#E6E6E6",
+  borderWidth: 1,
+  borderRadius: Metrix.LightRadius,
+  paddingLeft: Metrix.HorizontalSize(45),
+  fontSize: Metrix.FontRegular,
+  fontFamily: fonts.InterSemiBold
+},
+filterLogo: {
+  width: Metrix.HorizontalSize(20),
+  height: Metrix.VerticalSize(15)
 },
 });
 

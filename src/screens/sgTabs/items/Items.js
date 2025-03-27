@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Image, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Fonts, Images, Metrix } from "../../../config";
@@ -12,7 +12,8 @@ import { useSelector } from "react-redux";
 import axiosInstance from '../../../config/axios';
 import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
-import { BlackBitIcon, CashIcon, CategoryMobileIcon, HomeLogo } from "../../../assets/svg";
+import { BlackBitIcon, CashIcon, CategoryMobileIcon, HomeLogo, FilterIcon, CrossIcon } from "../../../assets/svg";
+import SearchIcon from '../../../assets/svg/SearchIcon.svg';
 
 const popularListings = [
     { id: "1", title: "Single Bed", location: "First Floor Maya Apartments", price: "8.5", image: Images.homePopularListing, bit: true, dollarLogo: false },
@@ -32,6 +33,8 @@ const ItemsTabScreen = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [searchResults, setSearchResults] = useState(null);
+    const searchInputRef = useRef('');
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -51,6 +54,15 @@ const ItemsTabScreen = () => {
             });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSearch = async (query) => {
+        try {
+            const response = await axiosInstance.get(`/api/products/search?query=${query}`);
+            setSearchResults(response.data.products);
+        } catch (error) {
+            console.error('Error searching products:', error);
         }
     };
 
@@ -86,12 +98,40 @@ const ItemsTabScreen = () => {
             )}
 
             <View style={{ marginTop: Metrix.VerticalSize(20) }}>
-                <CustomInput
-                    justifyContent={'space-around'}
-                    iconCondition={true}
-                    placeholder={"Search items near you"}
-                    borderRadius={Metrix.VerticalSize(3)}
-                />
+                <View style={styles.searchInputContainer}>
+                    <TextInput 
+                        style={styles.searchInput} 
+                        placeholder={"Search items near you"} 
+                        placeholderTextColor="#999"
+                        returnKeyType="done"
+                        ref={searchInputRef}
+                        onChangeText={(text) => {
+                            searchInputRef.current = text;
+                        }}
+                        onSubmitEditing={(event) => handleSearch(event.nativeEvent.text)}
+                        autoCorrect={false}
+                        blurOnSubmit={false}
+                    />
+                    <SearchIcon style={styles.searchIcon} />
+                    <TouchableOpacity 
+                        onPress={() => {
+                            searchInputRef.current = '';
+                            if (searchInputRef.current?.clear) {
+                                searchInputRef.current.clear();
+                            }
+                            setSearchResults(null);
+                            fetchProducts();
+                        }}
+                        style={styles.clearButton}
+                    >
+                        <View style={styles.clearIconContainer}>
+                            <Text style={styles.clearIconText}>X</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <View style={styles.filterIconContainer}>
+                        <FilterIcon />
+                    </View>
+                </View>
             </View>
 
             <View style={styles.categoryContainer}>
@@ -152,7 +192,7 @@ const ItemsTabScreen = () => {
     return (
         <View style={styles.container}>
             <FlatList
-                data={products}
+                data={searchResults || products}
                 renderItem={renderProduct}
                 keyExtractor={(item) => item.id}
                 numColumns={3}

@@ -13,6 +13,7 @@ export default function CustomInput({
   placeholder,
   height,
   borderRadius,
+  onSubmitEditing,
 }) {
   const onEnterPress = () => {
     Alert.alert("Enter Pressed!", "You submitted the input.");
@@ -24,7 +25,7 @@ export default function CustomInput({
       </View>
       <TextInput style={[styles.input, { height, borderRadius }, !iconCondition && { width: "100%", paddingLeft: Metrix.HorizontalSize(60) }]} placeholder={placeholder} placeholderTextColor="#999"
         returnKeyType="done" // Changes the Enter key label to "Done"
-        onSubmitEditing={onEnterPress} />
+        onSubmitEditing={onSubmitEditing} />
       {
         iconCondition &&
 <FilterIcon/>

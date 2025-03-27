@@ -209,6 +209,54 @@ const styles = StyleSheet.create({
         marginTop: Metrix.VerticalSize(20),
         fontFamily: fonts.InterRegular,
     },
+    searchInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: Metrix.HorizontalSize(15),
+        position: 'relative',
+    },
+    searchInput: {
+        flex: 1,
+        height: Metrix.VerticalSize(46),
+        backgroundColor: '#F3F3F3',
+        borderWidth: 1,
+        borderColor: '#E6E6E6',
+        borderRadius: Metrix.VerticalSize(3),
+        paddingLeft: Metrix.HorizontalSize(40),
+        paddingRight: Metrix.HorizontalSize(10),
+        fontFamily: Fonts.InterRegular,
+        fontSize: 16,
+    },
+    searchIcon: {
+        position: 'absolute',
+        left: Metrix.HorizontalSize(25),
+        zIndex: 1,
+    },
+    filterIconContainer: {
+        marginLeft: Metrix.HorizontalSize(10),
+    },
+    clearButton: {
+        position: 'absolute',
+        right: Metrix.HorizontalSize(50), // Adjust based on FilterIcon position
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 5,
+    },
+    clearIconContainer: {
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#999',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    clearIconText: {
+        color: '#999',
+        fontSize: 10,
+        fontFamily: Fonts.InterMedium,
+        lineHeight: 16,
+    },
 });
 
 export default styles;

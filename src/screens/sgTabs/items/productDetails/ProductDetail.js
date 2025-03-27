@@ -31,6 +31,11 @@ const ProductDetail = ({ route, navigation }) => {
   // Add new state for tracking favorite status
   const [isFavorite, setIsFavorite] = useState(false);
 
+  // Add these new states near other state declarations
+  const [isBidModalVisible, setIsBidModalVisible] = useState(false);
+  const [bidAmount, setBidAmount] = useState('');
+  const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
+
   const images = [Images.homePopularListing, Images.homeProfile, Images.homePopularListing,]
 
   const { width } = Dimensions.get('window');
@@ -166,6 +171,25 @@ const ProductDetail = ({ route, navigation }) => {
     return name ? name.charAt(0).toUpperCase() : '?';
   };
 
+  // Add these new functions before the return statement
+  const handleBidSubmit = async () => {
+    try {
+      await axiosInstance.post(`/api/products/${displayData.id}/bids`, {
+        amount: parseInt(bidAmount)
+      });
+      setIsBidModalVisible(false);
+      setBidAmount('');
+      // Optionally refresh product details to show updated bid
+      fetchProductDetail();
+    } catch (error) {
+      console.error('Error placing bid:', error);
+    }
+  };
+
+  const handlePurchaseRequest = () => {
+    setPurchaseModalVisible(true);
+  };
+
   return (
     <KeyboardAwareScrollView style={styles.ProductDetailcontainer} contentContainerStyle={{ paddingBottom: Metrix.VerticalSize(15) }}>
       <View style={styles.NavBarContainer}>
@@ -290,13 +314,25 @@ const ProductDetail = ({ route, navigation }) => {
           )}
 
           <View style={{ paddingHorizontal: Metrix.HorizontalSize(15), marginTop: Metrix.VerticalSize(18) }}>
-            <CustomButton
-              title={displayData.isSGPoints ? "PLACE BID" : "I WANT TO PURCHASE THIS"}
-              height={Metrix.VerticalSize(46)}
-              width={"100%"}
-              borderRadius={Metrix.VerticalSize(3)}
-              fontSize={Metrix.FontSmall}
-            />
+            {(displayData.isSGPoints || displayData.isBidding) ? (
+              <CustomButton
+                title="PLACE BID"
+                height={Metrix.VerticalSize(46)}
+                width={"100%"}
+                borderRadius={Metrix.VerticalSize(3)}
+                fontSize={Metrix.FontSmall}
+                onPress={() => setIsBidModalVisible(true)}
+              />
+            ) : (
+              <CustomButton
+                title="I WANT TO PURCHASE THIS"
+                height={Metrix.VerticalSize(46)}
+                width={"100%"}
+                borderRadius={Metrix.VerticalSize(3)}
+                fontSize={Metrix.FontSmall}
+                onPress={handlePurchaseRequest}
+              />
+            )}
           </View>
         </View>
 
@@ -428,6 +464,94 @@ const ProductDetail = ({ route, navigation }) => {
           <Text style={styles.modalFooter}>
             Thanks for using <Text style={styles.brandText}>ShareGarden</Text>.
           </Text>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={isBidModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsBidModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setIsBidModalVisible(false)}
+            >
+              <CrossIcon />
+            </TouchableOpacity>
+
+            <Text style={styles.modalTitle}>Place Your Bid</Text>
+            
+            <TextInput
+              style={{
+                borderWidth: 1,
+                borderColor: colors.borderColor,
+                borderRadius: Metrix.VerticalSize(3),
+                padding: Metrix.VerticalSize(10),
+                marginVertical: Metrix.VerticalSize(15),
+                width: '100%'
+              }}
+              value={bidAmount}
+              onChangeText={setBidAmount}
+              keyboardType="numeric"
+              placeholder="Enter bid amount"
+            />
+
+            <CustomButton
+              title="BID NOW"
+              height={Metrix.VerticalSize(46)}
+              width={"100%"}
+              borderRadius={Metrix.VerticalSize(3)}
+              fontSize={Metrix.FontSmall}
+              onPress={handleBidSubmit}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={purchaseModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPurchaseModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setPurchaseModalVisible(false)}
+            >
+              <CrossIcon />
+            </TouchableOpacity>
+
+            <HandShakeIcon />
+
+            <Text style={styles.modalTitle}>Alert sent to seller!</Text>
+
+            <Text style={styles.modalText}>
+              You can make payment and pickup arrangements by contacting seller via chat
+            </Text>
+
+            <CustomButton
+              title="START CHAT"
+              height={Metrix.VerticalSize(46)}
+              width={"100%"}
+              borderRadius={Metrix.VerticalSize(3)}
+              fontSize={Metrix.FontSmall}
+              onPress={() => {
+                setPurchaseModalVisible(false);
+                navigation.navigate('ChatDetail', { 
+                  sellerId: displayData.seller?.id,
+                  productId: displayData.id,
+                  productTitle: displayData.title
+                });
+              }}
+              icon={<NotificationIcon stroke="#fff" style={{ marginLeft: 10 }} />}
+              iconPosition="right"
+            />
+          </View>
         </View>
       </Modal>
     </KeyboardAwareScrollView>
