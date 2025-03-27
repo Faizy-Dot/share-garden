@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Image, FlatList, Dimensions, TextInput, TouchableOpacity, Linking, StyleSheet } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Images, Metrix } from '../../../../config';
@@ -28,6 +28,9 @@ const ProductDetail = ({ route, navigation }) => {
   const [seconds, setSeconds] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false)
 
+  // Add new state for tracking favorite status
+  const [isFavorite, setIsFavorite] = useState(false);
+
   const images = [Images.homePopularListing, Images.homeProfile, Images.homePopularListing,]
 
   const { width } = Dimensions.get('window');
@@ -39,6 +42,8 @@ const ProductDetail = ({ route, navigation }) => {
   ];
 
   const { user } = useSelector((state) => state.login);
+
+  const viewIncremented = useRef(false);
 
   const renderMyPosts = ({ item }) => (
     <TouchableOpacity activeOpacity={0.8} style={styles.postBox}>
@@ -74,6 +79,8 @@ const ProductDetail = ({ route, navigation }) => {
       try {
         const response = await axiosInstance.get(`/api/products/${item.id}`);
         setProductDetail(response.data);
+        // Set initial favorite status if your API returns this information
+        setIsFavorite(response.data.isFavorited || false);
 
         console.log("Product Detail response", response.data);
 
@@ -126,21 +133,38 @@ const ProductDetail = ({ route, navigation }) => {
   useEffect(() => {
     const incrementProductView = async () => {
       try {
-        // Only increment view if viewer is not the seller
-        if (user?.id !== route.params?.sellerId) {
-          await axiosInstance.post(
-            `/api/products/${route.params?.id}/views`
-          );
+        // Only increment view if viewer is not the seller and hasn't been incremented yet
+        if (user?.id !== displayData.seller?.id && !viewIncremented.current) {
+          await axiosInstance.post(`/api/products/${displayData.id}/views`);
+          viewIncremented.current = true; // Mark as incremented
         }
       } catch (error) {
         console.error('Error incrementing view:', error);
       }
     };
 
-    if (user && route.params?.id) {
+    // Only call if we have both user and product data
+    if (user && displayData && displayData.id) {
       incrementProductView();
     }
-  }, [user, route.params?.id, route.params?.sellerId]);
+  }, [user, displayData?.id]); // Only depend on user and product ID
+
+  // Add function to handle favorite toggle
+  const handleFavoritePress = async () => {
+    try {
+      const response = await axiosInstance.post(`/api/products/favorites/${item.id}`);
+      setIsFavorite(!isFavorite); // Toggle favorite status
+      // Optionally show some feedback to user
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // Optionally show error message to user
+    }
+  };
+
+  // Add this function near the top of your component
+  const getInitialLetter = (name) => {
+    return name ? name.charAt(0).toUpperCase() : '?';
+  };
 
   return (
     <KeyboardAwareScrollView style={styles.ProductDetailcontainer} contentContainerStyle={{ paddingBottom: Metrix.VerticalSize(15) }}>
@@ -200,7 +224,9 @@ const ProductDetail = ({ route, navigation }) => {
             <View style={styles.FeaturedContainer}>
               <Text style={styles.featuredText}>Featured</Text>
               <View style={styles.IconContainer}>
-                <LikesIcon stroke={colors.white} />
+                <TouchableOpacity onPress={handleFavoritePress}>
+                  <LikesIcon stroke={colors.white} fill={isFavorite ? colors.white : 'none'} />
+                </TouchableOpacity>
                 <ShareIcon stroke={colors.white} />
               </View>
             </View>
@@ -301,10 +327,29 @@ const ProductDetail = ({ route, navigation }) => {
 
         <View style={styles.middleBottomContainer}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(8) }}>
-            <Image
-              source={displayData.seller?.profileImage ? { uri: displayData.seller.profileImage } : Images.homeProfile}
-              style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64), borderRadius: Metrix.HorizontalSize(32) }}
-            />
+            {displayData.seller?.profileImage ? (
+              <Image
+                source={{ uri: displayData.seller.profileImage }}
+                style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64), borderRadius: Metrix.HorizontalSize(32) }}
+              />
+            ) : (
+              <View style={{
+                width: Metrix.HorizontalSize(64),
+                height: Metrix.HorizontalSize(64),
+                borderRadius: Metrix.HorizontalSize(32),
+                backgroundColor: '#E8F3FF', // Light blue background
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Text style={{
+                  fontSize: Metrix.FontExtraLarge,
+                  fontFamily: fonts.InterBold,
+                  color: colors.buttonColor, // Using your theme's button color
+                }}>
+                  {getInitialLetter(displayData.seller?.firstName)}
+                </Text>
+              </View>
+            )}
             <View>
               <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>
                 {displayData.isSGPoints ? "Bid by" : "Posted by | SG Member"}
@@ -318,8 +363,20 @@ const ProductDetail = ({ route, navigation }) => {
             </View>
           </View>
 
-          <Image source={Images.homeMessageIcon} />
-          <Image source={Images.callIcon} />
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('ChatDetail', { 
+              sellerId: displayData.seller?.id,
+              productId: displayData.id,
+              productTitle: displayData.title
+            })}
+          >
+            <NotificationIcon />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => Linking.openURL(`tel:${displayData.seller?.phoneNumber}`)}
+          >
+            <CallIcon />
+          </TouchableOpacity>
         </View>
       </View>
 

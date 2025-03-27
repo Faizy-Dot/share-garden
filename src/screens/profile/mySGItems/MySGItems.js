@@ -61,6 +61,7 @@ const NoItemsMessage = ({ text }) => (
 export default function MySGItems({ navigation }) {
     const [publishedItems, setPublishedItems] = useState([]);
     const [draftItems, setDraftItems] = useState([]);
+    const [favouritesData, setFavouritesData] = useState([]);
     const { user } = useSelector((state) => state.login);
 
     useEffect(() => {
@@ -82,6 +83,19 @@ export default function MySGItems({ navigation }) {
             fetchUserProducts();
         }
     }, [user]);
+
+    useEffect(() => {
+        const fetchFavorites = async () => {
+            try {
+                const response = await axiosInstance.get('/api/products/user/favorites');
+                setFavouritesData(response.data);
+            } catch (error) {
+                console.error('Error fetching favorites:', error);
+            }
+        };
+
+        fetchFavorites();
+    }, []);
 
     const renderPostedItems = (item) => (
         <TouchableOpacity 
@@ -202,47 +216,57 @@ export default function MySGItems({ navigation }) {
     }
 
     const renderFavourites = (item) => {
+        const product = item.product;
         return (
             <TouchableOpacity 
-                key={item.id} 
+                key={product.id} 
                 style={styles.draftsContainer}
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate('ProductDetail', { item })}
+                onPress={() => navigation.navigate('ProductDetail', { item: product })}
             >
                 <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(10), }}>
                     <Image 
-                        source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing} 
+                        source={{ uri: product.images.split(',')[0] }}
                         style={styles.postedImg} 
                     />
                     <View style={{ gap: Metrix.VerticalSize(15) }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                            <Text style={styles.title}>{item.title}</Text>
-                            {item.bids ? (
+                            <Text style={styles.title}>{product.title}</Text>
+                            {product.isSGPoints ? (
                                 <View style={styles.amount}>
-<BlackBitIcon/>
-                                    <Text>{item.bids}</Text>
+                                    <BlackBitIcon/>
+                                    <Text>{product.minBid}</Text>
                                 </View>
                             ) : (
                                 <View style={styles.amount}>
-<CashIcon/>
-                                    <Text>{item.dollar}</Text>
+                                    <CashIcon/>
+                                    <Text>{product.price}</Text>
                                 </View>
                             )}
                         </View>
-                        <Text style={styles.description}>{item.description}</Text>
+                        <Text style={styles.description}>{product.description}</Text>
                     </View>
                 </View>
                 <View style={styles.favouritesButtonContainer}>
-                  <Text style={{ fontSize: Metrix.FontRegular,
-        fontFamily: fonts.InterSemiBold}}>Highest bid {item.highestBid}</Text>
-                    <CustomButton title={"PLACE BIDS"}
-                        backgroundColor={colors.buttonColor}
-                        width={Metrix.HorizontalSize(100)}
-                        height={Metrix.VerticalSize(36)}
-                        borderRadius={Metrix.VerticalSize(4)}
-                        fontSize={Metrix.FontSmall}
-                        fontFamily={fonts.InterBold} />
-
+                    {(product.isSGPoints || product.isBidding) && (
+                        <>
+                            <Text style={{ 
+                                fontSize: Metrix.FontRegular,
+                                fontFamily: fonts.InterSemiBold
+                            }}>
+                                Highest bid {product.highestBid}
+                            </Text>
+                            <CustomButton 
+                                title={"PLACE BIDS"}
+                                backgroundColor={colors.buttonColor}
+                                width={Metrix.HorizontalSize(100)}
+                                height={Metrix.VerticalSize(36)}
+                                borderRadius={Metrix.VerticalSize(4)}
+                                fontSize={Metrix.FontSmall}
+                                fontFamily={fonts.InterBold} 
+                            />
+                        </>
+                    )}
                 </View>
             </TouchableOpacity>
         )

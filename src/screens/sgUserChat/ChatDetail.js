@@ -1,10 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, Image, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Images, Metrix } from '../../config';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './chatDetailStyle';
 import fonts from '../../config/Fonts';
+import { useDispatch } from 'react-redux';
+import { sendMessage } from '../../store/actions/chatActions';
+import moment from 'moment';
 
 const messages = [
   {
@@ -57,6 +60,9 @@ const ChatDetail = ({ route, navigation }) => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [userScrolled, setUserScrolled] = useState(false);
   const flatListRef = useRef(null);
+  const dispatch = useDispatch();
+  const [messages, setMessages] = useState([]);
+  const [isSending, setIsSending] = useState(false);
 
   const scrollToBottom = () => {
     if (flatListRef.current) {
@@ -75,6 +81,36 @@ const ChatDetail = ({ route, navigation }) => {
     } else {
       setShowScrollButton(false);
       setUserScrolled(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!message.trim() || isSending) return;
+
+    setIsSending(true);
+    try {
+      const newMessage = {
+        text: message.trim(),
+        time: moment().format('h:mm A'),
+        isSender: true,
+      };
+
+      await dispatch(sendMessage({
+        message: newMessage.text,
+        chatId: chatUser.id,
+        productId: productInfo.id,
+        timestamp: new Date().toISOString(),
+      }));
+
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+      setMessage('');
+      if (!userScrolled) {
+        scrollToBottom();
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -151,13 +187,15 @@ const ChatDetail = ({ route, navigation }) => {
           multiline
         />
         <TouchableOpacity 
-          style={styles.sendButton}
-          onPress={() => {
-            // Handle send message
-            setMessage('');
-          }}
+          style={[styles.sendButton, isSending && styles.sendButtonDisabled]}
+          onPress={handleSendMessage}
+          disabled={isSending}
         >
-          <Image source={Images.callIcon} style={styles.callIcon} />
+          {isSending ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Image source={Images.callIcon} style={styles.callIcon} />
+          )}
         </TouchableOpacity>
       </View>
     </View>
