@@ -4,7 +4,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TextInput, Image, Alert } from 'react-native';
 import { Fonts, Images, Metrix } from '../../config';
 import colors from '../../config/Colors';
-import { FilterIcon, SearchIcon } from '../../assets/svg';
+import { FilterIcon } from '../../assets/svg';
+import SearchIcon from '../../assets/svg/SearchIcon.svg';
 
 export default function CustomInput({
   justifyContent,
