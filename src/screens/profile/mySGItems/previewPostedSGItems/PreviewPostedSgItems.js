@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, TextInput, FlatList, Modal } from 'react-native';
 import { styles } from './style';
 import BackArrowIcon from '../../../../components/backArrowIcon/BackArrowIcon';
@@ -10,6 +10,8 @@ import colors from '../../../../config/Colors';
 import CustomButton from '../../../../components/Button/Button';
 import CustomInput from '../../../../components/customInput/CustomInput';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import axiosInstance from '../../../../config/axios';
+import { ActivityIndicator } from 'react-native-paper';
 
 
 const requestBuyData = [
@@ -41,35 +43,89 @@ export default function PreviewPostedSgItems({ navigation, route }) {
     const [declineState, setDeclineState] = useState({});
     const [tradeId, setTradeId] = useState(false)
     const [modalVisible, setModalVisible] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [productDetail, setProductDetail] = useState([])
 
-    console.log("accept state==>", acceptState)
+    // console.log("accept state==>", acceptState)
+    // console.log("product detail==>", productDetail)
 
-    const handleDeclinePress = useCallback((idx) => {
+
+
+
+
+
+    const fetchProductDetail = async () => {
+        setLoading(true)
+        try {
+            const response = await axiosInstance.get(`/api/products/${item.id}`);
+            // Set initial favorite status if your API returns this information
+            setProductDetail(response.data.bids)
+            console.log("Product Detail response", response.data.bids);
+
+
+        } catch (error) {
+            console.error('Error fetching product details:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch product details and update time
+    useEffect(() => {
+        fetchProductDetail();
+    }, [item.id]);
+
+    const handleDeclinePress = async (idx) => {
         setDeclineState((prevState) => ({
             ...prevState,
             [idx]: true,
         }));
-    }, []);
 
-    const handleAcceptPress = useCallback((idx) => {
+        try {
+            const response = await axiosInstance.post(`/api/bids/${productDetail[idx].id}/reject`);
+            console.log("reject bid ==>>", response.data)
+            return response.data; // Handle the response as needed
+        } catch (error) {
+            console.error("Error rejecting bid:", error);
+            throw error; // Re-throw the error to handle it later if necessary
+        }
+    }
+
+    const handleAcceptPress = async (idx) => {
+
         setAcceptState((prevState) => ({
             ...prevState,
             [idx]: true,
         }));
-    }, []);
+        // console.log("====>>>", productDetail[idx].bidderId)
+        try {
+            const response = await axiosInstance.post(`/api/bids/${productDetail[idx].id}/accept`);
+            console.log("accept bid ==>>", response.data)
+            return response.data; // Handle the response as needed
+        } catch (error) {
+            console.error("Error accepting bid:", error);
+            throw error; // Re-throw the error to handle it later if necessary
+        }
+
+    };
 
     const renderRequestBitData = (item, index) => {
         return (
             <View key={index} style={[styles.container, acceptState[index] && styles.containerAccepted]}>
                 <View style={styles.header}>
                     <View style={styles.userInfo}>
-                        <Image source={Images.homeProfile} style={styles.profileImage} />
+                        {item.bidder.profileImage ?
+
+                            <Image source={{ uri: item.bidder.profileImage }} style={styles.profileImage} />
+                            :
+                            <Icon name="user-circle" size={Metrix.HorizontalSize(40)} color="#ccc" />
+                        }
                         <View>
                             <Text style={styles.bidText}>Bid by</Text>
-                            <Text style={styles.bidName}>{item.name}</Text>
+                            <Text style={styles.bidName}>{item.bidder.firstName}{" "}{item.bidder.lastName} </Text>
                         </View>
                     </View>
-    
+
                     <View style={styles.notificationContainer}>
                         <NotificationIcon stroke={colors.buttonColor} width={24} height={24} />
                         <View style={styles.bidAmountContainer}>
@@ -78,7 +134,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                         </View>
                     </View>
                 </View>
-    
+
                 <View style={[styles.actionContainer, acceptState[index] && styles.actionContainerAccepted]}>
                     {declineState[index] ? (
                         <CustomButton
@@ -136,7 +192,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                         </>
                     )}
                 </View>
-    
+
                 {acceptState[index] && (
                     <View style={styles.infoContainer}>
                         <ModalInfoIcon width={24} height={24} outerStroke={colors.redColor} />
@@ -147,7 +203,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
         );
     };
 
-    console.log("item==>>>", item)
+    // console.log("item==>>>", item)
 
     return (
         <View style={styles.previewPostedSgItemsConatiner}>
@@ -315,12 +371,19 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                     keyboardShouldPersistTaps="handled"
                     contentContainerStyle={{ gap: Metrix.VerticalSize(7) }}
                 /> */}
+
                     {
-                        requestBuyData.map((item, index) => {
-                            return (
-                                renderRequestBitData(item, index)
-                            )
-                        })
+                        loading ?
+                            <ActivityIndicator style={{ marginTop: Metrix.VerticalSize(50) }} />
+                            :
+                            !productDetail.length ?
+                                <Text style={{ fontSize: Metrix.FontMedium, fontFamily: fonts.InterLight, textAlign: "center", marginTop: Metrix.VerticalSize(50) }}>No Bids Available</Text>
+                                :
+                                productDetail.map((item, index) => {
+                                    return (
+                                        renderRequestBitData(item, index)
+                                    )
+                                })
                     }
 
 
@@ -337,9 +400,9 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                             <CrossIcon />
                         </TouchableOpacity>
 
-                        <View style={{marginTop : Metrix.VerticalSize(20) ,gap:Metrix.VerticalSize(30),alignItems :"center"}}>
+                        <View style={{ marginTop: Metrix.VerticalSize(20), gap: Metrix.VerticalSize(30), alignItems: "center" }}>
                             <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold }}>Kindly enter SG ID, to mark as sold.</Text>
-                            <View style={{alignItems :"center" ,gap:Metrix.VerticalSize(20)}}>
+                            <View style={{ alignItems: "center", gap: Metrix.VerticalSize(20) }}>
                                 <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
                                     <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold }}>SG ID:</Text>
                                     <TextInput style={styles.modalInput} />
@@ -349,11 +412,11 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                                     height={Metrix.VerticalSize(36)}
                                     borderRadius={Metrix.VerticalSize(35)}
                                     fontSize={Metrix.FontSmall}
-                                     />
+                                />
                             </View>
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10),paddingHorizontal :Metrix.HorizontalSize(40) }}>
-                                <ModalInfoIcon outerStroke={colors.redColor} width={24} height={24}/>
-                                <Text style={{ fontSize: Metrix.normalize(11), fontFamily: fonts.InterRegular,color :"#646464" }}>Go back to your trade screen and copy trade Id to submit here</Text>
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10), paddingHorizontal: Metrix.HorizontalSize(40) }}>
+                                <ModalInfoIcon outerStroke={colors.redColor} width={24} height={24} />
+                                <Text style={{ fontSize: Metrix.normalize(11), fontFamily: fonts.InterRegular, color: "#646464" }}>Go back to your trade screen and copy trade Id to submit here</Text>
                             </View>
                         </View>
                     </View>

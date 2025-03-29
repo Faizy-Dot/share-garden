@@ -89,7 +89,11 @@ const Login = ({ navigation }) => {
 
     const handleLogin = async () => {
         if (!email || !password) {
-            alert('Please fill in both email and password.');
+            Toast.show({
+                type: 'error',
+                text1: "Please fill in both email and password.",
+            });
+            ;
             return;
         }
 
@@ -127,7 +131,10 @@ const Login = ({ navigation }) => {
 
             }
         } catch (err) {
-            alert('Login failed!');
+            Toast.show({
+                type: 'error',
+                text1: "Login Failed",
+            });
             console.error(err);
         }
     };

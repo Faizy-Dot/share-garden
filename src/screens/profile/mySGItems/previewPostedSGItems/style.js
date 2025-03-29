@@ -112,6 +112,7 @@ export const styles = StyleSheet.create({
     profileImage: {
         width: Metrix.HorizontalSize(40),
         height: Metrix.HorizontalSize(40),
+        borderRadius : Metrix.HorizontalSize(20)
     },
     bidText: {
         fontSize: Metrix.FontSmall,

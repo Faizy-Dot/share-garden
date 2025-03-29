@@ -13,6 +13,7 @@ import axiosInstance from '../../../../config/axios';
 import { useSelector } from 'react-redux';
 import { BlackBitIcon, CallIcon, CashIcon, CrossIcon, HandShakeIcon, LikesIcon, NotificationIcon, ShareIcon, SpeakerIcon, TimeIcon } from '../../../../assets/svg';
 import { Modal } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 
 const ProductDetail = ({ route, navigation }) => {
@@ -259,10 +260,14 @@ const ProductDetail = ({ route, navigation }) => {
         [{ text: 'OK' }]
       );
     } catch (err) {
-      console.error('Error placing bid:', err);
+      // console.error('Error placing bid:', err);
       // Log the full error response
       if (err.response) {
-        console.error('Error response:', err.response.data);
+        Toast.show({
+          type : "error",
+          text1 : err.response.data.message
+        })
+        // console.error('Error response:', err.response.data);
       }
       // Handle specific error messages from the backend
       const errorMessage = err.response?.data?.message || 'Failed to place bid. Please try again.';

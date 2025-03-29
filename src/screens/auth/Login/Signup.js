@@ -323,7 +323,7 @@ export default function SignUpScreen({ navigation }) {
                         />
                     </TouchableOpacity>
                 </View>
-                {form.password.length < 6 && (
+                {form.password.length < 6 &&  (
                     <Text style={styles.errorText}>Password must be at least 6 characters</Text>
                 )}
                 {form.password !== form.confirmpassword && form.password.length >= 6 && (
