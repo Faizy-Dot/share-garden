@@ -80,32 +80,32 @@ const ProductDetail = ({ route, navigation }) => {
     return { days, hours, minutes, seconds };
   };
 
+  const fetchProductDetail = async () => {
+    try {
+      const response = await axiosInstance.get(`/api/products/${item.id}`);
+      setProductDetail(response.data);
+      // Set initial favorite status if your API returns this information
+      setIsFavorite(response.data.isFavorited || false);
+
+      console.log("Product Detail response", response.data);
+
+      // Update time if it's a bidding product
+      if (response.data.isSGPoints && response.data.bidDuration) {
+        const timeRemaining = calculateTimeRemaining(response.data.bidDuration);
+        setDays(timeRemaining.days);
+        setHours(timeRemaining.hours);
+        setMinutes(timeRemaining.minutes);
+        setSeconds(timeRemaining.seconds);
+      }
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch product details and update time
   useEffect(() => {
-    const fetchProductDetail = async () => {
-      try {
-        const response = await axiosInstance.get(`/api/products/${item.id}`);
-        setProductDetail(response.data);
-        // Set initial favorite status if your API returns this information
-        setIsFavorite(response.data.isFavorited || false);
-
-        console.log("Product Detail response", response.data);
-
-        // Update time if it's a bidding product
-        if (response.data.isSGPoints && response.data.bidDuration) {
-          const timeRemaining = calculateTimeRemaining(response.data.bidDuration);
-          setDays(timeRemaining.days);
-          setHours(timeRemaining.hours);
-          setMinutes(timeRemaining.minutes);
-          setSeconds(timeRemaining.seconds);
-        }
-      } catch (error) {
-        console.error('Error fetching product details:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProductDetail();
   }, [item.id]);
 
@@ -146,7 +146,7 @@ const ProductDetail = ({ route, navigation }) => {
           viewIncremented.current = true; // Mark as incremented
         }
       } catch (error) {
-        console.error('Error incrementing view:', error);
+        console.log('Error incrementing view:', error);
       }
     };
 
@@ -163,7 +163,7 @@ const ProductDetail = ({ route, navigation }) => {
       setIsFavorite(!isFavorite); // Toggle favorite status
       // Optionally show some feedback to user
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+      console.log('Error toggling favorite:', error);
       // Optionally show error message to user
     }
   };
@@ -645,10 +645,10 @@ const ProductDetail = ({ route, navigation }) => {
             >
               <CrossIcon />
             </TouchableOpacity>
-
-            <HandShakeIcon />
-
-            <Text style={styles.modalTitle}>Alert sent to seller!</Text>
+            <View style={{ alignItems: 'center' }}>
+              <HandShakeIcon />
+              <Text style={styles.modalTitle}>Alert sent to seller!</Text>
+            </View>
 
             <Text style={styles.modalText}>
               You can make payment and pickup arrangements by contacting seller via chat

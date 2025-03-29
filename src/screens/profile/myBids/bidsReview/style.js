@@ -19,8 +19,9 @@ const styles = StyleSheet.create({
         paddingBottom: Metrix.VerticalSize(30)
     },
     profileImage: {
-        width: Metrix.HorizontalSize(66),
-        height: Metrix.HorizontalSize(66)
+        width: Metrix.HorizontalSize(40),
+        height: Metrix.HorizontalSize(40),
+        borderRadius: Metrix.HorizontalSize(20)
     },
     bidHeader: {
         flexDirection: "row",
@@ -30,29 +31,36 @@ const styles = StyleSheet.create({
         paddingHorizontal: Metrix.HorizontalSize(25),
         borderBottomWidth: 1,
         borderColor: "#C4C4C4",
+        width: "100%",
     },
     bidHeaderLeft: {
         flexDirection: "row",
         alignItems: "center",
         gap: Metrix.VerticalSize(10),
+        flex: 1,
+        marginRight: Metrix.HorizontalSize(10),
     },
     titleText: {
         fontSize: Metrix.FontRegular,
         fontFamily: fonts.InterBold,
+        flexShrink: 1,
     },
     subtitleText: {
         fontSize: Metrix.FontExtraSmall,
         fontFamily: fonts.InterSemiBold,
         color: colors.buttonColor,
+        flexShrink: 1,
     },
     publishDateText: {
         fontSize: Metrix.FontExtraSmall,
         fontFamily: fonts.InterRegular,
+        flexShrink: 1,
     },
     bidHeaderRight: {
         flexDirection: "row",
         alignItems: "center",
         gap: Metrix.VerticalSize(10),
+        flexShrink: 0,
     },
     bitValue: {
         fontSize: Metrix.normalize(25),
@@ -114,11 +122,16 @@ const styles = StyleSheet.create({
     infoWrapper: {
         flexDirection: "row",
         alignItems: "center",
-        gap: Metrix.HorizontalSize(5),
+        justifyContent: "center",
+        gap: Metrix.HorizontalSize(10),
+        marginTop: Metrix.VerticalSize(10),
+        paddingHorizontal: Metrix.HorizontalSize(20),
     },
     infoText: {
         fontSize: Metrix.FontSmall,
-        fontFamily: fonts.InterSemiBold,
+        fontFamily: fonts.InterRegular,
+        color: colors.black,
+        lineHeight: Metrix.FontSmall * 1.5,
     },
     confirmWrapper: {
         borderWidth: 1,
