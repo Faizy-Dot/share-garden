@@ -175,6 +175,18 @@ const ProductDetail = ({ route, navigation }) => {
 
   // Add these new functions before the return statement
   const handleBidSubmit = async () => {
+    // Add debug logs
+    console.log('Product details for bidding:', {
+      id: displayData.id,
+      isSGPoints: displayData.isSGPoints,
+      isBidding: displayData.isBidding,
+      status: displayData.status,
+      bidStartTime: displayData.bidStartTime,
+      bidEndTime: displayData.bidEndTime,
+      minBid: displayData.minBid,
+      highestBid: displayData.highestBid
+    });
+
     // Basic validation
     if (!bidAmount || isNaN(bidAmount) || parseInt(bidAmount) <= 0) {
       setBidError('Please enter a valid bid amount');
@@ -182,38 +194,38 @@ const ProductDetail = ({ route, navigation }) => {
     }
 
     // Check if product is still active for bidding
-    if (!productDetail.isSGPoints || !productDetail.isBidding) {
+    if (!displayData?.isSGPoints || !displayData?.isBidding) {
       setBidError('This product is not open for bidding');
       return;
     }
 
     // Check if bidding has ended
-    if (productDetail.bidEndTime && new Date(productDetail.bidEndTime) < new Date()) {
+    if (displayData?.bidEndTime && new Date(displayData.bidEndTime) < new Date()) {
       setBidError('Bidding has ended for this product');
       return;
     }
 
     // Check if bidding has started
-    if (productDetail.bidStartTime && new Date(productDetail.bidStartTime) > new Date()) {
+    if (displayData?.bidStartTime && new Date(displayData.bidStartTime) > new Date()) {
       setBidError('Bidding has not started yet');
       return;
     }
 
     // Check if user is trying to bid on their own product
-    if (productDetail.sellerId === user?.id) {
+    if (displayData?.sellerId === user?.id) {
       setBidError('You cannot bid on your own product');
       return;
     }
 
     // Check if bid meets minimum bid requirement
-    if (parseInt(bidAmount) < productDetail.minBid) {
-      setBidError(`Bid must be at least ${productDetail.minBid} SG Points`);
+    if (parseInt(bidAmount) < displayData?.minBid) {
+      setBidError(`Bid must be at least ${displayData.minBid} SG Points`);
       return;
     }
 
     // Check if bid is higher than current highest bid
-    if (productDetail.highestBid && parseInt(bidAmount) <= productDetail.highestBid) {
-      setBidError(`Bid must be higher than current highest bid of ${productDetail.highestBid} SG Points`);
+    if (displayData?.highestBid && parseInt(bidAmount) <= displayData.highestBid) {
+      setBidError(`Bid must be higher than current highest bid of ${displayData.highestBid} SG Points`);
       return;
     }
 
@@ -221,10 +233,17 @@ const ProductDetail = ({ route, navigation }) => {
       setBidLoading(true);
       setBidError(null);
       
-      const response = await axiosInstance.post('/api/bids', {
-        productId: productDetail.id,
+      console.log('Submitting bid with data:', {
+        productId: displayData.id,
         amount: parseInt(bidAmount)
       });
+
+      const response = await axiosInstance.post('/api/bids', {
+        productId: displayData.id,
+        amount: parseInt(bidAmount)
+      });
+
+      console.log('Bid response:', response.data);
 
       // Show success message and close modal
       setIsBidModalVisible(false);
@@ -241,6 +260,10 @@ const ProductDetail = ({ route, navigation }) => {
       );
     } catch (err) {
       console.error('Error placing bid:', err);
+      // Log the full error response
+      if (err.response) {
+        console.error('Error response:', err.response.data);
+      }
       // Handle specific error messages from the backend
       const errorMessage = err.response?.data?.message || 'Failed to place bid. Please try again.';
       setBidError(errorMessage);
