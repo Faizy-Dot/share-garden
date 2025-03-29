@@ -94,15 +94,16 @@ const Login = ({ navigation }) => {
         }
 
         // Get device details
-        const { deviceid, fcmtoken, devicetype } = await getDeviceDetails();
+        // const { deviceid, fcmtoken, devicetype } = await getDeviceDetails();
+        const devicetype = Platform.OS.toString();
 
         // Prepare user data
 
         const userData = {
             email: email,
             password,
-            // deviceToken: fcmtoken,
-            // deviceType: devicetype,
+            deviceToken: getFcmToken(),
+            deviceType: devicetype,
         };
 
         // Call login action
