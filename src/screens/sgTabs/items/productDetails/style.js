@@ -221,20 +221,19 @@ modalContainer: {
   flex: 1,
   backgroundColor: 'rgba(0, 0, 0, 0.5)',
   justifyContent: 'center',
-  alignItems: 'center',
-  padding: Metrix.HorizontalSize(20)
+  alignItems: 'center'
 },
 modalContent: {
   backgroundColor: colors.white,
-  borderRadius: Metrix.VerticalSize(10),
+  width: '90%',
   padding: Metrix.VerticalSize(20),
-  width: '100%',
-  alignItems: 'center'
+  borderRadius: Metrix.VerticalSize(10),
+  position: 'relative'
 },
 closeButton: {
   position: 'absolute',
-  right: Metrix.HorizontalSize(15),
-  top: Metrix.VerticalSize(15)
+  right: Metrix.HorizontalSize(10),
+  top: Metrix.VerticalSize(10)
 },
 closeIcon: {
   width: Metrix.HorizontalSize(24),
@@ -246,9 +245,10 @@ modalLogo: {
   marginBottom: Metrix.VerticalSize(20),
 },
 modalTitle: {
-  fontSize: Metrix.FontLarge,
+  fontSize: Metrix.FontRegular,
   fontFamily: fonts.InterBold,
-  marginVertical: Metrix.VerticalSize(15)
+  color: colors.black,
+  marginBottom: Metrix.VerticalSize(10)
 },
 modalText: {
   fontSize: Metrix.FontRegular,
@@ -293,6 +293,26 @@ searchInput: {
 filterLogo: {
   width: Metrix.HorizontalSize(20),
   height: Metrix.VerticalSize(15)
+},
+bidInput: {
+  borderWidth: 1,
+  borderColor: colors.borderColor,
+  borderRadius: Metrix.VerticalSize(3),
+  padding: Metrix.VerticalSize(10),
+  marginVertical: Metrix.VerticalSize(15),
+  width: '100%',
+  color: colors.black,
+  fontFamily: fonts.InterRegular,
+  fontSize: Metrix.FontSmall
+},
+bidInputError: {
+  borderColor: colors.redColor
+},
+errorText: {
+  color: colors.redColor,
+  fontFamily: fonts.InterRegular,
+  fontSize: Metrix.FontSmall,
+  marginBottom: Metrix.VerticalSize(5)
 },
 });
 

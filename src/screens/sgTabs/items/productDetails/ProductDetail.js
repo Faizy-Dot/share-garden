@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, FlatList, Dimensions, TextInput, TouchableOpacity, Linking, StyleSheet } from 'react-native';
+import { View, Text, Image, FlatList, Dimensions, TextInput, TouchableOpacity, Linking, StyleSheet, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Images, Metrix } from '../../../../config';
 import styles from './style';
@@ -35,6 +35,8 @@ const ProductDetail = ({ route, navigation }) => {
   const [isBidModalVisible, setIsBidModalVisible] = useState(false);
   const [bidAmount, setBidAmount] = useState('');
   const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
+  const [bidLoading, setBidLoading] = useState(false);
+  const [bidError, setBidError] = useState(null);
 
   const images = [Images.homePopularListing, Images.homeProfile, Images.homePopularListing,]
 
@@ -173,21 +175,96 @@ const ProductDetail = ({ route, navigation }) => {
 
   // Add these new functions before the return statement
   const handleBidSubmit = async () => {
+    // Basic validation
+    if (!bidAmount || isNaN(bidAmount) || parseInt(bidAmount) <= 0) {
+      setBidError('Please enter a valid bid amount');
+      return;
+    }
+
+    // Check if product is still active for bidding
+    if (!productDetail.isSGPoints || !productDetail.isBidding) {
+      setBidError('This product is not open for bidding');
+      return;
+    }
+
+    // Check if bidding has ended
+    if (productDetail.bidEndTime && new Date(productDetail.bidEndTime) < new Date()) {
+      setBidError('Bidding has ended for this product');
+      return;
+    }
+
+    // Check if bidding has started
+    if (productDetail.bidStartTime && new Date(productDetail.bidStartTime) > new Date()) {
+      setBidError('Bidding has not started yet');
+      return;
+    }
+
+    // Check if user is trying to bid on their own product
+    if (productDetail.sellerId === user?.id) {
+      setBidError('You cannot bid on your own product');
+      return;
+    }
+
+    // Check if bid meets minimum bid requirement
+    if (parseInt(bidAmount) < productDetail.minBid) {
+      setBidError(`Bid must be at least ${productDetail.minBid} SG Points`);
+      return;
+    }
+
+    // Check if bid is higher than current highest bid
+    if (productDetail.highestBid && parseInt(bidAmount) <= productDetail.highestBid) {
+      setBidError(`Bid must be higher than current highest bid of ${productDetail.highestBid} SG Points`);
+      return;
+    }
+
     try {
-      await axiosInstance.post(`/api/products/${displayData.id}/bids`, {
+      setBidLoading(true);
+      setBidError(null);
+      
+      const response = await axiosInstance.post('/api/bids', {
+        productId: productDetail.id,
         amount: parseInt(bidAmount)
       });
+
+      // Show success message and close modal
       setIsBidModalVisible(false);
       setBidAmount('');
-      // Optionally refresh product details to show updated bid
+      
+      // Refresh product details to show updated bid
       fetchProductDetail();
-    } catch (error) {
-      console.error('Error placing bid:', error);
+      
+      // Show success message
+      Alert.alert(
+        'Success',
+        'Your bid has been placed successfully!',
+        [{ text: 'OK' }]
+      );
+    } catch (err) {
+      console.error('Error placing bid:', err);
+      // Handle specific error messages from the backend
+      const errorMessage = err.response?.data?.message || 'Failed to place bid. Please try again.';
+      setBidError(errorMessage);
+    } finally {
+      setBidLoading(false);
     }
   };
 
   const handlePurchaseRequest = () => {
     setPurchaseModalVisible(true);
+  };
+
+  // Add this function to check if bidding is allowed
+  const isBiddingAllowed = () => {
+    if (!displayData?.isSGPoints || !displayData?.isBidding) return false;
+    if (displayData?.bidEndTime && new Date(displayData.bidEndTime) < new Date()) return false;
+    if (displayData?.bidStartTime && new Date(displayData.bidStartTime) > new Date()) return false;
+    if (displayData?.sellerId === user?.id) return false;
+    return true;
+  };
+
+  // Add this function to check if user is seller
+  const isUserSeller = () => {
+    return displayData?.sellerId === user?.id;
   };
 
   return (
@@ -316,12 +393,14 @@ const ProductDetail = ({ route, navigation }) => {
           <View style={{ paddingHorizontal: Metrix.HorizontalSize(15), marginTop: Metrix.VerticalSize(18) }}>
             {(displayData.isSGPoints || displayData.isBidding) ? (
               <CustomButton
-                title="PLACE BID"
+                title={isUserSeller() ? "YOU ARE THE SELLER" : (isBiddingAllowed() ? "PLACE BID" : "BIDDING ENDED")}
                 height={Metrix.VerticalSize(46)}
                 width={"100%"}
                 borderRadius={Metrix.VerticalSize(3)}
                 fontSize={Metrix.FontSmall}
                 onPress={() => setIsBidModalVisible(true)}
+                disabled={!isBiddingAllowed() || isUserSeller()}
+                backgroundColor={isBiddingAllowed() && !isUserSeller() ? colors.buttonColor : colors.grey}
               />
             ) : (
               <CustomButton
@@ -485,35 +564,45 @@ const ProductDetail = ({ route, navigation }) => {
           <View style={styles.modalContent}>
             <TouchableOpacity
               style={styles.closeButton}
-              onPress={() => setIsBidModalVisible(false)}
+              onPress={() => {
+                setIsBidModalVisible(false);
+                setBidAmount('');
+                setBidError(null);
+              }}
             >
               <CrossIcon />
             </TouchableOpacity>
 
             <Text style={styles.modalTitle}>Place Your Bid</Text>
             
+            {bidError && (
+              <Text style={styles.errorText}>{bidError}</Text>
+            )}
+            
             <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: colors.borderColor,
-                borderRadius: Metrix.VerticalSize(3),
-                padding: Metrix.VerticalSize(10),
-                marginVertical: Metrix.VerticalSize(15),
-                width: '100%'
-              }}
+              style={[
+                styles.bidInput,
+                bidError && styles.bidInputError
+              ]}
               value={bidAmount}
-              onChangeText={setBidAmount}
+              onChangeText={(text) => {
+                setBidAmount(text);
+                setBidError(null);
+              }}
               keyboardType="numeric"
               placeholder="Enter bid amount"
+              placeholderTextColor={colors.grey}
             />
 
             <CustomButton
-              title="BID NOW"
+              title={bidLoading ? "PLACING BID..." : "BID NOW"}
               height={Metrix.VerticalSize(46)}
               width={"100%"}
               borderRadius={Metrix.VerticalSize(3)}
               fontSize={Metrix.FontSmall}
               onPress={handleBidSubmit}
+              disabled={bidLoading}
+              backgroundColor={bidLoading ? colors.grey : colors.buttonColor}
             />
           </View>
         </View>
