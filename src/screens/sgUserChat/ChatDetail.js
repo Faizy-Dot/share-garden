@@ -64,7 +64,7 @@ const getInitialLetter = (name) => {
 };
 
 const ChatDetail = ({ route, navigation }) => {
-  const { chatUser, productInfo } = route.params;
+  const { chatUser, productInfo } = route.params || {};
   const [message, setMessage] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [userScrolled, setUserScrolled] = useState(false);
@@ -75,7 +75,58 @@ const ChatDetail = ({ route, navigation }) => {
   const [isSending, setIsSending] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
 
+  // Get the correct user ID based on the chatUser object structure
+  const getChatUserId = () => {
+    if (!chatUser) {
+      console.error('Chat user data is missing');
+      return null;
+    }
+    // Handle different possible structures of chatUser
+    const userId = chatUser.id || chatUser.userId || chatUser._id;
+    if (!userId) {
+      console.error('Chat user ID is missing');
+      return null;
+    }
+    return userId;
+  };
+
+  // Get the correct product info
+  const getProductInfo = () => {
+    if (!productInfo) {
+      return {
+        title: 'Product',
+        price: '0',
+        image: null
+      };
+    }
+    return {
+      title: productInfo.title || 'Product',
+      price: productInfo.price || '0',
+      image: productInfo.image || null
+    };
+  };
+
+  // Get the correct chat user info
+  const getChatUserInfo = () => {
+    if (!chatUser) {
+      return {
+        name: 'Chat',
+        image: null
+      };
+    }
+    return {
+      name: chatUser.name || 'Chat',
+      image: chatUser.image || null
+    };
+  };
+
   useEffect(() => {
+    const chatUserId = getChatUserId();
+    if (!chatUserId) {
+      console.error('Invalid chat user data');
+      return;
+    }
+
     socketRef.current = io(BASE_URL, {
       transports: ['websocket'],
       path: '/socket.io',
@@ -84,31 +135,53 @@ const ChatDetail = ({ route, navigation }) => {
       reconnectionDelay: 1000
     });
 
-    socketRef.current.emit('authenticate', { userId: user.id });
-
-    socketRef.current.on('private message', (newMessage) => {
-      if (newMessage.otherPerson.id === chatUser.id) {
-        const formattedMessage = {
-          id: newMessage.id,
-          text: newMessage.message,
-          time: moment(newMessage.createdAt).format('h:mm A'),
-          isSender: newMessage.isSentByMe
-        };
-        
-        setMessages(prevMessages => [...prevMessages, formattedMessage]);
-        
-        if (!userScrolled) {
-          scrollToBottom();
-        }
-      }
+    // Add connection event listeners
+    socketRef.current.on('connect', () => {
+      console.log('Socket connected successfully');
+      // Join personal room after connection
+      socketRef.current.emit('join', user.id);
     });
+
+    socketRef.current.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+
+    socketRef.current.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
+    });
+
+    // Listen for both types of message events
+    socketRef.current.on('private message', handleNewMessage);
+    socketRef.current.on('receive_message', handleNewMessage);
 
     return () => {
       if (socketRef.current) {
+        socketRef.current.off('private message', handleNewMessage);
+        socketRef.current.off('receive_message', handleNewMessage);
         socketRef.current.disconnect();
       }
     };
-  }, [chatUser.id, user.id]);
+  }, [getChatUserId(), user.id]);
+
+  const handleNewMessage = (newMessage) => {
+    console.log('Received message:', newMessage);
+    const chatUserId = getChatUserId();
+    // Check if message is related to current chat
+    if (newMessage.senderId === chatUserId || newMessage.receiverId === chatUserId) {
+      const formattedMessage = {
+        id: newMessage.id,
+        text: newMessage.message,
+        time: moment(newMessage.createdAt).format('h:mm A'),
+        isSender: newMessage.senderId === user.id
+      };
+      
+      setMessages(prevMessages => [...prevMessages, formattedMessage]);
+      
+      if (!userScrolled) {
+        scrollToBottom();
+      }
+    }
+  };
 
   const scrollToBottom = () => {
     if (flatListRef.current) {
@@ -129,12 +202,18 @@ const ChatDetail = ({ route, navigation }) => {
     }
   };
 
-  console.log("Chat User ID", chatUser.id);
+  console.log("Chat User ID", getChatUserId());
 
   const fetchChatHistory = async () => {
     try {
       setIsLoadingMessages(true);
-      const response = await axiosInstance.get(`/api/chat/${chatUser.id}`);
+      const chatUserId = getChatUserId();
+      if (!chatUserId) {
+        console.error('Invalid chat user data');
+        return;
+      }
+
+      const response = await axiosInstance.get(`/api/chat/${chatUserId}`);
       
       const formattedMessages = response.data.map(msg => ({
         id: msg.id,
@@ -157,13 +236,19 @@ const ChatDetail = ({ route, navigation }) => {
 
   useEffect(() => {
     fetchChatHistory();
-  }, [chatUser.id]);
+  }, [getChatUserId()]);
 
   const handleSendMessage = async () => {
     if (!message.trim() || isSending) return;
 
     setIsSending(true);
     try {
+      const chatUserId = getChatUserId();
+      if (!chatUserId) {
+        console.error('Invalid chat user data');
+        return;
+      }
+
       const newMessage = {
         text: message.trim(),
         time: moment().format('h:mm A'),
@@ -178,7 +263,7 @@ const ChatDetail = ({ route, navigation }) => {
       }
 
       const response = await axiosInstance.post('/api/chat/send', {
-        receiverId: chatUser.id,
+        receiverId: chatUserId,
         message: newMessage.text
       });
       
@@ -224,9 +309,9 @@ const ChatDetail = ({ route, navigation }) => {
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <View style={styles.userInfo}>
-            {chatUser?.image ? (
+            {getChatUserInfo().image ? (
               <Image 
-                source={{ uri: chatUser.image }} 
+                source={{ uri: getChatUserInfo().image }} 
                 style={styles.userImage} 
               />
             ) : (
@@ -244,23 +329,23 @@ const ChatDetail = ({ route, navigation }) => {
                   fontFamily: fonts.InterBold,
                   color: colors.buttonColor,
                 }}>
-                  {getInitialLetter(chatUser?.name?.split(' ')[0])}
+                  {getInitialLetter(getChatUserInfo().name?.split(' ')[0])}
                 </Text>
               </View>
             )}
-            <Text style={styles.headerTitle}>{chatUser?.name || 'Chat'}</Text>
+            <Text style={styles.headerTitle}>{getChatUserInfo().name}</Text>
           </View>
           <View style={styles.productInfo}>
             <Image 
               source={
-                productInfo?.image 
-                  ? { uri: productInfo.image } 
+                getProductInfo().image 
+                  ? { uri: getProductInfo().image } 
                   : Images.homePopularListing
               } 
               style={styles.productImage} 
             />
-            <Text style={styles.productTitle}>{productInfo?.title || 'Product'}</Text>
-            <Text style={styles.productPrice}>$ {productInfo?.price || '0'}</Text>
+            <Text style={styles.productTitle}>{getProductInfo().title}</Text>
+            <Text style={styles.productPrice}>$ {getProductInfo().price}</Text>
           </View>
         </View>
       </View>

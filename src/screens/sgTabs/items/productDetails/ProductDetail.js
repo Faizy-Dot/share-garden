@@ -403,14 +403,14 @@ const ProductDetail = ({ route, navigation }) => {
             onPress={() => navigation.navigate('ChatDetail', { 
               chatUser: {
                 id: displayData.seller?.id,
-                name: `${displayData.seller?.firstName || ''} ${displayData.seller?.lastName || ''}`,
+                name: displayData.seller?.name || 'Seller',
                 image: displayData.seller?.profileImage
               },
               productInfo: {
                 id: displayData.id,
                 title: displayData.title,
                 price: displayData.price,
-                image: displayData.images ? displayData.images.split(',')[0] : null, // Get first image from comma-separated string
+                image: displayData.images?.[0]
               }
             })}
           >
@@ -551,9 +551,17 @@ const ProductDetail = ({ route, navigation }) => {
               onPress={() => {
                 setPurchaseModalVisible(false);
                 navigation.navigate('ChatDetail', { 
-                  sellerId: displayData.seller?.id,
-                  productId: displayData.id,
-                  productTitle: displayData.title
+                  chatUser: {
+                    id: displayData.seller?.id,
+                    name: displayData.seller?.name || 'Seller',
+                    image: displayData.seller?.profileImage
+                  },
+                  productInfo: {
+                    id: displayData.id,
+                    title: displayData.title,
+                    price: displayData.price,
+                    image: displayData.images?.[0]
+                  }
                 });
               }}
               icon={<NotificationIcon stroke="#fff" style={{ marginLeft: 10 }} />}
