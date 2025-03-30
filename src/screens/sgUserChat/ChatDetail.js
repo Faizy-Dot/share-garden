@@ -14,51 +14,6 @@ import axiosInstance from '../../config/axios';
 import io from 'socket.io-client';
 import { BASE_URL } from '../../config/constants';
 
-const messages = [
-  {
-    id: 1,
-    text: "Please share account details",
-    time: "7:00 PM",
-    isSender: false
-  },
-  {
-    id: 2,
-    text: "Sure! We offer a full range of laundry services.",
-    time: "7:02 PM",
-    isSender: true
-  },
-  {
-    id: 3,
-    text: "That is great! What are your prices like?",
-    time: "7:22 PM",
-    isSender: false
-  },
-  {
-    id: 4,
-    text: "Our prices are very competitive.",
-    time: "7:30 PM",
-    isSender: true
-  },
-  {
-    id: 5,
-    text: "Great! I'll place an order online now.",
-    time: "12:25 PM",
-    isSender: false
-  },
-  {
-    id: 6,
-    text: "Thanks for your help!",
-    time: "12:25 PM",
-    isSender: false
-  },
-  {
-    id: 7,
-    text: "You're welcome! We're happy to help.",
-    time: "12:29 PM",
-    isSender: true
-  }
-];
-
 const getInitialLetter = (name) => {
   return name ? name.charAt(0).toUpperCase() : '?';
 };
@@ -150,14 +105,12 @@ const ChatDetail = ({ route, navigation }) => {
       console.log('Socket disconnected:', reason);
     });
 
-    // Listen for both types of message events
+    // Only listen for one type of message event
     socketRef.current.on('private message', handleNewMessage);
-    socketRef.current.on('receive_message', handleNewMessage);
 
     return () => {
       if (socketRef.current) {
         socketRef.current.off('private message', handleNewMessage);
-        socketRef.current.off('receive_message', handleNewMessage);
         socketRef.current.disconnect();
       }
     };
@@ -175,7 +128,28 @@ const ChatDetail = ({ route, navigation }) => {
         isSender: newMessage.senderId === user.id
       };
       
-      setMessages(prevMessages => [...prevMessages, formattedMessage]);
+      setMessages(prevMessages => {
+        // Check if we have a temporary message with the same text
+        const hasTempMessage = prevMessages.some(msg => 
+          msg.id.startsWith('temp-') && 
+          msg.text === newMessage.message && 
+          msg.isSender === (newMessage.senderId === user.id)
+        );
+
+        if (hasTempMessage) {
+          // Replace the temporary message with the real one
+          return prevMessages.map(msg => 
+            msg.id.startsWith('temp-') && 
+            msg.text === newMessage.message && 
+            msg.isSender === (newMessage.senderId === user.id)
+              ? formattedMessage
+              : msg
+          );
+        } else {
+          // If no temporary message found, add the new message
+          return [...prevMessages, formattedMessage];
+        }
+      });
       
       if (!userScrolled) {
         scrollToBottom();
@@ -249,13 +223,15 @@ const ChatDetail = ({ route, navigation }) => {
         return;
       }
 
+      const tempId = `temp-${new Date().getTime()}`;
       const newMessage = {
         text: message.trim(),
         time: moment().format('h:mm A'),
         isSender: true,
-        id: new Date().getTime(),
+        id: tempId,
       };
 
+      // Add message to local state with temporary ID
       setMessages(prevMessages => [...prevMessages, newMessage]);
       setMessage('');
       if (!userScrolled) {
@@ -267,15 +243,13 @@ const ChatDetail = ({ route, navigation }) => {
         message: newMessage.text
       });
       
-      if (response.data.id) {
-        setMessages(prevMessages => 
-          prevMessages.map(msg => 
-            msg.id === newMessage.id ? { ...msg, id: response.data.id } : msg
-          )
-        );
-      }
+      // No need to update the message here as it will be handled by the socket
     } catch (error) {
       console.error('Failed to send message:', error);
+      // Remove the temporary message if sending fails
+      setMessages(prevMessages => 
+        prevMessages.filter(msg => msg.id !== tempId)
+      );
     } finally {
       setIsSending(false);
     }

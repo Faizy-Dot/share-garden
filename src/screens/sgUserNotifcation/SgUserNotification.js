@@ -1,55 +1,74 @@
-import React from 'react';
-import { View, Text, FlatList, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, Image, ActivityIndicator } from 'react-native';
 import styles from './style';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../components/navBar/NavBar';
 import { Images } from '../../config';
-
-
-
-const notificationData = [
-    {
-        id: 1,
-        image: Images.bidsIcon,
-        title: "7  Seater Sofa Set, By Terry",
-        description : "Congratulations ! Your 2000 Bid has been accepted "
-    },
-    {
-        id: 2,
-        image: Images.notificationScreenImg,
-        title: "DIY towel clean tip has been shared",
-        description : "by Steve Anderson "
-    },
-    {
-        id: 3,
-        image: Images.notificationScreenImg,
-        title: "DIY towel clean tip has been liked",
-        description : "by Alexa Smith"
-    },
-    {
-        id: 4,
-        image: Images.redBidsIcon,
-        title: "Kids Scotty By Jerry",
-        description : "Your 1800 Bid has been declined. ",
-        declined : true
-    },
-]
-
-const renderNotification = ({item})=>{
-    return(
-        <View  style= {styles.flatlistContainer}>
-            <View style={styles.imageContainer}>
-            <Image source={item.image} />
-            </View>
-            <View>
-                <Text style={styles.title}>{item.title}</Text>
-                <Text style={[styles.description , item.declined && {color : "#FE130B"}]}>{item.description}</Text>
-            </View>
-        </View>
-    )
-}
+import axiosInstance from '../../config/axios';
 
 export default function SgUserNotification() {
+    const [notifications, setNotifications] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const fetchNotifications = async () => {
+        try {
+            setLoading(true);
+            const response = await axiosInstance.get('/api/notifications');
+            setNotifications(response.data);
+            console.log('Notifications response:', response.data);
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+            setError('Failed to load notifications');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Get appropriate image based on notification type
+    const getNotificationImage = (notification) => {
+        switch (notification.type) {
+            case 'TRADE_COMPLETED':
+            case 'TRADE_CREATED':
+                return notification.product?.images ? 
+                    { uri: notification.product.images.split(',')[0] } : 
+                    Images.bidsIcon;
+            case 'BID_ACCEPTED':
+                return Images.bidsIcon;
+            case 'BID_REJECTED':
+                return Images.redBidsIcon;
+            case 'CHAT':
+                return Images.notificationScreenImg;
+            default:
+                return Images.notificationScreenImg;
+        }
+    };
+
+    const renderNotification = ({ item }) => {
+        return (
+            <View style={styles.flatlistContainer}>
+                <View style={styles.imageContainer}>
+                    <Image source={getNotificationImage(item)} />
+                </View>
+                <View>
+                    <Text style={styles.title}>
+                        {item.product?.title || 'Notification'}
+                    </Text>
+                    <Text style={[
+                        styles.description, 
+                        item.type === 'BID_REJECTED' && { color: "#FE130B" }
+                    ]}>
+                        {item.message}
+                    </Text>
+                </View>
+            </View>
+        );
+    };
+
     return (
         <View style={styles.notificationContainer}>
             <View style={styles.topContainer}>
@@ -57,11 +76,23 @@ export default function SgUserNotification() {
                 <NavBar title={"Notifications"} />
             </View>
 
-<FlatList data={notificationData}
-renderItem={renderNotification}
-keyExtractor={(item) => item.id}
-showsVerticalScrollIndicator={false}/>
-
+            {loading ? (
+                <ActivityIndicator size="large" style={{ marginTop: 20 }} />
+            ) : error ? (
+                <Text style={{ textAlign: 'center', marginTop: 20 }}>{error}</Text>
+            ) : (
+                <FlatList
+                    data={notifications}
+                    renderItem={renderNotification}
+                    keyExtractor={(item) => item.id}
+                    showsVerticalScrollIndicator={false}
+                    ListEmptyComponent={
+                        <Text style={{ textAlign: 'center', marginTop: 20 }}>
+                            No notifications found
+                        </Text>
+                    }
+                />
+            )}
         </View>
     );
 }

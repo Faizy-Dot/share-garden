@@ -19,6 +19,7 @@ export default function SgUserChat() {
     try {
       const response = await axiosInstance.get('/api/chat/list');
       setChats(response.data);
+      console.log("response.data:=>", response.data);
     } catch (error) {
       console.error('Error fetching chats:', error);
       Toast.show({

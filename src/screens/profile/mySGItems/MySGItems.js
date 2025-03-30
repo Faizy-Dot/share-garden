@@ -70,7 +70,7 @@ export default function MySGItems({ navigation }) {
                 // Fetch published products
                 const publishedResponse = await axiosInstance.get(`/api/products/user/${user.id}/published`);
                 setPublishedItems(publishedResponse.data);
-
+                console.log("publishedResponse.data:=>", publishedResponse.data);
                 // Fetch draft products
                 const draftsResponse = await axiosInstance.get(`/api/products/user/${user.id}/drafts`);
                 setDraftItems(draftsResponse.data);
@@ -139,6 +139,7 @@ export default function MySGItems({ navigation }) {
                         borderRadius={Metrix.VerticalSize(4)}
                         fontSize={Metrix.FontSmall}
                         fontFamily={fonts.InterBold}
+                        onPress={() => navigation.navigate('PreviewPostedSgItems', { item: item })}
                     />
                 </View>
             )}
