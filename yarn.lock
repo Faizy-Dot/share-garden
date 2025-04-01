@@ -2028,24 +2028,24 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
-"@react-native-firebase/app@^21.11.0", "@react-native-firebase/app@21.11.0":
-  version "21.11.0"
-  resolved "https://registry.npmjs.org/@react-native-firebase/app/-/app-21.11.0.tgz"
-  integrity sha512-25qALpiaVuJB+QA6XdNw/t9Cqb/wbf9cf0XeXfBbSoOYZfaa7yZynS8a2HnBFEHfpV0KfD4tS/5g1sgZSLp0zg==
+"@react-native-firebase/app@^21.13.0", "@react-native-firebase/app@21.13.0":
+  version "21.13.0"
+  resolved "https://registry.npmjs.org/@react-native-firebase/app/-/app-21.13.0.tgz"
+  integrity sha512-UjM+yTTuBTQkGQHSTmJtKoXumgWxN+G90q6TCBqf2fQzAGhWpeMQSKOpD3arW+gmmO2eNIb1P8wyMYQk9GeGVA==
   dependencies:
     firebase "11.3.1"
 
-"@react-native-firebase/auth@^21.11.0":
-  version "21.11.0"
-  resolved "https://registry.npmjs.org/@react-native-firebase/auth/-/auth-21.11.0.tgz"
-  integrity sha512-xV+BhQu6QS+R+/x9zUJKzjJlJsPxdN9/PsmH49PF4AOi36UWpgFshIKW7dMD9MRfK9cUzJLacIzCazD4OPgxEg==
+"@react-native-firebase/auth@^21.13.0":
+  version "21.13.0"
+  resolved "https://registry.npmjs.org/@react-native-firebase/auth/-/auth-21.13.0.tgz"
+  integrity sha512-oM4PgOmh5xSB+pDQil5ATbEZ48AxBU2lC6EJCDCcSf5LqdWwOm8LA3Ew1ffJnCQJ0RafH7eSrYpFgnxR2y2sPg==
   dependencies:
     plist "^3.1.0"
 
-"@react-native-firebase/messaging@^21.11.0":
-  version "21.11.0"
-  resolved "https://registry.npmjs.org/@react-native-firebase/messaging/-/messaging-21.11.0.tgz"
-  integrity sha512-oQDDRnjuFWX2Zbc1f/nPFGdZdZRKBj+G5NKEHm2F03d9UtnPLlPIZeFemTPQKYUPM8QeRWWzD8VA55ZzNEgQCw==
+"@react-native-firebase/messaging@^21.13.0":
+  version "21.13.0"
+  resolved "https://registry.npmjs.org/@react-native-firebase/messaging/-/messaging-21.13.0.tgz"
+  integrity sha512-ZUc44XRPjVvg0os9TdcOB7GECewJXsEzsder8gJRgCrOL6wn96uAqqOOmzAja64SQeMxvnelbfOtDtwoltLCvA==
 
 "@react-native-google-signin/google-signin@^13.2.0":
   version "13.2.0"
@@ -3465,6 +3465,13 @@ binary-extensions@^1.0.0:
   version "1.13.1"
   resolved "https://registry.npmjs.org/binary-extensions/-/binary-extensions-1.13.1.tgz"
   integrity sha512-Un7MIEDdUC5gNpcGDV97op1Ywk748MpHcFTHoYs6qnj1Z3j7I53VG3nwZhKzoBZmbdRNnb6WRdFlwl7tSDuZGw==
+
+bindings@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.npmjs.org/bindings/-/bindings-1.5.0.tgz"
+  integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
+  dependencies:
+    file-uri-to-path "1.0.0"
 
 bl@^4.1.0:
   version "4.1.0"
@@ -5438,6 +5445,11 @@ file-entry-cache@^6.0.1:
   dependencies:
     flat-cache "^3.0.4"
 
+file-uri-to-path@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz"
+  integrity sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==
+
 filename-regex@^2.0.0:
   version "2.0.1"
   resolved "https://registry.npmjs.org/filename-regex/-/filename-regex-2.0.1.tgz"
@@ -5687,6 +5699,19 @@ fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"
   integrity sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==
+
+fsevents@^1.0.0:
+  version "1.2.13"
+  resolved "https://registry.npmjs.org/fsevents/-/fsevents-1.2.13.tgz"
+  integrity sha512-oWb1Z6mkHIskLzEJ/XWX0srkpkTQ7vaopMQkyaEIoq0fmtFVxOthb8cCxeT+p3ynTdkk/RZwbgG4brR5BeWECw==
+  dependencies:
+    bindings "^1.5.0"
+    nan "^2.12.1"
+
+fsevents@^2.3.2:
+  version "2.3.3"
+  resolved "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz"
+  integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
 function-bind@^1.1.2:
   version "1.1.2"
@@ -7930,6 +7955,11 @@ multiparty@3.3.2:
   dependencies:
     readable-stream "~1.1.9"
     stream-counter "~0.2.0"
+
+nan@^2.12.1:
+  version "2.22.1"
+  resolved "https://registry.npmjs.org/nan/-/nan-2.22.1.tgz"
+  integrity sha512-pfRR4ZcNTSm2ZFHaztuvbICf+hyiG6ecA06SfAxoPmuHjvMu0KUIae7Y8GyVkbBqeEIidsmXeYooWIX9+qjfRQ==
 
 nanoid@3.3.8:
   version "3.3.8"
