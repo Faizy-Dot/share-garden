@@ -9,6 +9,7 @@ const colors = {
   borderColor : "#E6E6E6",
   yellowColor : "#FFC202",
   redColor : "#F8443E",
+  greenColor : "#4CAF50",
   inputBackgroundColor : "#F3F3F3"
 };
 

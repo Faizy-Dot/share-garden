@@ -36,7 +36,8 @@ const isValidPassword = (password) => {
             isValid: false,
             minLength: false,
             hasUpperCase: false,
-            hasSymbol: false
+            hasSymbol: false,
+            hasNumber: false
         };
     }
 
@@ -44,12 +45,14 @@ const isValidPassword = (password) => {
     const hasUpperCase = /[A-Z]/.test(password);
     // Update the symbol regex to be more specific and escape special characters
     const hasSymbol = /[-!@#$%^&*()_+|~=`{}\[\]:";'<>?,./]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
 
     return {
-        isValid: minLength && hasUpperCase && hasSymbol,
+        isValid: minLength && hasUpperCase && hasSymbol && hasNumber,
         minLength,
         hasUpperCase,
-        hasSymbol
+        hasSymbol,
+        hasNumber
     };
 };
 
@@ -92,7 +95,8 @@ export default function SignUpScreen({ navigation }) {
     const [passwordValidation, setPasswordValidation] = useState({
         minLength: false,
         hasUpperCase: false,
-        hasSymbol: false
+        hasSymbol: false,
+        hasNumber: false
     });
 
     const handleInputChange = (key, value) => {
@@ -110,7 +114,8 @@ export default function SignUpScreen({ navigation }) {
             setPasswordValidation({
                 minLength: validation.minLength,
                 hasUpperCase: validation.hasUpperCase,
-                hasSymbol: validation.hasSymbol
+                hasSymbol: validation.hasSymbol,
+                hasNumber: validation.hasNumber
             });
         }
     };
@@ -119,7 +124,8 @@ export default function SignUpScreen({ navigation }) {
     const handleSubmit = async () => {
         try {
             // Add password validation check
-            if (!passwordValidation.isValid) {
+            const validPassword = isValidPassword(form.password);
+            if (!validPassword.isValid) {
                 Toast.show({
                     type: 'error',
                     text1: 'Error',
@@ -303,8 +309,54 @@ export default function SignUpScreen({ navigation }) {
                             color={isPasswordVisible ? colors.buttonColor : "#ccc"}
                         />
                     </TouchableOpacity>
-
                 </View>
+
+                {form.password.length > 0 && (
+                    <View style={styles.passwordValidationContainer}>
+                        <Text style={styles.validationTitle}>Password must contain:</Text>
+                        <View style={styles.validationItem}>
+                            <Icon 
+                                name={passwordValidation.minLength ? "check-circle" : "cancel"} 
+                                size={16} 
+                                color={passwordValidation.minLength ? colors.greenColor : colors.redColor} 
+                            />
+                            <Text style={[styles.validationText, passwordValidation.minLength ? styles.validRequirement : styles.invalidRequirement]}>
+                                At least 6 characters
+                            </Text>
+                        </View>
+                        <View style={styles.validationItem}>
+                            <Icon 
+                                name={passwordValidation.hasUpperCase ? "check-circle" : "cancel"} 
+                                size={16} 
+                                color={passwordValidation.hasUpperCase ? colors.greenColor : colors.redColor} 
+                            />
+                            <Text style={[styles.validationText, passwordValidation.hasUpperCase ? styles.validRequirement : styles.invalidRequirement]}>
+                                At least one capital letter
+                            </Text>
+                        </View>
+                        <View style={styles.validationItem}>
+                            <Icon 
+                                name={passwordValidation.hasNumber ? "check-circle" : "cancel"} 
+                                size={16} 
+                                color={passwordValidation.hasNumber ? colors.greenColor : colors.redColor} 
+                            />
+                            <Text style={[styles.validationText, passwordValidation.hasNumber ? styles.validRequirement : styles.invalidRequirement]}>
+                                At least one number
+                            </Text>
+                        </View>
+                        <View style={styles.validationItem}>
+                            <Icon 
+                                name={passwordValidation.hasSymbol ? "check-circle" : "cancel"} 
+                                size={16} 
+                                color={passwordValidation.hasSymbol ? colors.greenColor : colors.redColor} 
+                            />
+                            <Text style={[styles.validationText, passwordValidation.hasSymbol ? styles.validRequirement : styles.invalidRequirement]}>
+                                At least one special character (!@#$%^&*)
+                            </Text>
+                        </View>
+                    </View>
+                )}
+
                 <View style={styles.eyeContainer}>
                     <TextInput
                         placeholder="Confirm Password"
@@ -323,10 +375,8 @@ export default function SignUpScreen({ navigation }) {
                         />
                     </TouchableOpacity>
                 </View>
-                {form.password.length < 6 &&  (
-                    <Text style={styles.errorText}>Password must be at least 6 characters</Text>
-                )}
-                {form.password !== form.confirmpassword && form.password.length >= 6 && (
+                
+                {form.confirmpassword.length > 0 && form.password !== form.confirmpassword && (
                     <Text style={styles.errorText}>Passwords do not match!</Text>
                 )}
                 <View style={styles.row}>
@@ -350,7 +400,7 @@ export default function SignUpScreen({ navigation }) {
                         onChangeText={(text) => handleInputChange('address1', text)} />
                 </View>
                 <View>
-                    <TextInput placeholder="Country,State" style={[styles.input, { width: "100%" }]}
+                    <TextInput placeholder="Address Line 2 (optional)" style={[styles.input, { width: "100%" }]}
                         onChangeText={(text) => handleInputChange('address2', text)} />
                 </View>
             </View>
@@ -466,5 +516,36 @@ const styles = StyleSheet.create({
     eyeIcon: {
         position: "absolute",
         right: Metrix.HorizontalSize(10)
-    }
+    },
+    passwordValidationContainer: {
+        marginTop: Metrix.VerticalSize(5),
+        marginBottom: Metrix.VerticalSize(10),
+        padding: Metrix.HorizontalSize(10),
+        backgroundColor: '#f9f9f9',
+        borderRadius: Metrix.HorizontalSize(4),
+        borderWidth: 1,
+        borderColor: '#EAEAEA',
+    },
+    validationTitle: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+        marginBottom: Metrix.VerticalSize(5),
+        fontWeight: '500',
+    },
+    validationItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: Metrix.VerticalSize(2),
+    },
+    validationText: {
+        fontSize: Metrix.FontExtraSmall - 1,
+        fontFamily: fonts.InterRegular,
+        marginLeft: Metrix.HorizontalSize(5),
+    },
+    validRequirement: {
+        color: colors.greenColor,
+    },
+    invalidRequirement: {
+        color: colors.redColor,
+    },
 });

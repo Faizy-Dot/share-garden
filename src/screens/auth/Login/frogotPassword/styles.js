@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
         paddingLeft: Metrix.HorizontalSize(25),
         fontSize: Metrix.FontMedium,
         fontFamily: fonts.InterRegular,
-        borderRadius: Metrix.LightRadius
+        borderRadius: Metrix.LightRadius,
+        height: Metrix.VerticalSize(45),
     },
     emailContainer: {
         width: "100%",
@@ -71,6 +72,52 @@ const styles = StyleSheet.create({
         width : "100%",
         gap : Metrix.HorizontalSize(10),
         marginBottom : Metrix.VerticalSize(30)
+    },
+    eyeContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        position: "relative",
+    },
+    eyeIcon: {
+        position: "absolute",
+        right: Metrix.HorizontalSize(10)
+    },
+    passwordValidationContainer: {
+        marginTop: Metrix.VerticalSize(5),
+        marginBottom: Metrix.VerticalSize(10),
+        padding: Metrix.HorizontalSize(10),
+        backgroundColor: '#f9f9f9',
+        borderRadius: Metrix.HorizontalSize(4),
+        borderWidth: 1,
+        borderColor: '#EAEAEA',
+    },
+    validationTitle: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+        marginBottom: Metrix.VerticalSize(5),
+        fontWeight: '500',
+    },
+    validationItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: Metrix.VerticalSize(2),
+    },
+    validationText: {
+        fontSize: Metrix.FontExtraSmall - 1,
+        fontFamily: fonts.InterRegular,
+        marginLeft: Metrix.HorizontalSize(5),
+    },
+    validRequirement: {
+        color: colors.greenColor,
+    },
+    invalidRequirement: {
+        color: colors.redColor,
+    },
+    errorText: {
+        color: colors.redColor,
+        fontSize: Metrix.FontExtraSmall,
+        marginLeft: 4,
+        marginTop: Metrix.VerticalSize(2)
     }
 })
 
