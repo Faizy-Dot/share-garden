@@ -95,7 +95,7 @@ export const styles = StyleSheet.create({
     containerAccepted: {
         backgroundColor: '#F3F3F3',
         borderWidth: 0,
-        height: Metrix.VerticalSize(160),
+        height: Metrix.VerticalSize(167),
     },
     header: {
         flexDirection: 'row',
@@ -163,16 +163,206 @@ export const styles = StyleSheet.create({
     statusAccepted: {
         color: colors.black,
     },
-    infoContainer: {
-        flexDirection: 'row',
+    acceptedInfoContainer: {
         alignItems: 'center',
         paddingVertical: Metrix.VerticalSize(10),
         gap: Metrix.HorizontalSize(5),
         paddingLeft: Metrix.HorizontalSize(15),
+        flexDirection :"row"
     },
     awaitingText: {
         fontSize: Metrix.normalize(11),
         fontFamily: fonts.InterRegular,
     },
+    headerContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginTop: Metrix.VerticalSize(20),
+      },
+      titleText: {
+        fontSize: Metrix.FontRegular,
+        fontFamily: fonts.InterBold,
+      },
+      iconRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(5),
+      },
+      minBidText: {
+        fontSize: Metrix.FontMedium,
+        fontFamily: fonts.InterSemiBold,
+        color: colors.buttonColor,
+      },
+      topMiddleContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+      },
+      iconContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(8),
+      },
+      iconRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(5),
+      },
+      iconText: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterBold,
+      },
+      closedBox: {
+        height: Metrix.VerticalSize(48),
+        backgroundColor: colors.buttonColor,
+        borderRadius: Metrix.VerticalSize(3),
+        justifyContent: "center",
+        width: "100%",
+      },
+      openBox: {
+        backgroundColor: colors.white,
+        borderColor: colors.borderColor,
+        borderWidth: 1,
+        paddingTop: Metrix.VerticalSize(10),
+        borderRadius: Metrix.VerticalSize(3),
+        justifyContent: "center",
+        width: "100%",
+      },
+      headerRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(20),
+      },
+      arrowButton: {
+        paddingLeft: Metrix.HorizontalSize(20),
+      },
+      headerText: {
+        fontSize: Metrix.FontRegular,
+        fontFamily: fonts.InterSemiBold,
+        color: colors.white,
+      },
+      headerTextBlack: {
+        color: colors.black,
+      },
+      itemDetailsContainer: {
+        paddingVertical: Metrix.VerticalSize(20),
+        gap: Metrix.VerticalSize(10),
+      },
+      itemImage: {
+        width: "100%",
+        height: Metrix.VerticalSize(177),
+      },
+      itemDescription: {
+        paddingLeft: Metrix.HorizontalSize(15),
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+      },
+      bidDetailsContainer: {
+        paddingVertical: Metrix.VerticalSize(10),
+        gap: Metrix.VerticalSize(10),
+        marginTop: Metrix.VerticalSize(10),
+      },
+      bidSummaryBox: {
+        height: Metrix.VerticalSize(48),
+        width: "100%",
+        backgroundColor: "#DADADA",
+        flexDirection: "row",
+        justifyContent: "space-around",
+        alignItems: "center",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: colors.borderColor,
+      },
+      bidSummaryText: {
+        fontSize: Metrix.normalize(13),
+        fontFamily: fonts.InterBold,
+        color: colors.buttonColor,
+      },
+      bidValue: {
+        color: colors.black,
+      },
+      sameMiddleBox: {
+        flexDirection: "row",
+        gap: Metrix.HorizontalSize(29),
+        justifyContent : "center"
+      },
+      timeRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(15),
+      },
+      bidEndsText: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterBold,
+      },
+   
+      timeInputRow: {
+        flexDirection: "row",
+        alignItems: "center",
+      },
+      modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        paddingHorizontal : Metrix.HorizontalSize(15)
+      },
+      modalBox: {
+        backgroundColor: colors.white,
+        borderRadius: Metrix.VerticalSize(10),
+        width:"100%",
+        padding: Metrix.VerticalSize(20),
+        alignItems: "center",
+      },
+      closeButton: {
+        alignSelf: "flex-end",
+      },
+      modalContent: {
+        marginTop: Metrix.VerticalSize(20),
+        gap: Metrix.VerticalSize(30),
+        alignItems: "center",
+      },
+      modalTitle: {
+        fontSize: Metrix.FontRegular,
+        fontFamily: fonts.InterSemiBold,
+        textAlign: "center",
+      },
+      modalInputContainer: {
+        alignItems: "center",
+        gap: Metrix.VerticalSize(20),
+      },
+      inputRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(10),
+      },
+      modalLabel: {
+        fontSize: Metrix.FontRegular,
+        fontFamily: fonts.InterSemiBold,
+      },
+      modalInput: {
+        borderWidth: 1,
+        borderColor: colors.borderColor,
+        borderRadius: Metrix.VerticalSize(5),
+        paddingHorizontal: Metrix.HorizontalSize(10),
+        width: Metrix.HorizontalSize(211),
+        height: Metrix.VerticalSize(40),
+        fontSize: Metrix.FontRegular,
+        fontFamily: fonts.InterRegular,
+        color: colors.black,
+      },
+      infoContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(10),
+        paddingHorizontal: Metrix.HorizontalSize(40),
+      },
+      infoText: {
+        fontSize: Metrix.normalize(11),
+        fontFamily: fonts.InterRegular,
+        color: "#646464",
+      },
+     
 
 })

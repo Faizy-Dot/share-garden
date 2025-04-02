@@ -50,6 +50,9 @@ export default function PreviewPostedSgItems({ navigation, route }) {
   const [sgId, setSgId] = useState('')
   const [bidTradeMap, setBidTradeMap] = useState({}) // Map to track which bids have trades
 
+
+  console.log("tradeid==>>",tradeId)
+
   const calculateTimeRemaining = (bidEndTime) => {
     const now = new Date();
     const endTime = new Date(bidEndTime);
@@ -100,7 +103,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
       // Store both product info and bids
       setProductInfo(response.data);
       setProductDetail(response.data.bids);
-      
+
       // Create a map of bidId to trade for quick lookup
       if (response.data.trades && response.data.trades.length > 0) {
         const tradeMap = {};
@@ -108,8 +111,9 @@ export default function PreviewPostedSgItems({ navigation, route }) {
           tradeMap[trade.bidId] = trade;
         });
         setBidTradeMap(tradeMap);
+        setTradeId(true)
       }
-      
+
       console.log("Product Detail Bid response", response.data.bids);
       console.log("Trades response:", response.data.trades);
       console.log("Bid End Time:", response.data.bidEndTime);
@@ -146,6 +150,8 @@ export default function PreviewPostedSgItems({ navigation, route }) {
     }
   }
 
+
+
   const handleAcceptPress = async (idx) => {
 
     setAcceptState((prevState) => ({
@@ -169,9 +175,9 @@ export default function PreviewPostedSgItems({ navigation, route }) {
     const matchingTrade = bidTradeMap[item.id];
     const hasTrade = !!matchingTrade;
     const tradeIsPending = hasTrade && matchingTrade.status === 'PENDING';
-    
+
     return (
-      <View key={index} style={[styles.container, acceptState[index] && styles.containerAccepted]}>
+      <View key={index} style={[styles.container, item.status === "ACCEPTED" || acceptState[index] ? styles.containerAccepted : null]}>
         <View style={styles.header}>
           <View style={styles.userInfo}>
             {item.bidder.profileImage ?
@@ -220,7 +226,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
         </View>
 
         <View style={[styles.actionContainer, acceptState[index] && styles.actionContainerAccepted]}>
-          {item.status === 'REJECTED' ? (
+          {item.status === 'REJECTED' || declineState[index] ? (
             <CustomButton
               height={Metrix.VerticalSize(36)}
               flex={1}
@@ -231,7 +237,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
             />
           ) : (
             <>
-              {item.status === 'ACCEPTED' ? (
+              {item.status === 'ACCEPTED' || acceptState[index] ? (
                 <View style={styles.statusContainer}>
                   <Text style={styles.bidStatus}>
                     Bid Status: <Text style={styles.statusAccepted}>Accepted</Text>
@@ -283,8 +289,8 @@ export default function PreviewPostedSgItems({ navigation, route }) {
           )}
         </View>
 
-        {item.status === 'ACCEPTED' && (
-          <View style={styles.infoContainer}>
+        {item.status === 'ACCEPTED' || acceptState[index] ? (
+          <View style={styles.acceptedInfoContainer}>
             <ModalInfoIcon width={24} height={24} outerStroke={colors.redColor} />
             {hasTrade ? (
               matchingTrade.status === 'COMPLETED' ? (
@@ -295,18 +301,18 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                 <Text style={styles.awaitingText}>Awaiting for the buyer to Confirm Buy and close the trade.</Text>
               ) : (
                 // Show trade ID when pending
-                <Text style={styles.awaitingText}>Trade ID: <Text style={{fontFamily: fonts.InterBold}}>{matchingTrade.tradeId}</Text></Text>
+                <Text style={styles.awaitingText}>Trade ID: <Text style={{ fontFamily: fonts.InterBold }}>{matchingTrade.tradeId}</Text></Text>
               )
             ) : (
               // No trade available yet
               <Text style={styles.awaitingText}>Awaiting for the buyer to share trade id with you.</Text>
             )}
           </View>
-        )}
+        ):null}
       </View>
     );
   };
-
+  // i want in this code remove in line css and give name styles.somthing   and also give me style sheet css of these css names and nothing change in my code
   // console.log("item==>>>", item)
 
   return (
@@ -320,28 +326,28 @@ export default function PreviewPostedSgItems({ navigation, route }) {
       <KeyboardAwareScrollView showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
 
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: Metrix.VerticalSize(20) }}>
-          <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>{productInfo?.title || item.title}</Text>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5) }}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.titleText}>{productInfo?.title || item.title}</Text>
+          <View style={styles.iconRow}>
             <BlackBitIcon width={16} height={16} />
-            <Text style={{ fontSize: Metrix.FontMedium, fontFamily: fonts.InterSemiBold, color: colors.buttonColor }}>{productInfo?.minBid || item.minBid}</Text>
+            <Text style={styles.minBidText}>{productInfo?.minBid || item.minBid}</Text>
           </View>
         </View>
 
         <View style={styles.middleToBottomContainer}>
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(8) }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5) }}>
+          <View style={styles.topMiddleContainer}>
+            <View style={styles.iconContainer}>
+              <View style={styles.iconRow}>
                 <ViewsIcon width={16} height={10} />
-                <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{productInfo?.views || item.views || 0}</Text>
+                <Text style={styles.iconText}>{productInfo?.views || item.views || 0}</Text>
               </View>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5) }}>
+              <View style={styles.iconRow}>
                 <LikesIcon width={14} height={12} />
-                <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{productInfo?.likes || item.likes || 0}</Text>
+                <Text style={styles.iconText}>{productInfo?.likes || item.likes || 0}</Text>
               </View>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5) }}>
+              <View style={styles.iconRow}>
                 <ShareIcon width={14} height={17} />
-                <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{productInfo?.shares || item.shares || 0}</Text>
+                <Text style={styles.iconText}>{productInfo?.shares || item.shares || 0}</Text>
               </View>
             </View>
 
@@ -361,17 +367,15 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                 } else {
                   try {
                     const response = await axiosInstance.post(`/api/products/${item.id}/mark-sold`);
-                    // Handle success
                     fetchProductDetail(); // Refresh product details
                   } catch (error) {
                     console.error('Error marking product as sold:', error);
-                    // Handle error
                   }
                 }
               }}
             />
-
           </View>
+
 
           {
             Object.values(acceptState).some(value => value) && (
@@ -387,79 +391,58 @@ export default function PreviewPostedSgItems({ navigation, route }) {
             )
           }
 
-          <View style={[!viewItemsDetails ? { height: Metrix.VerticalSize(48), backgroundColor: colors.buttonColor } : {
-            backgroundColor: colors.white, borderColor: colors.borderColor, borderWidth: 1, paddingTop: Metrix.VerticalSize(10)
-          }, {
-            borderRadius: Metrix.VerticalSize(3), justifyContent: "center",
-            width: "100%",
-          }]}>
-            <View style={[{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(20) }]}>
-
-              <TouchableOpacity style={{ paddingLeft: Metrix.HorizontalSize(20), }} activeOpacity={0.8} onPress={() => setViewItemsDetails(!viewItemsDetails)}>
-                {
-                  viewItemsDetails ? <DownArrowIcon stroke={colors.buttonColor} /> : <RightArrowIcon stroke={colors.white} />
-                }
-
+          <View style={[!viewItemsDetails ? styles.closedBox : styles.openBox]}>
+            <View style={styles.headerRow}>
+              <TouchableOpacity style={styles.arrowButton} activeOpacity={0.8} onPress={() => setViewItemsDetails(!viewItemsDetails)}>
+                {viewItemsDetails ? <DownArrowIcon stroke={colors.buttonColor} /> : <RightArrowIcon stroke={colors.white} />}
               </TouchableOpacity>
-              <Text style={[{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold, color: colors.white }, viewItemsDetails && { color: colors.black }]}>View item details</Text>
+              <Text style={[styles.headerText, viewItemsDetails && styles.headerTextBlack]}>View item details</Text>
             </View>
 
-            {
-              viewItemsDetails && <View style={{ paddingVertical: Metrix.VerticalSize(20), gap: Metrix.VerticalSize(10) }}>
+            {viewItemsDetails && (
+              <View style={styles.itemDetailsContainer}>
                 <Image
                   source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
-                  style={{ width: "100%", height: Metrix.VerticalSize(177) }}
+                  style={styles.itemImage}
                 />
-                <Text style={{ paddingLeft: Metrix.HorizontalSize(15), fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular }}>{item.description}</Text>
+                <Text style={styles.itemDescription}>{item.description}</Text>
               </View>
-            }
-
+            )}
           </View>
 
-          <View style={[!viewBidsDetails ? { height: Metrix.VerticalSize(48), backgroundColor: colors.buttonColor } : {
-            backgroundColor: colors.white, borderColor: colors.borderColor, borderWidth: 1, paddingTop: Metrix.VerticalSize(10)
-          }, {
-            borderRadius: Metrix.VerticalSize(3), justifyContent: "center",
-            width: "100%",
-          }]}>
-            <View style={[{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(20) }]}>
-
-              <TouchableOpacity style={{ paddingLeft: Metrix.HorizontalSize(20), }} activeOpacity={0.8} onPress={() => setViewBidsDetails(!viewBidsDetails)}>
-                {
-                  viewBidsDetails ? <DownArrowIcon stroke={colors.buttonColor} /> : <RightArrowIcon stroke={colors.white} />
-                }
-
+          <View style={[!viewBidsDetails ? styles.closedBox : styles.openBox]}>
+            <View style={styles.headerRow}>
+              <TouchableOpacity style={styles.arrowButton} activeOpacity={0.8} onPress={() => setViewBidsDetails(!viewBidsDetails)}>
+                {viewBidsDetails ? <DownArrowIcon stroke={colors.buttonColor} /> : <RightArrowIcon stroke={colors.white} />}
               </TouchableOpacity>
-              <Text style={[{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold, color: colors.white }, viewBidsDetails && { color: colors.black }]}>Bidding Details</Text>
+              <Text style={[styles.headerText, viewBidsDetails && styles.headerTextBlack]}>Bidding Details</Text>
             </View>
 
-            {
-              viewBidsDetails && <View style={{ paddingVertical: Metrix.VerticalSize(10), gap: Metrix.VerticalSize(10), marginTop: Metrix.VerticalSize(10) }}>
-                <View style={{ height: Metrix.VerticalSize(48), width: "100%", backgroundColor: "#DADADA", flexDirection: "row", justifyContent: "space-around", alignItems: "center", borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.borderColor }}>
-                  <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>Total Bid: <Text style={{ color: colors.black }}>{productDetail.length}</Text></Text>
-                  <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>Highest Bid: <Text style={{ color: colors.black }}>{Math.max(...productDetail.map(bid => bid.amount))}</Text></Text>
-                  <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>Status: <Text style={{ color: colors.black }}>{productInfo?.status || 'Active'}</Text></Text>
+            {viewBidsDetails && (
+              <View style={styles.bidDetailsContainer}>
+                <View style={styles.bidSummaryBox}>
+                  <Text style={styles.bidSummaryText}>Total Bid: <Text style={styles.bidValue}>{productDetail.length}</Text></Text>
+                  <Text style={styles.bidSummaryText}>Highest Bid: <Text style={styles.bidValue}>{Math.max(...productDetail.map(bid => bid.amount))}</Text></Text>
+                  <Text style={styles.bidSummaryText}>Status: <Text style={styles.bidValue}>{productInfo?.status || 'Active'}</Text></Text>
                 </View>
 
-                <View style={[styles.sameMiddleBox, { flexDirection: "row", gap: Metrix.HorizontalSize(29) }]}>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(15) }}>
+                <View style={styles.sameMiddleBox}>
+                  <View style={styles.timeRow}>
                     <TimeIcon width={12} height={12} stroke="#5A5A5A" />
                     <Text style={styles.bidEndsText}>Bid Ends</Text>
                   </View>
 
                   <View style={styles.timerRow}>
                     {[
-                      { label: "Days", value: days, setter: setDays, field: 'days' },
-                      { label: "Hours", value: hours, setter: setHours, field: 'hours' },
-                      { label: "Minutes", value: minutes, setter: setMinutes, field: 'minutes' },
-                      { label: "Seconds", value: seconds, setter: setSeconds, field: 'seconds' },
+                      { label: "Days", value: days, setter: setDays },
+                      { label: "Hours", value: hours, setter: setHours },
+                      { label: "Minutes", value: minutes, setter: setMinutes },
+                      { label: "Seconds", value: seconds, setter: setSeconds },
                     ].map((item, index) => (
                       <View key={index} style={styles.inputContainer}>
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <View style={styles.timeInputRow}>
                           <TextInput
-                            style={[
-                              styles.input,
-                            ]}
+                            style={styles.input}
                             value={item.value}
                             keyboardType="numeric"
                             placeholder="00"
@@ -467,7 +450,6 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                             editable={false}
                             selectTextOnFocus={false}
                             maxLength={2}
-                            color={colors.black}
                           />
                           {index < 3 && <Text style={styles.separator}>:</Text>}
                         </View>
@@ -475,13 +457,11 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                       </View>
                     ))}
                   </View>
-
                 </View>
-
               </View>
-            }
-
+            )}
           </View>
+
 
 
           {/* <FlatList
@@ -507,71 +487,68 @@ export default function PreviewPostedSgItems({ navigation, route }) {
 
 
         </View>
+
       </KeyboardAwareScrollView>
 
       <Modal visible={modalVisible} transparent animationType="fade">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalBox}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => {
-                setModalVisible(false);
-                setSgId('');
-              }}
-            >
-              <CrossIcon />
-            </TouchableOpacity>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalBox}>
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => {
+          setModalVisible(false);
+          setSgId('');
+        }}
+      >
+        <CrossIcon />
+      </TouchableOpacity>
 
-            <View style={{ marginTop: Metrix.VerticalSize(20), gap: Metrix.VerticalSize(30), alignItems: "center" }}>
-              <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold }}>Kindly enter SG ID, to mark as sold.</Text>
-              <View style={{ alignItems: "center", gap: Metrix.VerticalSize(20) }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
-                  <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold }}>SG ID:</Text>
-                  <TextInput
-                    style={styles.modalInput}
-                    value={sgId}
-                    onChangeText={setSgId}
-                    placeholder="Enter SG ID"
-                  />
-                </View>
-                <CustomButton
-                  title={"SUBMIT"}
-                  width={Metrix.HorizontalSize(144)}
-                  height={Metrix.VerticalSize(36)}
-                  borderRadius={Metrix.VerticalSize(35)}
-                  fontSize={Metrix.FontSmall}
-                  onPress={async () => {
-                    if (sgId.trim()) {
-                      try {
-                        // Call the trades verify endpoint instead
-                        const response = await axiosInstance.post('/api/trades/verify', {
-                          tradeId: sgId.trim()
-                        });
-                        console.log('Trade verification response:', response.data);
-                        
-                        // Handle success
-                        setModalVisible(false);
-                        setSgId('');
-                        
-                        // Refresh product details
-                        fetchProductDetail();
-                      } catch (error) {
-                        console.error('Error verifying trade:', error);
-                        // Handle error
-                      }
-                    }
-                  }}
-                  disabled={!sgId.trim()}
-                />
-              </View>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10), paddingHorizontal: Metrix.HorizontalSize(40) }}>
-                <ModalInfoIcon outerStroke={colors.redColor} width={24} height={24} />
-                <Text style={{ fontSize: Metrix.normalize(11), fontFamily: fonts.InterRegular, color: "#646464" }}>Go back to your trade screen and copy trade Id to submit here</Text>
-              </View>
-            </View>
+      <View style={styles.modalContent}>
+        <Text style={styles.modalTitle}>Kindly enter SG ID, to mark as sold.</Text>
+        <View style={styles.modalInputContainer}>
+          <View style={styles.inputRow}>
+            <Text style={styles.modalLabel}>SG ID:</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={sgId}
+              onChangeText={setSgId}
+              placeholder="Enter SG ID"
+            />
           </View>
+          <CustomButton
+            title={"SUBMIT"}
+            width={Metrix.HorizontalSize(144)}
+            height={Metrix.VerticalSize(36)}
+            borderRadius={Metrix.VerticalSize(35)}
+            fontSize={Metrix.FontSmall}
+            onPress={async () => {
+              if (sgId.trim()) {
+                try {
+                  const response = await axiosInstance.post('/api/trades/verify', {
+                    tradeId: sgId.trim()
+                  });
+                  console.log('Trade verification response:', response.data);
+
+                  setModalVisible(false);
+                  setSgId('');
+                  fetchProductDetail();
+                } catch (error) {
+                  console.error('Error verifying trade:', error);
+                }
+              }
+            }}
+            disabled={!sgId.trim()}
+          />
         </View>
-      </Modal>
+        <View style={styles.infoContainer}>
+          <ModalInfoIcon outerStroke={colors.redColor} width={24} height={24} />
+          <Text style={styles.infoText}>Go back to your trade screen and copy trade Id to submit here</Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</Modal>
+
 
     </View>
   );

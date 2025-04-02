@@ -145,7 +145,7 @@ const Login = ({ navigation }) => {
             alignItems: 'center',
             justifyContent: 'center',
             paddingBottom: Metrix.VerticalSize(25)
-        }}>
+        }} keyboardShouldPersistTaps="handled">
             <View style={styles.logo}>
                 <Logo />
             </View>

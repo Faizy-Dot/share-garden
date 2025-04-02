@@ -282,7 +282,7 @@ export default function PostTabScreen({ navigation, route }) {
     };
 
     return (
-        <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false}>
+        <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false}  keyboardShouldPersistTaps="handled">
             <View>
                 <BackArrowIcon />
             </View>
