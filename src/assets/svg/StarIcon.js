@@ -7,6 +7,7 @@ const StarIcon = ({fillColor = "none",strokeColor = "#000",...props}) => (
     height={27}
     fill={fillColor}
     {...props}
+    viewBox="0 0 29 27"
   >
     <Path
       stroke={strokeColor}

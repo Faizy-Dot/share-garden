@@ -242,15 +242,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 5,
     },
-    clearIconContainer: {
-        width: 16,
-        height: 16,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#999',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+   
     clearIconText: {
         color: '#999',
         fontSize: 10,

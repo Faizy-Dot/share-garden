@@ -84,7 +84,7 @@ const ItemsTabScreen = () => {
             </View>
 
             {user ? (
-                <View style={{ paddingHorizontal: Metrix.HorizontalSize(15) }}>
+                <View style={{ paddingHorizontal: Metrix.HorizontalSize(5) }}>
                     <NavBar title={"SG Marketplace"} />
                 </View>
             ) : (
@@ -124,9 +124,7 @@ const ItemsTabScreen = () => {
                         }}
                         style={styles.clearButton}
                     >
-                        <View style={styles.clearIconContainer}>
-                            <Text style={styles.clearIconText}>X</Text>
-                        </View>
+                            <CrossIcon width={16} height={16} strokeColor="#999"/>
                     </TouchableOpacity>
                     <View style={styles.filterIconContainer}>
                         <FilterIcon />

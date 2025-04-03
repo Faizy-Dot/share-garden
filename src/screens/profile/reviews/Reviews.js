@@ -6,6 +6,7 @@ import { ProgressBar } from 'react-native-paper';
 import { Colors, Images, Metrix } from '../../../config';
 import colors from '../../../config/Colors';
 import CustomButton from '../../../components/Button/Button';
+import { StarIcon } from '../../../assets/svg';
 
 const reviewsData = [
   { label: 'Excellent', percentage: 0.8 },
@@ -44,9 +45,9 @@ export default function Reviews() {
               <Text style={styles.nameTimeText}>{item.name}</Text>
               <View style={styles.renderStarContainer}>
                 {[1, 2, 3, 4].map((_, index) => (
-                  <Image source={Images.starGreen} style={styles.renderStarIcon} key={index} />
+                  <StarIcon width={13} height={13} key={index} fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
                 ))}
-                <Image source={Images.starWhite} style={styles.renderStarIcon} />
+                <StarIcon width={13} height={13} />
               </View>
             </View>
           </View>
@@ -69,9 +70,9 @@ export default function Reviews() {
         <Text style={styles.averageRating}>4.0</Text>
         <View style={styles.starsContainer}>
           {[1, 2, 3, 4].map((_, index) => (
-            <Image source={Images.starGreen} style={styles.starIcon} key={index} />
+            <StarIcon key={index} fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
           ))}
-          <Image source={Images.starWhite} style={styles.starIcon} />
+          <StarIcon />
         </View>
       </View>
 
@@ -92,12 +93,12 @@ export default function Reviews() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ marginTop: Metrix.VerticalSize(15), gap: Metrix.VerticalSize(10), borderBottomWidth: 1, borderColor: colors.borderColor, }} />
 
-        <View style={{paddingHorizontal : Metrix.HorizontalSize(40),marginBottom:Metrix.VerticalSize(5)}}>
-          <CustomButton title={"Write reviews"}
+      <View style={{ paddingHorizontal: Metrix.HorizontalSize(40), marginBottom: Metrix.VerticalSize(5) }}>
+        <CustomButton title={"Write reviews"}
           height={Metrix.VerticalSize(48)}
           width={"100%"}
-          borderRadius={Metrix.VerticalSize(37)}/>
-        </View>
+          borderRadius={Metrix.VerticalSize(37)} />
+      </View>
 
     </View>
   );

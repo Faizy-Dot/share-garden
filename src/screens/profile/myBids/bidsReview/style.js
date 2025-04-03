@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     transferText: { fontSize: Metrix.FontMedium, fontFamily: fonts.InterBold, textAlign: 'center' },
     modalSmallCenterText: { fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold, textAlign: 'center' },
     thanksText: { fontSize: Metrix.FontMedium, fontFamily: fonts.InterBold },
+    thanksTextInner: { color : colors.buttonColor},
 })
 
 export default styles; 

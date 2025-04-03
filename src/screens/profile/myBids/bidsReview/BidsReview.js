@@ -519,7 +519,7 @@ export default function BidsReview() {
             </Modal>
 
             {/* Modal 2 */}
-            <Modal visible={transferSgPointsModal} transparent animationType="fade">
+            <Modal visible={true} transparent animationType="fade">
                 <View style={styles.modalContainer}>
                     <View style={[styles.modalBox, styles.modalGap]}>
                         <TouchableOpacity
@@ -538,7 +538,7 @@ export default function BidsReview() {
                                 Transferred to Seller.
                             </Text>
                             <Text style={styles.thanksText}>
-                                Thanks you for using <Text>ShareGarden.</Text>
+                                Thanks you for using <Text style={styles.thanksTextInner}>ShareGarden.</Text>
                             </Text>
                         </View>
 
@@ -552,6 +552,7 @@ export default function BidsReview() {
                             width={Metrix.HorizontalSize(261)}
                             borderRadius={Metrix.VerticalSize(35)}
                             fontSize={Metrix.FontSmall}
+                            onPress={()=> navigation.navigate("SubmitReview")}
                         />
                     </View>
                 </View>

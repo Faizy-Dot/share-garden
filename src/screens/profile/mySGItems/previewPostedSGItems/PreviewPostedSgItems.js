@@ -90,11 +90,11 @@ export default function PreviewPostedSgItems({ navigation, route }) {
     }
   }, [productInfo?.bidEndTime]);
 
-  useEffect(() => {
-    updateTimer();
-    const timer = setInterval(updateTimer, 1000);
-    return () => clearInterval(timer);
-  }, [updateTimer]);
+  // useEffect(() => {
+  //   updateTimer();
+  //   const timer = setInterval(updateTimer, 1000);
+  //   return () => clearInterval(timer);
+  // }, [updateTimer]);
 
   const fetchProductDetail = async () => {
     setLoading(true)
@@ -111,10 +111,16 @@ export default function PreviewPostedSgItems({ navigation, route }) {
           tradeMap[trade.bidId] = trade;
         });
         setBidTradeMap(tradeMap);
+
+
+      }
+      if(response.data.trades[0].status === "ACCEPT"){
         setTradeId(true)
+      }else{
+        setTradeId(false)
       }
 
-      console.log("Product Detail Bid response", response.data.bids);
+      console.log("Product Detail Bid response", response.data);
       console.log("Trades response:", response.data.trades);
       console.log("Bid End Time:", response.data.bidEndTime);
     } catch (error) {
