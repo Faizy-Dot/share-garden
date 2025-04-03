@@ -6,6 +6,7 @@ import styles from './style';
 import { Images, Metrix } from '../../../config';
 import fonts from '../../../config/Fonts';
 import colors from '../../../config/Colors';
+import { EditIcon, GreenBitIcon, PointsEarnIcon, SgTipsIcon } from '../../../assets/svg';
 
 
 const publishedSGTipsData = [
@@ -38,12 +39,12 @@ const draftsSGTipsData = [
   {
     id: 1,
     title: "How to style your wardrobe",
-    edit : true
+    edit: true
   },
   {
     id: 2,
     title: "How to style your wardrobe",
-    edit : true
+    edit: true
   }
 ]
 
@@ -51,19 +52,19 @@ const renderData = (item) => {
   return (
     <View key={item.id} style={styles.renderDataContainer}>
       <View style={styles.renderLeftContainer}>
-        <Image source={Images.tipsBlackTab} style={styles.renderTipsIcon} />
+        <SgTipsIcon />
         <Text style={styles.renderTitle}>{item.title}</Text>
       </View>
       {
         item.bids &&
         <View style={styles.bidsContainer}>
-          <Image source={Images.homeGreenBit} style={styles.bitIcon} />
+          <GreenBitIcon />
           <Text>{item.bids}</Text>
         </View>
       }
       {
         item.edit &&
-        <Image source={Images.editIcon} style={styles.editIcon}/>
+        <EditIcon />
       }
     </View>
   )
@@ -74,17 +75,17 @@ export default function MySGTips() {
     <View style={styles.myTipsContainer}>
       <View style={styles.topContainer}>
         <BackArrowIcon />
-        <NavBar title={"My Bids"} />
+        <NavBar title={"My SG Tips"} />
       </View>
 
       <View style={styles.middleContainer}>
         <Text style={styles.middleHeading}>Earned Points via SG Tips</Text>
         <View style={styles.middleSame}>
-          <Image source={Images.homeGreenBit} />
+          <GreenBitIcon />
           <Text style={styles.middleBids}>10,300</Text>
         </View>
         <View style={styles.middleSame}>
-          <Image source={Images.earnArrowIcon} />
+          <PointsEarnIcon />
           <Text style={styles.middleEarn}>Points earned <Text style={{ fontFamily: fonts.InterBold }}>+300</Text> from last <Text style={{ fontFamily: fonts.InterBold, color: colors.buttonColor }}>SG Tips</Text></Text>
         </View>
         <View style={styles.middleTotalTips}>

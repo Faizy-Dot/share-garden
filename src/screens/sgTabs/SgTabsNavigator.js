@@ -20,6 +20,7 @@ import Preview from "./post/preview/Preview";
 import ProductDetail from "./items/productDetails/ProductDetail";
 import BidsReview from "../profile/myBids/bidsReview/BidsReview";
 import PreviewPostedSgItems from "../profile/mySGItems/previewPostedSGItems/PreviewPostedSgItems";
+import SubmitReview from "../profile/submitReview/SubmitReview";
 
 
 
@@ -44,6 +45,7 @@ function PostStackScreen() {
         <ItemsStack.Screen name="Preview" component={Preview} />
         <ItemsStack.Screen name="BidsReview" component={BidsReview} />
         <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
+        <ItemsStack.Screen name="SubmitReview" component={SubmitReview} />
       </ItemsStack.Navigator>
     );
   }
@@ -65,6 +67,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
          <ItemsStack.Screen name="BidsReview" component={BidsReview} />
          <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
+         <ItemsStack.Screen name="SubmitReview" component={SubmitReview} />
       </ItemsStack.Navigator>
     );
   }
@@ -87,6 +90,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
          <ItemsStack.Screen name="BidsReview" component={BidsReview} />
          <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
+         <ItemsStack.Screen name="SubmitReview" component={SubmitReview} />
       </ItemsStack.Navigator>
     );
   }
@@ -108,6 +112,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
          <ItemsStack.Screen name="BidsReview" component={BidsReview} />
          <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
+         <ItemsStack.Screen name="SubmitReview" component={SubmitReview} />
       </ItemsStack.Navigator>
     );
   }
@@ -129,6 +134,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="HelpAndSupport" component={HelpAndSupport} />
          <ItemsStack.Screen name="BidsReview" component={BidsReview} />
          <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
+         <ItemsStack.Screen name="SubmitReview" component={SubmitReview} />
       </ItemsStack.Navigator>
     );
   }

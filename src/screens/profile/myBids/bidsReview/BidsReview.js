@@ -552,7 +552,7 @@ export default function BidsReview() {
                             width={Metrix.HorizontalSize(261)}
                             borderRadius={Metrix.VerticalSize(35)}
                             fontSize={Metrix.FontSmall}
-                            onPress={()=> navigation.navigate("SubmitReview")}
+                            onPress={()=>{ navigation.navigate("SubmitReview")}}
                         />
                     </View>
                 </View>
