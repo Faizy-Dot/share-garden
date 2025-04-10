@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "743643897751",
-    "project_id": "share-garden-2025",
-    "storage_bucket": "share-garden-2025.firebasestorage.app"
+    "project_number": "661471973050",
+    "project_id": "share-garden-1793e",
+    "storage_bucket": "share-garden-1793e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:743643897751:android:34809d5ba2c96358c7eed2",
+        "mobilesdk_app_id": "1:661471973050:android:4617664ba6d43048fdfc83",
         "android_client_info": {
           "package_name": "com.awesomeproject"
         }
       },
       "oauth_client": [
         {
-          "client_id": "743643897751-0k37julmvnaaeet0vvggmb4um05ik9n5.apps.googleusercontent.com",
+          "client_id": "661471973050-6usi4c7u1tggt9eehtfghft42r92icrg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.awesomeproject",
-            "certificate_hash": "9760555e5d6cc569ecc43658154f4b058a62291c"
+            "certificate_hash": "1914f518b80b8b6f79b6d59a04daa0c5104f734d"
           }
         },
         {
-          "client_id": "743643897751-ua9nc05ikmvksl0hkid4t5asdvk6d7gj.apps.googleusercontent.com",
+          "client_id": "661471973050-thrsc9ir9u7t2t67j0ulfrhs84ln52f4.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDz5DKbjXfheSJznBKjF8PHvbmAem5oyFs"
+          "current_key": "AIzaSyAACF12d_JqjsxSlYv3UmBFs-ZIXLRc0po"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "743643897751-ua9nc05ikmvksl0hkid4t5asdvk6d7gj.apps.googleusercontent.com",
+              "client_id": "661471973050-thrsc9ir9u7t2t67j0ulfrhs84ln52f4.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -18,13 +18,14 @@ import { getMessaging, getToken } from '@react-native-firebase/messaging';
 import Logo from '../../../assets/svg/Logo';
 import Icon from "react-native-vector-icons/MaterialIcons";
 import colors from '../../../config/Colors';
+import { WEB_CLIENT_ID } from './GoogleAuthKey';
 
 
 const Login = ({ navigation }) => {
 
     useEffect(() => {
         GoogleSignin.configure({
-            webClientId: '743643897751-ua9nc05ikmvksl0hkid4t5asdvk6d7gj.apps.googleusercontent.com',
+            webClientId: WEB_CLIENT_ID,
             offlineAccess: true, // Needed for ID token
             forceCodeForRefreshToken: true,
         });

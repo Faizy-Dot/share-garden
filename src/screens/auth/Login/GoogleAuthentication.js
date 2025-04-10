@@ -2,16 +2,17 @@ import auth from '@react-native-firebase/auth';
 import {
   GoogleSignin,
 } from '@react-native-google-signin/google-signin';
+import { useEffect } from 'react';
 
- // const checkToken = async () => {
-  //   try {
-  //     const userInfo = await GoogleSignin.signInSilently();
-  //     console.log("User Info:", userInfo);
-  //   } catch (error) {
-  //     console.error("Silent Sign-In Error:", error.message);
-  //   }
-  // };
-  // useEffect(() => { checkToken(); }, []);
+//  const checkToken = async () => {
+//     try {
+//       const userInfo = await GoogleSignin.signInSilently();
+//       console.log("User Info:", userInfo);
+//     } catch (error) {
+//       console.error("Silent Sign-In Error:", error.message);
+//     }
+//   };
+//   useEffect(() => { checkToken() }, []);
   
   
 
