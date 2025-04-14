@@ -23,6 +23,8 @@ import Toast from 'react-native-toast-message';
 import { signUp } from "../../../redux/Actions/authActions/signupAction";
 import fonts from "../../../config/Fonts";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { Dropdown } from "react-native-element-dropdown";
+import DropdownComponent from "../../../components/dropDown/DropDownInput";
 
 const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,7 +67,6 @@ export default function SignUpScreen({ navigation }) {
         confirmpassword: '',
         postalcode: '',
         address1: '',
-        address2: "",
         phonenumber1: '',
         phonenumber2: '',
     });
@@ -75,6 +76,27 @@ export default function SignUpScreen({ navigation }) {
     const [isMerchant, setIsMerchant] = useState(false);
     const [isPasswordVisible, setPasswordVisible] = useState(false);
     const [isConfirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+
+    const [selectedCountry, setSelectedCountry] = useState("")
+const [selectedProvince , setSelectedProvince] = useState("")
+
+    const countries = [{
+        label: "Canada"
+    }]
+
+    const provinces = [
+        { label: "Alberta" },
+        { label: "British Columbia" },
+        { label: "Manitoba" },
+        { label: "New Brunswick" },
+        { label: "Newfoundland and Labrador" },
+        { label: "Nova Scotia" },
+        { label: "Ontario" },
+        { label: "Prince Edward Island" },
+        { label: "Quebec" },
+        { label: "Saskatchewan" }
+      ];
+      
 
     const dispatch = useDispatch();
     const { loading, error, user } = useSelector((state) => state.auth);
@@ -164,7 +186,7 @@ export default function SignUpScreen({ navigation }) {
                 email: form.emailaddress,
                 password: form.password,
                 address1: form.address1,
-                address2: form.address2,
+                address2: selectedProvince,
                 postalcode: form.postalcode,
                 phoneNumber: form.phonenumber1 + form.phonenumber2,
                 deviceToken: deviceid,
@@ -202,7 +224,6 @@ export default function SignUpScreen({ navigation }) {
                 confirmpassword: '',
                 postalcode: '',
                 address1: '',
-                address2: '',
                 phonenumber1: '',
                 phonenumber2: '',
             });
@@ -315,40 +336,40 @@ export default function SignUpScreen({ navigation }) {
                     <View style={styles.passwordValidationContainer}>
                         <Text style={styles.validationTitle}>Password must contain:</Text>
                         <View style={styles.validationItem}>
-                            <Icon 
-                                name={passwordValidation.minLength ? "check-circle" : "cancel"} 
-                                size={16} 
-                                color={passwordValidation.minLength ? colors.greenColor : colors.redColor} 
+                            <Icon
+                                name={passwordValidation.minLength ? "check-circle" : "cancel"}
+                                size={16}
+                                color={passwordValidation.minLength ? colors.greenColor : colors.redColor}
                             />
                             <Text style={[styles.validationText, passwordValidation.minLength ? styles.validRequirement : styles.invalidRequirement]}>
                                 At least 6 characters
                             </Text>
                         </View>
                         <View style={styles.validationItem}>
-                            <Icon 
-                                name={passwordValidation.hasUpperCase ? "check-circle" : "cancel"} 
-                                size={16} 
-                                color={passwordValidation.hasUpperCase ? colors.greenColor : colors.redColor} 
+                            <Icon
+                                name={passwordValidation.hasUpperCase ? "check-circle" : "cancel"}
+                                size={16}
+                                color={passwordValidation.hasUpperCase ? colors.greenColor : colors.redColor}
                             />
                             <Text style={[styles.validationText, passwordValidation.hasUpperCase ? styles.validRequirement : styles.invalidRequirement]}>
                                 At least one capital letter
                             </Text>
                         </View>
                         <View style={styles.validationItem}>
-                            <Icon 
-                                name={passwordValidation.hasNumber ? "check-circle" : "cancel"} 
-                                size={16} 
-                                color={passwordValidation.hasNumber ? colors.greenColor : colors.redColor} 
+                            <Icon
+                                name={passwordValidation.hasNumber ? "check-circle" : "cancel"}
+                                size={16}
+                                color={passwordValidation.hasNumber ? colors.greenColor : colors.redColor}
                             />
                             <Text style={[styles.validationText, passwordValidation.hasNumber ? styles.validRequirement : styles.invalidRequirement]}>
                                 At least one number
                             </Text>
                         </View>
                         <View style={styles.validationItem}>
-                            <Icon 
-                                name={passwordValidation.hasSymbol ? "check-circle" : "cancel"} 
-                                size={16} 
-                                color={passwordValidation.hasSymbol ? colors.greenColor : colors.redColor} 
+                            <Icon
+                                name={passwordValidation.hasSymbol ? "check-circle" : "cancel"}
+                                size={16}
+                                color={passwordValidation.hasSymbol ? colors.greenColor : colors.redColor}
                             />
                             <Text style={[styles.validationText, passwordValidation.hasSymbol ? styles.validRequirement : styles.invalidRequirement]}>
                                 At least one special character (!@#$%^&*)
@@ -375,7 +396,7 @@ export default function SignUpScreen({ navigation }) {
                         />
                     </TouchableOpacity>
                 </View>
-                
+
                 {form.confirmpassword.length > 0 && form.password !== form.confirmpassword && (
                     <Text style={styles.errorText}>Passwords do not match!</Text>
                 )}
@@ -399,9 +420,26 @@ export default function SignUpScreen({ navigation }) {
                         style={[styles.input, { width: "65%" }]}
                         onChangeText={(text) => handleInputChange('address1', text)} />
                 </View>
-                <View>
-                    <TextInput placeholder="Address Line 2 (optional)" style={[styles.input, { width: "100%" }]}
-                        onChangeText={(text) => handleInputChange('address2', text)} />
+                <View style={{ flexDirection: "row" , gap : Metrix.HorizontalSize(10) }}>
+                    <View style={{flex :1}}>
+
+                        <DropdownComponent data={countries}
+                            placeholder={"country"} value={selectedCountry}
+                            onChange={(item) => setSelectedCountry(item.label)}
+                            height={Metrix.VerticalSize(40)}
+                        />
+                    </View>
+                    <View style={{flex :1}}>
+
+                        <DropdownComponent data={provinces}
+                            placeholder={"Province"} value={selectedProvince}
+                            onChange={(item) => setSelectedProvince(item.label)}
+                            height={Metrix.VerticalSize(40)}
+                        />
+                    </View>
+
+                    {/* <TextInput placeholder="Address Line 2 (optional)" style={[styles.input, { width: "100%" }]}
+                        onChangeText={(text) => handleInputChange('address2', text)} /> */}
                 </View>
             </View>
 
@@ -507,7 +545,7 @@ const styles = StyleSheet.create({
         color: colors.redColor,
         fontSize: Metrix.FontExtraSmall,
         marginLeft: 4,
-        bottom : Metrix.VerticalSize(8)
+        bottom: Metrix.VerticalSize(8)
     },
     eyeContainer: {
         flexDirection: "row",

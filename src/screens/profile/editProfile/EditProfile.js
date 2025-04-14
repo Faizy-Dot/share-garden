@@ -38,12 +38,30 @@ export default function EditProfile({ navigation }) {
     const dispatch = useDispatch();
     const [imageLoading, setImageLoading] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
+    const [selectedProvince , setSelectedProvince] = useState("")
+
+    const countries = [{
+        label: "Canada"
+    }]
+
+    const provinces = [
+        { label: "Alberta" },
+        { label: "British Columbia" },
+        { label: "Manitoba" },
+        { label: "New Brunswick" },
+        { label: "Newfoundland and Labrador" },
+        { label: "Nova Scotia" },
+        { label: "Ontario" },
+        { label: "Prince Edward Island" },
+        { label: "Quebec" },
+        { label: "Saskatchewan" }
+      ];
 
     const config = {
         headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'application/json' }
     }
 
-    console.log("user from edit profile==>>>", user.token)
+    console.log("user from edit profile==>>>", user.address2)
 
 
     const handleSubmit = async () => {
@@ -350,6 +368,44 @@ export default function EditProfile({ navigation }) {
                                 value={gender}
                             />
                         </View>
+                        <View style={{ gap: Metrix.VerticalSize(7) }}>
+                            <Text style={styles.userName}>Country</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                data={countries}
+                                maxHeight={300}
+                                labelField="label"
+                                valueField="value"
+                                renderItem={renderItem}
+                                onChange={item => {
+                                    setGender(item.value);
+                                }}
+                                value={"Canada"}
+                                placeholder='Canada'
+                            />
+                        </View>
+                        <View style={{ gap: Metrix.VerticalSize(7) }}>
+                            <Text style={styles.userName}>Province</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                data={provinces}
+                                maxHeight={300}
+                                labelField="label"
+                                valueField="value"
+                                renderItem={renderItem}
+                                onChange={item => {
+                                    setSelectedProvince(item.label);
+                                }}
+                                value={selectedProvince}
+                                placeholder={user.address2}
+                            />
+                        </View>
+
+
                         <View style={{ gap: Metrix.VerticalSize(7) }}>
                             <Text style={styles.userName}>Date of birth</Text>
                             <TouchableOpacity onPress={() => setOpen(true)}>

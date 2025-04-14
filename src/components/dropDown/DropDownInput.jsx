@@ -4,8 +4,9 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { Images, Metrix } from '../../config';
 import colors from '../../config/Colors';
 import fonts from '../../config/Fonts';
+import { DropDownGreenArrow } from '../../assets/svg';
 
-const DropdownComponent = ({ data, value, onChange, placeholder }) => {
+const DropdownComponent = ({ data, value, onChange, placeholder,height = Metrix.VerticalSize(58) }) => {
     const renderItem = item => {
         return (
             <View style={styles.item}>
@@ -16,7 +17,7 @@ const DropdownComponent = ({ data, value, onChange, placeholder }) => {
 
     return (
         <Dropdown
-            style={styles.dropdown}
+            style={[styles.dropdown , {height : height}]}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             inputSearchStyle={styles.inputSearchStyle}
@@ -31,10 +32,10 @@ const DropdownComponent = ({ data, value, onChange, placeholder }) => {
             onChange={onChange}
             renderItem={renderItem}
             renderRightIcon={() => (
-                <Image
-                    source={Images.dropDownIcon}
-                    style={styles.icon}
-                />
+                <View>
+
+                    <DropDownGreenArrow/>
+                </View>
             )}
         />
     );
@@ -66,7 +67,9 @@ const styles = StyleSheet.create({
         borderColor: colors.borderColor
     },
     placeholderStyle: {
-        fontFamily: fonts.InterRegular,
+        fontFamily: fonts.InterLight,
+        color : "#6E6E6E",
+        fontSize : Metrix.FontExtraSmall
     },
     selectedTextStyle: {
         fontSize: Metrix.FontSmall

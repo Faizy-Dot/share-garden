@@ -43,6 +43,7 @@ import HandShakeIcon from "./HandShakeIcon";
 import BidTitleIcon from "./BidTitleIcon";
 import DownArrowIcon from "./DownArrowIcon";
 import EditIcon from "./EditIcon";
+import DropDownGreenArrow from "./DropDownGreenArrow";
 
 export{
     BellIcon,
@@ -89,6 +90,7 @@ export{
     HandShakeIcon,
     BidTitleIcon,
     DownArrowIcon,
-    EditIcon
+    EditIcon,
+    DropDownGreenArrow
 
 }
