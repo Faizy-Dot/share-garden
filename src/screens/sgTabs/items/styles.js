@@ -212,8 +212,9 @@ const styles = StyleSheet.create({
     searchInputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: Metrix.HorizontalSize(15),
-        position: 'relative',
+        paddingHorizontal: Metrix.HorizontalSize(10),
+        marginTop : Metrix.VerticalSize(10),
+        gap : Metrix.HorizontalSize(10)
     },
     searchInput: {
         flex: 1,
@@ -222,25 +223,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#E6E6E6',
         borderRadius: Metrix.VerticalSize(3),
-        paddingLeft: Metrix.HorizontalSize(40),
+        paddingLeft: Metrix.HorizontalSize(10),
         paddingRight: Metrix.HorizontalSize(10),
         fontFamily: Fonts.InterRegular,
-        fontSize: 16,
+        fontSize: Metrix.FontRegular,
+        width : "100%"
     },
-    searchIcon: {
-        position: 'absolute',
-        left: Metrix.HorizontalSize(25),
-        zIndex: 1,
-    },
-    filterIconContainer: {
-        marginLeft: Metrix.HorizontalSize(10),
-    },
+  
+    
     clearButton: {
         position: 'absolute',
-        right: Metrix.HorizontalSize(50), // Adjust based on FilterIcon position
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 5,
+        right: Metrix.HorizontalSize(5), // Adjust based on FilterIcon position
     },
    
     clearIconText: {

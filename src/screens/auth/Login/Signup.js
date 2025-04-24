@@ -424,7 +424,7 @@ const [selectedProvince , setSelectedProvince] = useState("")
                     <View style={{flex :1}}>
 
                         <DropdownComponent data={countries}
-                            placeholder={"country"} value={selectedCountry}
+                            placeholder={isMerchant ? "City" : "Country"} value={selectedCountry}
                             onChange={(item) => setSelectedCountry(item.label)}
                             height={Metrix.VerticalSize(40)}
                         />

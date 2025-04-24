@@ -97,11 +97,12 @@ const ItemsTabScreen = () => {
                 </View>
             )}
 
-            <View style={{ marginTop: Metrix.VerticalSize(20) }}>
-                <View style={styles.searchInputContainer}>
-                    <TextInput 
-                        style={styles.searchInput} 
-                        placeholder={"Search items near you"} 
+            <View style={styles.searchInputContainer}>
+                <View style={{flex : 1 , justifyContent : "center"}}>
+
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder={"Search items near you"}
                         placeholderTextColor="#999"
                         returnKeyType="done"
                         ref={searchInputRef}
@@ -112,8 +113,8 @@ const ItemsTabScreen = () => {
                         autoCorrect={false}
                         blurOnSubmit={false}
                     />
-                    <SearchIcon style={styles.searchIcon} />
-                    <TouchableOpacity 
+                    {/* <SearchIcon style={styles.searchIcon} /> */}
+                    <TouchableOpacity
                         onPress={() => {
                             searchInputRef.current = '';
                             if (searchInputRef.current?.clear) {
@@ -124,11 +125,12 @@ const ItemsTabScreen = () => {
                         }}
                         style={styles.clearButton}
                     >
-                            <CrossIcon width={16} height={16} strokeColor="#999"/>
+                        <CrossIcon width={16} height={16} strokeColor="#999" />
                     </TouchableOpacity>
-                    <View style={styles.filterIconContainer}>
-                        <FilterIcon />
-                    </View>
+                </View>
+
+                <View style={styles.filterIconContainer}>
+                    <FilterIcon />
                 </View>
             </View>
 
@@ -136,7 +138,7 @@ const ItemsTabScreen = () => {
                 <View style={{ marginTop: Metrix.VerticalSize(15) }}>
                     <CategoryFlatList />
                 </View>
-            
+
             </View>
         </>
     );

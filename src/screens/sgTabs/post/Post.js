@@ -18,6 +18,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import GreenBitIcon from "../../../assets/svg/GreenBitIcon.js";
 import CashIcon from "../../../assets/svg/CashIcon.js";
 import UploadImgIcon from "../../../assets/svg/UploadImgIcon.js";
+import CrossIcon from "../../../assets/svg/CrossIcon.js";
 
 
 
@@ -54,7 +55,7 @@ export default function PostTabScreen({ navigation, route }) {
         setSelectedCategory(null);
         setSelectedCategoryName('');
     };
-    
+
     const handleCheckboxChange = (key) => {
         setChecked(key);
     };
@@ -211,7 +212,7 @@ export default function PostTabScreen({ navigation, route }) {
                 Toast.show({
                     type: 'error',
                     text1: 'Login or Signup',
-                    text2: 'First Login plz',
+                    text2: 'First Login please',
                 });
                 return;
             }
@@ -231,7 +232,7 @@ export default function PostTabScreen({ navigation, route }) {
         return null;
     }
 
-   
+
 
     const handlePreview = () => {
         if (activeButton === "SG Tip") {
@@ -282,7 +283,7 @@ export default function PostTabScreen({ navigation, route }) {
     };
 
     return (
-        <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false}  keyboardShouldPersistTaps="handled">
+        <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             <View>
                 <BackArrowIcon />
             </View>
@@ -368,7 +369,19 @@ export default function PostTabScreen({ navigation, route }) {
                 <View style={styles.imagesContainer}>
                     {images.map((image, index) => (
                         <View key={index} style={styles.image}>
-                            {image && <Image source={{ uri: image }} style={styles.image} />}
+                            {image &&
+                                <>
+                                    <Image on source={{ uri: image }} style={styles.image} />
+                                    <TouchableOpacity onPress={() => {
+                                        const updatedImages = [...images]; // clone the array
+                                        updatedImages[index] = null; // set the specific image to null
+                                        setImages(updatedImages); // update the state
+                                    }} style={{ position: "absolute", right: 3, top: 0 }}>
+                                        <CrossIcon width={14} />
+                                    </TouchableOpacity>
+                                </>
+
+                            }
                         </View>
                     ))}
                 </View>
@@ -415,9 +428,9 @@ export default function PostTabScreen({ navigation, route }) {
                                             >
                                                 <View style={styles.checkBox}>
                                                 </View>
-                                                    {checked === item.value && (
-                                                        <Icon name="check" size={22} color="black" style={{ position: "absolute",bottom:Metrix.VerticalSize(2) }} />
-                                                    )}
+                                                {checked === item.value && (
+                                                    <Icon name="check" size={22} color="black" style={{ position: "absolute", bottom: Metrix.VerticalSize(2) }} />
+                                                )}
                                                 <Text style={styles.checkboxText}>{item.display}</Text>
                                             </TouchableOpacity>
                                         )

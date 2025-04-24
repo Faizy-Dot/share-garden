@@ -233,14 +233,14 @@ const Login = ({ navigation }) => {
 
             <View style={{ marginTop: Metrix.VerticalSize(30) }}>
                 <CustomButton
-                    title={"Don't have an account?Sign up Now"}
+                    title={"Don't have an account? Create an Account"}
                     width={Metrix.HorizontalSize(300)}
                     fontSize={Metrix.FontSmall}
                     onPress={() => navigation.navigate("Signup")}
                 />
             </View>
 
-            <View style={styles.skip}>
+            {/* <View style={styles.skip}>
                 <TouchableOpacity
                     style={{ width: Metrix.HorizontalSize(60), height: Metrix.VerticalSize(30) }}
                     activeOpacity={0.8}
@@ -249,7 +249,7 @@ const Login = ({ navigation }) => {
                 >
                     <Text style={styles.skipText}>{"Skip>>"}</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </KeyboardAwareScrollView>
     )
 }
