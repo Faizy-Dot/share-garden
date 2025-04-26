@@ -92,7 +92,10 @@ const ProductDetail = ({ route, navigation }) => {
 
       // Update time if it's a bidding product
       if (response.data.isSGPoints && response.data.bidDuration) {
-        const timeRemaining = calculateTimeRemaining(response.data.bidDuration);
+        const bidEndTime = new Date(response.data.bidEndTime);
+        const now = new Date();
+        const durationInSeconds = Math.floor((bidEndTime - now) / 1000);
+        const timeRemaining = calculateTimeRemaining(durationInSeconds);
         setDays(timeRemaining.days);
         setHours(timeRemaining.hours);
         setMinutes(timeRemaining.minutes);
@@ -233,7 +236,7 @@ const ProductDetail = ({ route, navigation }) => {
     try {
       setBidLoading(true);
       setBidError(null);
-      
+
       console.log('Submitting bid with data:', {
         productId: displayData.id,
         amount: parseInt(bidAmount)
@@ -249,10 +252,10 @@ const ProductDetail = ({ route, navigation }) => {
       // Show success message and close modal
       setIsBidModalVisible(false);
       setBidAmount('');
-      
+
       // Refresh product details to show updated bid
       fetchProductDetail();
-      
+
       // Show success message
       Alert.alert(
         'Success',
@@ -264,8 +267,8 @@ const ProductDetail = ({ route, navigation }) => {
       // Log the full error response
       if (err.response) {
         Toast.show({
-          type : "error",
-          text1 : err.response.data.message
+          type: "error",
+          text1: err.response.data.message
         })
         // console.error('Error response:', err.response.data);
       }
@@ -506,8 +509,8 @@ const ProductDetail = ({ route, navigation }) => {
             </View>
           </View>
 
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('ChatDetail', { 
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ChatDetail', {
               chatUser: {
                 id: displayData.seller?.id,
                 name: displayData.seller?.name || 'Seller',
@@ -523,7 +526,7 @@ const ProductDetail = ({ route, navigation }) => {
           >
             <NotificationIcon />
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => Linking.openURL(`tel:${displayData.seller?.phoneNumber}`)}
           >
             <CallIcon />
@@ -602,11 +605,11 @@ const ProductDetail = ({ route, navigation }) => {
             </TouchableOpacity>
 
             <Text style={styles.modalTitle}>Place Your Bid</Text>
-            
+
             {bidError && (
               <Text style={styles.errorText}>{bidError}</Text>
             )}
-            
+
             <TextInput
               style={[
                 styles.bidInput,
@@ -667,7 +670,7 @@ const ProductDetail = ({ route, navigation }) => {
               fontSize={Metrix.FontSmall}
               onPress={() => {
                 setPurchaseModalVisible(false);
-                navigation.navigate('ChatDetail', { 
+                navigation.navigate('ChatDetail', {
                   chatUser: {
                     id: displayData.seller?.id,
                     name: displayData.seller?.name || 'Seller',

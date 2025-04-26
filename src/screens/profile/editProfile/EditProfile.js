@@ -430,7 +430,7 @@ export default function EditProfile({ navigation }) {
                                         textColor={colors.white}
 
                                     />
-                                    <CustomButton title={"X"}
+                                    <CustomButton title={"Set"}
                                         onPress={() => handleConfirm(date)} />
                                 </View>
                             </Modal>

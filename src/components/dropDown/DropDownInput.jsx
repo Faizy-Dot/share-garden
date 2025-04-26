@@ -22,7 +22,7 @@ const DropdownComponent = ({ data, value, onChange, placeholder,height = Metrix.
             selectedTextStyle={styles.selectedTextStyle}
             inputSearchStyle={styles.inputSearchStyle}
             data={data || []}
-            search
+            // search
             maxHeight={300}
             labelField="label"
             valueField="value"

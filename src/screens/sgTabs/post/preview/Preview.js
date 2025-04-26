@@ -14,6 +14,7 @@ import fonts from "../../../../config/Fonts";
 import CustomButton from "../../../../components/Button/Button";
 import axiosInstance from '../../../../config/axios';
 import { BlackBitIcon, CashIcon, CrossIcon, ModalInfoIcon, ModalSuccessLogo, TimeIcon } from "../../../../assets/svg";
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 
 export default function PostTabScreen({ navigation, route }) {
@@ -255,7 +256,8 @@ export default function PostTabScreen({ navigation, route }) {
               }
             ],
           });
-        }, 2000);
+        }, 7000);
+        timeout()
 
         setNavigateTimeout(timeout);
       }
@@ -275,7 +277,7 @@ export default function PostTabScreen({ navigation, route }) {
     setModalVisible(true)
     setTimeout(() => {
       setModalVisible(false)
-    }, 1000);
+    }, 5000);
   }
 
   const getDisplayCondition = (apiCondition) => {
@@ -336,7 +338,7 @@ export default function PostTabScreen({ navigation, route }) {
   };
 
   return (
-    <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false}>
+    <KeyboardAwareScrollView style={styles.postContainer} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
       <View style={{ padding: Metrix.VerticalSize(10) }}>
 
         <View>
@@ -351,7 +353,7 @@ export default function PostTabScreen({ navigation, route }) {
       </View>
 
       {
-        activeButton === "SG Item" ?
+        activeButton === "SG Item" ? 
           <View style={styles.middleContainer}>
             <Text style={styles.middleHeading}>ITEMS PREVIEW</Text>
             <View style={styles.middleBox}>
@@ -496,11 +498,16 @@ export default function PostTabScreen({ navigation, route }) {
               </View>
 
               <View style={{ borderWidth: 1, borderColor: colors.borderColor, padding: Metrix.VerticalSize(20), borderRadius: Metrix.VerticalSize(3), flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
-                <Image source={{ uri: user?.profileImage }} style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64), borderRadius: 32 }} />
+                {
+                  user.profileImage ? 
+                  <Image source={{ uri: user?.profileImage }} style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64), borderRadius: 32 }} />
+                :
+                 <FontAwesomeIcon name="user-circle" size={Metrix.HorizontalSize(64)} color="#ccc" />
+                }
                 <View>
                   <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>Posted by | SG Member</Text>
                   <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterRegular, color: colors.buttonColor }}>{user.firstName + " " + user.lastName}</Text>
-                  <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular }}>Published on 23 April 2024</Text>
+                  <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular }}> Published on {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</Text>
                 </View>
               </View>
 

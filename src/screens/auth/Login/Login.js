@@ -119,11 +119,13 @@ const Login = ({ navigation }) => {
 
             if (res.token && res.token !== '') {
                 // console.log('Login successfully:', res);
-                navigation.navigate('SgTabs');
                 Toast.show({
                     type: 'success',
                     text1: res.message,
                 });
+                setTimeout(() => {
+                    navigation.navigate('SgTabs');
+                }, 2000);
             } else {
                 Toast.show({
                     type: 'error',
