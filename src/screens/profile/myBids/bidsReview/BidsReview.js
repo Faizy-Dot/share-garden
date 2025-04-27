@@ -50,19 +50,21 @@ export default function BidsReview() {
   const [bidDetail, setBidDetail] = useState(null);
   const [verifiedTrade, setVerifiedTrade] = useState(null);
 
-    const [modalVisible, setModalVisible] = useState(false)
-    const [tradeProceed, setTradeProceed] = useState(false)
-    const [buyProceed, setBuyProceed] = useState(false)
-    const [transferSgPointsModal, setTransferSgPointsModal] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [tradeProceed, setTradeProceed] = useState(false)
+  const [buyProceed, setBuyProceed] = useState(false)
+  const [transferSgPointsModal, setTransferSgPointsModal] = useState(false)
   const [tradeResponse, setTradeResponse] = useState(null)
   const [tradeLoading, setTradeLoading] = useState(false)
   const [tradeCompleted, setTradeCompleted] = useState(false)
 
-    const resetStates = useCallback(() => {
-        setBuyProceed(false);
-    }, []);
 
-    useEffect(() => {
+
+  const resetStates = useCallback(() => {
+    setBuyProceed(false);
+  }, []);
+
+  useEffect(() => {
     console.log("useEffect triggered");
     console.log("Current route params:", JSON.stringify(route.params, null, 2));
 
@@ -89,6 +91,25 @@ export default function BidsReview() {
     }
   }, [resetStates, route.params]);
 
+
+  const startTrade = async () => {
+    try {
+      setTradeLoading(true);
+      const response = await axiosInstance.post('/api/trades', { bidId: bidDetail.id });
+      console.log('Trade response:', response.data);
+      // Save the entire response
+      setTradeResponse(response.data);
+      setTradeLoading(false);
+      setTradeProceed(true);
+      setModalVisible(false)
+
+    } catch (error) {
+      console.error('Error starting trade:', error);
+      setTradeLoading(false);
+      // Handle error
+    }
+  }
+
   const fetchDetails = async () => {
     try {
       setLoading(true);
@@ -97,33 +118,52 @@ export default function BidsReview() {
       console.log("Fetching product details for ID:", productId);
       // Fetch product details
       const productResponse = await axiosInstance.get(`/api/products/${productId}`);
-      console.log("Product response:", productResponse.data);
       setProductDetail(productResponse.data);
 
-      // Check if there's a verified trade that matches the current bid
-      if (productResponse.data.trades && productResponse.data.trades.length > 0) {
-        // Look for a matching trade (either VERIFIED or COMPLETED)
-        const matchingTrade = productResponse.data.trades.find(
-          trade => trade.bidId === bidId && (trade.status === 'VERIFIED' || trade.status === 'COMPLETED')
-        );
-        
-        if (matchingTrade) {
-          console.log("Found matching trade for this bid:", matchingTrade);
-          
-          // If the trade is already completed
-          if (matchingTrade.status === 'COMPLETED') {
-            setTradeCompleted(true);
-            setTradeResponse(matchingTrade);
-            setTradeProceed(true);
-          } 
-          // If the trade is verified but not completed
-          else if (matchingTrade.status === 'VERIFIED') {
-            setVerifiedTrade(matchingTrade);
-            setTradeResponse(matchingTrade);
-            setTradeProceed(true);
-          }
-        }
+      console.log("productResponse==>>", productResponse.data)
+      if (!productResponse.data.activeTrade) {
+        setTradeProceed(false)
+        setBuyProceed(false)
       }
+      if (productResponse.data.activeTrade && productResponse.data.activeTrade?.status === "PENDING") {
+        setTradeProceed(true)
+      }
+      if (productResponse.data.activeTrade && productResponse.data.activeTrade?.status === "VERIFIED") {
+        setBuyProceed(true)
+        setTradeProceed(true)
+      }
+
+      const completedTradeCheck = productResponse.data.bids.map((bid) => {
+        if (bid.id == bidId && bid.trades[0]?.status === "COMPLETED") {
+          setTradeCompleted(true)
+        }
+      })
+
+
+      // Check if there's a verified trade that matches the current bid
+      // if (productResponse.data.trades && productResponse.data.trades.length > 0) {
+      //   // Look for a matching trade (either VERIFIED or COMPLETED)
+      //   const matchingTrade = productResponse.data.trades.find(
+      //     trade => trade.bidId === bidId && (trade.status === 'VERIFIED' || trade.status === 'COMPLETED')
+      //   );
+
+      //   if (matchingTrade) {
+      //     console.log("Found matching trade for this bid:", matchingTrade);
+
+      //     // If the trade is already completed
+      //     if (matchingTrade.status === 'COMPLETED') {
+      //       setTradeCompleted(true);
+      //       setTradeResponse(matchingTrade);
+      //       setTradeProceed(true);
+      //     }
+      //     // If the trade is verified but not completed
+      //     else if (matchingTrade.status === 'VERIFIED') {
+      //       setVerifiedTrade(matchingTrade);
+      //       setTradeResponse(matchingTrade);
+      //       setTradeProceed(true);
+      //     }
+      //   }
+      // }
 
       // Instead of fetching individual bid, get all user bids and find the matching one
       console.log("Fetching user bids to find bid:", bidId);
@@ -207,15 +247,23 @@ export default function BidsReview() {
     return name ? name.charAt(0).toUpperCase() : '?';
   };
 
-    return (
-        <View style={styles.BidsReviewContainer}>
-            <View style={styles.topContainer}>
-                <BackArrowIcon />
-                <NavBar title={"My Bids"} />
-            </View>
+  console.log("productDetail===>>>", productDetail)
 
-            <View style={styles.bidHeader}>
-                <View style={styles.bidHeaderLeft}>
+  return (
+    <View style={styles.BidsReviewContainer}>
+      <View style={styles.topContainer}>
+        <BackArrowIcon />
+        <NavBar title={"My Bids"} />
+      </View>
+
+      <View style={styles.bidHeader}>
+        {
+          tradeProceed && !tradeCompleted &&
+          <View style={styles.pendingLogo}>
+            <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold, color: colors.white }}>Pending to pickup</Text>
+          </View>
+        }
+        <View style={styles.bidHeaderLeft}>
           {productDetail.seller?.profileImage ? (
             <Image
               source={{ uri: productDetail.seller.profileImage }}
@@ -242,16 +290,16 @@ export default function BidsReview() {
             <Text style={styles.publishDateText} numberOfLines={1}>
               Published on {new Date(productDetail.createdAt).toLocaleDateString()}
             </Text>
-                    </View>
-                </View>
+          </View>
+        </View>
 
         <View style={[styles.bidHeaderRight, { minWidth: Metrix.HorizontalSize(80) }]}>
           <BlackBitIcon width={24} height={24} />
           <Text style={[styles.bitValue, { marginLeft: Metrix.HorizontalSize(5) }]}>{bidDetail.amount}</Text>
-                </View>
-            </View>
+        </View>
+      </View>
 
-            <View style={styles.chatContainer}>
+      <View style={styles.chatContainer}>
         <TouchableOpacity
           style={{ flexDirection: 'row', alignItems: 'center', gap: Metrix.HorizontalSize(10) }}
           onPress={() => navigation.navigate('ChatDetail', {
@@ -268,23 +316,23 @@ export default function BidsReview() {
             }
           })}
         >
-                <NotificationIcon />
-                <Text style={styles.chatText}>
+          <NotificationIcon />
+          <Text style={styles.chatText}>
             Chat With <Text style={styles.redText}>{productDetail.seller?.firstName} {productDetail.seller?.lastName}</Text>
-                </Text>
+          </Text>
         </TouchableOpacity>
-            </View>
+      </View>
 
-            <View style={styles.bidInfo}>
-                <Text style={styles.myBidText}>
+      <View style={styles.bidInfo}>
+        <Text style={styles.myBidText}>
           My Bid: <Text style={[
             styles.myBidAcceptedText,
             bidDetail.status === 'REJECTED' && { color: colors.redColor }
           ]}>
             {bidDetail.amount}
           </Text>
-                </Text>
-                <View style={styles.statusContainer}>
+        </Text>
+        <View style={styles.statusContainer}>
           <Text style={[
             styles.myBidAcceptedText,
             bidDetail.status === 'REJECTED' && { color: colors.redColor }
@@ -292,113 +340,99 @@ export default function BidsReview() {
             {bidDetail.status}
           </Text>
           {bidDetail.status === 'ACCEPTED' && (
-                    <ModalSuccessLogo width={39} height={39} checkColor={colors.buttonColor} />
+            <ModalSuccessLogo width={39} height={39} checkColor={colors.buttonColor} />
           )}
-                </View>
-            </View>
+        </View>
+      </View>
 
-            <View style={styles.buttonsContainer}>
+      <View style={styles.buttonsContainer}>
         {!tradeCompleted ? (
           <>
-                <View style={[styles.buttonWrapper, buyProceed && { backgroundColor: colors.buttonColor, borderWidth: 0 }]}>
-                    {
+            <View style={[styles.buttonWrapper, buyProceed && { backgroundColor: colors.buttonColor, borderWidth: 0 }]}>
+              {
                 tradeProceed && !tradeCompleted ?
-                            <>
-                                <Text style={[styles.tradeProgress, buyProceed && { color: colors.white }]}>Trade in Progress...</Text>
-                                <View style={styles.infoWrapper}>
-                                    <ModalInfoIcon IstrokeColor={buyProceed ? colors.white : colors.black} outerStroke={buyProceed ? colors.white : colors.black} />
-                                    <Text style={[styles.infoText, buyProceed && { color: colors.white }]}>
+                  <>
+                    <Text style={[styles.tradeProgress, buyProceed && { color: colors.white }]}>Trade in Progress...</Text>
+                    <View style={styles.infoWrapper}>
+                      <ModalInfoIcon IstrokeColor={buyProceed ? colors.white : colors.black} outerStroke={buyProceed ? colors.white : colors.black} />
+                      <Text style={[styles.infoText, buyProceed && { color: colors.white }]}>
                         {bidDetail.amount} SG points are on hold. {buyProceed && "until confirm"}
-                                    </Text>
-                                </View>
-                            </>
-                            :
-                            <>
-                                <CustomButton
-                                    title={"Start Trade"}
-                                    width={Metrix.HorizontalSize(202)}
-                                    height={Metrix.VerticalSize(44)}
-                                    borderRadius={Metrix.VerticalSize(25)}
-                                    fontSize={Metrix.FontLarge}
-                                    fontFamily={fonts.InterBold}
-                      onPress={async () => {
-                        try {
-                          setTradeLoading(true);
-                          const response = await axiosInstance.post('/api/trades', { bidId: bidDetail.id });
-                          console.log('Trade response:', response.data);
-                          // Save the entire response
-                          setTradeResponse(response.data);
-                          setModalVisible(true);
-                          setTradeLoading(false);
-                        } catch (error) {
-                          console.error('Error starting trade:', error);
-                          setTradeLoading(false);
-                          // Handle error
-                        }
-                      }}
+                      </Text>
+                    </View>
+                  </>
+                  :
+                  <>
+                    <CustomButton
+                      title={"Start Trade"}
+                      width={Metrix.HorizontalSize(202)}
+                      height={Metrix.VerticalSize(44)}
+                      borderRadius={Metrix.VerticalSize(25)}
+                      fontSize={Metrix.FontLarge}
+                      fontFamily={fonts.InterBold}
+                      onPress={() => setModalVisible(true)}
                       disabled={bidDetail.status !== 'ACCEPTED' || tradeLoading}
                       backgroundColor={bidDetail.status === 'ACCEPTED' ? colors.buttonColor : colors.grey}
                       color={bidDetail.status === 'ACCEPTED' ? colors.white : '#AFAFAF'}
-                                />
-                                <View style={styles.infoWrapper}>
-                                    <ModalInfoIcon IstrokeColor={colors.black} />
-                      <Text style={[styles.infoText, { flex: 1, textAlign: 'center' }]} numberOfLines={2}>
+                    />
+                    <View style={styles.infoWrapper}>
+                      <ModalInfoIcon IstrokeColor={colors.black} />
+                      <Text style={[styles.infoText, { flex: 1, }]} numberOfLines={2}>
                         {bidDetail.status === 'ACCEPTED'
                           ? "Click to start the trade process"
                           : "Your bid is pending. Wait for seller's acceptance."}
-                                    </Text>
-                                </View>
-                            </>
-                    }
-                </View>
+                      </Text>
+                    </View>
+                  </>
+              }
+            </View>
 
-                <View style={[styles.confirmWrapper, buyProceed && { backgroundColor: "#EEEDEF" }]}>
-                    {
-                        !buyProceed ?
-                            <>
-                                <CustomButton
-                                    title={"Confirm Buy"}
-                                    width={Metrix.HorizontalSize(202)}
-                                    height={Metrix.VerticalSize(44)}
-                                    borderRadius={Metrix.VerticalSize(25)}
-                                    fontSize={Metrix.FontLarge}
-                                    fontFamily={fonts.InterBold}
+            <View style={[styles.confirmWrapper, buyProceed && { backgroundColor: "#EEEDEF" }]}>
+              {
+                !buyProceed ?
+                  <>
+                    <CustomButton
+                      title={"Confirm Buy"}
+                      width={Metrix.HorizontalSize(202)}
+                      height={Metrix.VerticalSize(44)}
+                      borderRadius={Metrix.VerticalSize(25)}
+                      fontSize={Metrix.FontLarge}
+                      fontFamily={fonts.InterBold}
                       backgroundColor={verifiedTrade ? colors.buttonColor : "#D2D2D2"}
                       color={verifiedTrade ? colors.white : '#AFAFAF'}
                       disabled={!verifiedTrade}
-                                    onPress={() => {
-                                        setBuyProceed(true)
-                                        setModalVisible(true)
-                                    }}
-                                />
-                                <View style={styles.confirmInfoWrapper}>
+                      onPress={() => {
+                        setBuyProceed(true)
+                        setModalVisible(true)
+                      }}
+                    />
+                    <View style={styles.confirmInfoWrapper}>
                       <ModalInfoIcon IstrokeColor={!verifiedTrade ? "#646464" : colors.black} outerStroke={!verifiedTrade ? "#646464" : colors.black} />
-                                    {
+                      {
                         !verifiedTrade ?
-                                            <Text style={[styles.confirmInfoText, { color: "#646464" }]}>
+                          <Text style={[styles.confirmInfoText, { color: "#646464" }]}>
                             You need a verified trade to proceed with your purchase.
-                                            </Text>
-                                            :
-                                            <Text style={[styles.confirmInfoText, { width: "90%" }]}>
-                                                You need to confirm buy to share your Trade ID with seller to transfer points & then pick up your item.
-                                            </Text>
-                                    }
-                                </View>
-                            </>
-                            :
-                            <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }} activeOpacity={0.8} onPress={() => setModalVisible(true)}>
-                                <View>
-                                    <Text style={{ fontSize: Metrix.FontLarge, fontFamily: fonts.InterBold, color: colors.buttonColor, textAlign: "center" }}>Confirm Buy</Text>
-                                    <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold, }}>I have got this Share Trade ID# </Text>
-                                </View>
-                                <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(7), alignItems: "center" }}>
-                                    <ModalInfoIcon outerStroke="#646464"
-                                        IstrokeColor='#646464' />
-                                    <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold, color: "#646464" }}>You need to confirm buy to transfer points & then pick up your item.</Text>
-                                </View>
-                            </TouchableOpacity>
-                    }
-                </View>
+                          </Text>
+                          :
+                          <Text style={[styles.confirmInfoText, { width: "90%" }]}>
+                            You need to confirm buy to share your Trade ID with seller to transfer points & then pick up your item.
+                          </Text>
+                      }
+                    </View>
+                  </>
+                  :
+                  <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }} activeOpacity={0.8} onPress={() => setModalVisible(true)}>
+                    <View>
+                      <Text style={{ fontSize: Metrix.FontLarge, fontFamily: fonts.InterBold, color: colors.buttonColor, textAlign: "center" }}>Confirm Buy</Text>
+                      <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold, }}>I have got this Share Trade ID# </Text>
+                    </View>
+                    <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(7), alignItems: "center" }}>
+                      <ModalInfoIcon outerStroke="#646464"
+                        IstrokeColor='#646464' />
+                      <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold, color: "#646464" }}>You need to confirm buy to transfer points & then pick up your item.</Text>
+                    </View>
+                  </TouchableOpacity>
+              }
+            </View>
           </>
         ) : (
           <View style={customStyles.completedTradeContainer}>
@@ -416,92 +450,89 @@ export default function BidsReview() {
             </View>
           </View>
         )}
-            </View>
+      </View>
 
 
-            <Modal visible={modalVisible} transparent animationType="fade">
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalBox}>
-                        <TouchableOpacity
-                            style={styles.closeButton}
-                            onPress={() => setModalVisible(!modalVisible)}
-                        >
-                            <CrossIcon />
-                        </TouchableOpacity>
+      <Modal visible={modalVisible} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalBox}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <CrossIcon />
+            </TouchableOpacity>
 
-                        <View style={styles.modalContentWrapper}>
-                            <BlackBitIcon width={64} height={64} />
-                            <Text style={styles.modalSmallText}>Upon Clicking Proceed</Text>
-                            {!buyProceed ? (
-                                <>
-                                    <View>
+            <View style={styles.modalContentWrapper}>
+              <BlackBitIcon width={64} height={64} />
+              <Text style={styles.modalSmallText}>Upon Clicking Proceed</Text>
+              {!buyProceed ? (
+                <>
+                  <View>
                     <Text style={styles.modalRegularText}>Your {bidDetail.amount} SG Points</Text>
-                                        <Text style={styles.modalSmallBoldText}>
-                                            will be placed on hold, Until you confirm buy
-                                        </Text>
-                                    </View>
+                    <Text style={styles.modalSmallBoldText}>
+                      will be placed on hold, Until you confirm buy
+                    </Text>
+                  </View>
 
-                                    <Text style={styles.tradeIdText}>
-                    Trade ID# <Text style={styles.tradeIdHighlight}>{tradeResponse?.tradeId || 'Loading...'}</Text>
-                                    </Text>
+                  <Text style={styles.tradeIdText}>
+                    Trade ID# <Text style={styles.tradeIdHighlight}>{productDetail.activeTrade?.tradeId || 'Loading...'}</Text>
+                  </Text>
 
-                                    <CustomButton
-                                        title={"PROCEED"}
-                                        backgroundColor={colors.yellowColor}
-                                        height={Metrix.VerticalSize(36)}
-                                        width={Metrix.HorizontalSize(193)}
-                                        borderRadius={Metrix.VerticalSize(35)}
-                                        fontSize={Metrix.FontSmall}
-                                        fontFamily={fonts.InterBold}
-                                        onPress={() => {
-                                            setTradeProceed(true);
-                                            setModalVisible(false);
-                                        }}
-                                    />
-                                </>
-                            ) : (
-                                <>
-                                    <Text style={styles.tradeIdText}>
-                    Trade ID# <Text style={styles.tradeIdHighlight}>{tradeResponse?.tradeId || 'Loading...'}</Text>
-                                    </Text>
+                  <CustomButton
+                    title={"PROCEED"}
+                    backgroundColor={colors.yellowColor}
+                    height={Metrix.VerticalSize(36)}
+                    width={Metrix.HorizontalSize(193)}
+                    borderRadius={Metrix.VerticalSize(35)}
+                    fontSize={Metrix.FontSmall}
+                    fontFamily={fonts.InterBold}
+                    onPress={startTrade}
+                  />
+                </>
+              ) : (
+                <>
+                  <Text style={styles.tradeIdText}>
+                    Trade ID# <Text style={styles.tradeIdHighlight}>{productDetail.activeTrade?.tradeId || 'Loading...'}</Text>
+                  </Text>
 
-                                    <Text style={styles.modalCenterText}>
-                                        will be sent to the Seller which the seller will use to claim
+                  <Text style={styles.modalCenterText}>
+                    will be sent to the Seller which the seller will use to claim
                     the {bidDetail.amount} SG point that are on hold.
-                                    </Text>
+                  </Text>
 
-                                    <CustomButton
-                                        title={"PROCEED"}
-                                        backgroundColor={colors.yellowColor}
-                                        height={Metrix.VerticalSize(36)}
-                                        width={Metrix.HorizontalSize(193)}
-                                        borderRadius={Metrix.VerticalSize(35)}
-                                        fontSize={Metrix.FontSmall}
-                                        fontFamily={fonts.InterBold}
+                  <CustomButton
+                    title={"PROCEED"}
+                    backgroundColor={colors.yellowColor}
+                    height={Metrix.VerticalSize(36)}
+                    width={Metrix.HorizontalSize(193)}
+                    borderRadius={Metrix.VerticalSize(35)}
+                    fontSize={Metrix.FontSmall}
+                    fontFamily={fonts.InterBold}
                     onPress={async () => {
                       try {
                         setTradeLoading(true);
                         // Get the trade ID from either tradeResponse or productDetail.trades
                         const tradeId = tradeResponse?.id || (productDetail.trades && productDetail.trades.length > 0 && productDetail.trades[0].id);
-                        
+
                         if (!tradeId) {
                           console.error('No trade ID found to complete trade');
                           setTradeLoading(false);
                           return;
                         }
-                        
+
                         // Call the complete trade API
                         const response = await axiosInstance.post(`/api/trades/${tradeId}/complete`);
                         console.log('Trade completion response:', response.data);
-                        
+
                         // Update the UI state
                         setTradeCompleted(true);
-                                            setModalVisible(false);
-                                            setTransferSgPointsModal(true);
-                        
+                        setModalVisible(false);
+                        setTransferSgPointsModal(true);
+
                         // Refresh product details to show updated status
                         fetchDetails();
-                        
+
                         setTradeLoading(false);
                       } catch (error) {
                         console.error('Error completing trade:', error);
@@ -510,54 +541,56 @@ export default function BidsReview() {
                       }
                     }}
                     disabled={tradeLoading}
-                                    />
-                                </>
-                            )}
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-
-            {/* Modal 2 */}
-            <Modal visible={true} transparent animationType="fade">
-                <View style={styles.modalContainer}>
-                    <View style={[styles.modalBox, styles.modalGap]}>
-                        <TouchableOpacity
-                            style={styles.closeButton}
-                            onPress={() => setTransferSgPointsModal(!transferSgPointsModal)}
-                        >
-                            <CrossIcon />
-                        </TouchableOpacity>
-
-                        <ModalSuccessLogo checkColor={colors.buttonColor} />
-                        <View>
-                            <Text style={styles.transferText}>
-                SG Points <Text style={styles.tradeIdHighlight}>{bidDetail.amount}</Text>
-                            </Text>
-                            <Text style={styles.modalSmallCenterText}>
-                                Transferred to Seller.
-                            </Text>
-                            <Text style={styles.thanksText}>
-                                Thanks you for using <Text style={styles.thanksTextInner}>ShareGarden.</Text>
-                            </Text>
-                        </View>
-
-                        <Text style={styles.tradeIdText}>
-              Trade ID# <Text style={styles.tradeIdHighlight}>{tradeResponse?.tradeId || 'Loading...'}</Text>
-                        </Text>
-
-                        <CustomButton
-                            title={"Rate & Reviews Seller"}
-                            height={Metrix.VerticalSize(36)}
-                            width={Metrix.HorizontalSize(261)}
-                            borderRadius={Metrix.VerticalSize(35)}
-                            fontSize={Metrix.FontSmall}
-                            onPress={()=>{ navigation.navigate("SubmitReview")}}
-                        />
-                    </View>
-                </View>
-            </Modal>
+                  />
+                </>
+              )}
+            </View>
+          </View>
         </View>
-    );
+      </Modal>
+
+      {/* Modal 2 */}
+      <Modal visible={transferSgPointsModal} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={[styles.modalBox, styles.modalGap]}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setTransferSgPointsModal(!transferSgPointsModal)}
+            >
+              <CrossIcon />
+            </TouchableOpacity>
+
+            <ModalSuccessLogo checkColor={colors.buttonColor} />
+            <View>
+              <Text style={styles.transferText}>
+                SG Points <Text style={styles.tradeIdHighlight}>{bidDetail.amount}</Text>
+              </Text>
+              <Text style={styles.modalSmallCenterText}>
+                Transferred to Seller.
+              </Text>
+              <Text style={styles.thanksText}>
+                Thanks you for using <Text style={styles.thanksTextInner}>ShareGarden.</Text>
+              </Text>
+            </View>
+
+            <Text style={styles.tradeIdText}>
+              Trade ID# <Text style={styles.tradeIdHighlight}>{productDetail.activeTrade?.tradeId || 'Loading...'}</Text>
+            </Text>
+
+            <CustomButton
+              title={"Rate & Reviews Seller"}
+              height={Metrix.VerticalSize(36)}
+              width={Metrix.HorizontalSize(261)}
+              borderRadius={Metrix.VerticalSize(35)}
+              fontSize={Metrix.FontSmall}
+              onPress={() => { navigation.navigate("SubmitReview") }}
+            />
+          </View>
+        </View>
+      </Modal>
+    </View>
+
+
+  );
 }
 

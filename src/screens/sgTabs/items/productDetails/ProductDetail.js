@@ -299,7 +299,7 @@ const ProductDetail = ({ route, navigation }) => {
   };
 
   return (
-    <KeyboardAwareScrollView style={styles.ProductDetailcontainer} contentContainerStyle={{ paddingBottom: Metrix.VerticalSize(15) }}>
+    <KeyboardAwareScrollView style={styles.ProductDetailcontainer} contentContainerStyle={{ paddingBottom: Metrix.VerticalSize(15) }} keyboardShouldPersistTaps="handled">
       <View style={styles.NavBarContainer}>
         <View style={styles.BackArrowContainer}>
           <BackArrowIcon />

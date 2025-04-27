@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         paddingVertical: Metrix.VerticalSize(15),
-        gap: Metrix.VerticalSize(15),
+        // gap: Metrix.VerticalSize(15),
         borderRadius: Metrix.VerticalSize(5),
     },
     infoWrapper: {
@@ -181,6 +181,15 @@ const styles = StyleSheet.create({
         fontFamily: fonts.InterBold,
         color: colors.buttonColor
     },
+    pendingLogo: {
+        position: "absolute",
+        right: 0,
+        top: Metrix.VerticalSize(-16),
+        backgroundColor : colors.yellowColor,
+        padding : 5,
+        paddingHorizontal : Metrix.HorizontalSize(15)
+    }
+    ,
     modalContentWrapper: { marginTop: Metrix.VerticalSize(25), alignItems: 'center', gap: Metrix.VerticalSize(10) },
     modalSmallText: { fontSize: Metrix.FontSmall, fontFamily: fonts.InterRegular },
     modalRegularText: { fontSize: Metrix.FontRegular, fontFamily: fonts.InterSemiBold, textAlign: 'center' },
@@ -192,7 +201,7 @@ const styles = StyleSheet.create({
     transferText: { fontSize: Metrix.FontMedium, fontFamily: fonts.InterBold, textAlign: 'center' },
     modalSmallCenterText: { fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterSemiBold, textAlign: 'center' },
     thanksText: { fontSize: Metrix.FontMedium, fontFamily: fonts.InterBold },
-    thanksTextInner: { color : colors.buttonColor},
+    thanksTextInner: { color: colors.buttonColor },
 })
 
 export default styles; 

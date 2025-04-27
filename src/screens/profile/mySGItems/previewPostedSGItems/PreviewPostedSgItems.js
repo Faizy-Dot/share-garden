@@ -13,6 +13,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import axiosInstance from '../../../../config/axios';
 import { ActivityIndicator } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ToastAndroid, Platform } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
+
 
 
 const requestBuyData = [
@@ -114,14 +117,14 @@ export default function PreviewPostedSgItems({ navigation, route }) {
 
 
       }
-      if(response.data.trades[0].status === "ACCEPT"){
+      if(response.data.trades[0]?.tradeId){
         setTradeId(true)
       }else{
         setTradeId(false)
       }
 
       console.log("Product Detail Bid response", response.data);
-      console.log("Trades response:", response.data.trades);
+      // console.log("Trades response:", response.data.trades);
       console.log("Bid End Time:", response.data.bidEndTime);
     } catch (error) {
       console.error('Error fetching product details:', error);
@@ -259,11 +262,15 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                     borderRadius={Metrix.VerticalSize(4)}
                     disabled={!hasTrade || !tradeIsPending}
                     onPress={() => {
-                      if (hasTrade && tradeIsPending) {
-                        // Set the SG ID to the trade ID
-                        setSgId(matchingTrade.tradeId);
-                        // Open the modal
-                        setModalVisible(true);
+                      console.log("check==>>",item.trades[0].tradeId)
+                      if (item.trades.length > 0) {
+                        Clipboard.setString(item.trades[0].tradeId);
+                        if (Platform.OS === 'android') {
+                          ToastAndroid.show('Trade ID copied!', ToastAndroid.SHORT);
+                        }
+                        console.log("Trade ID copied:", item.trades[0].tradeId);
+                      } else {
+                        console.log("No Trade ID to copy");
                       }
                     }}
                   />
