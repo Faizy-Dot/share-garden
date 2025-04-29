@@ -25,6 +25,7 @@ import fonts from "../../../config/Fonts";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { Dropdown } from "react-native-element-dropdown";
 import DropdownComponent from "../../../components/dropDown/DropDownInput";
+import Logo from '../../../assets/svg/Logo';
 
 const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -81,22 +82,79 @@ export default function SignUpScreen({ navigation }) {
 const [selectedProvince , setSelectedProvince] = useState("")
 
     const countries = [{
-        label: "Canada"
+        label: "Canada",
+        value: "Canada"
     }]
 
     const provinces = [
-        { label: "Alberta" },
-        { label: "British Columbia" },
-        { label: "Manitoba" },
-        { label: "New Brunswick" },
-        { label: "Newfoundland and Labrador" },
-        { label: "Nova Scotia" },
-        { label: "Ontario" },
-        { label: "Prince Edward Island" },
-        { label: "Quebec" },
-        { label: "Saskatchewan" }
-      ];
-      
+        { label: "Alberta", value: "Alberta" },
+        { label: "British Columbia", value: "British Columbia" },
+        { label: "Manitoba", value: "Manitoba" },
+        { label: "New Brunswick", value: "New Brunswick" },
+        { label: "Newfoundland and Labrador", value: "Newfoundland and Labrador" },
+        { label: "Nova Scotia", value: "Nova Scotia" },
+        { label: "Ontario", value: "Ontario" },
+        { label: "Prince Edward Island", value: "Prince Edward Island" },
+        { label: "Quebec", value: "Quebec" },
+        { label: "Saskatchewan", value: "Saskatchewan" }
+    ];
+
+    const citiesByProvince = {
+        "Alberta": [
+            { label: "Calgary", value: "Calgary" },
+            { label: "Edmonton", value: "Edmonton" },
+            { label: "Red Deer", value: "Red Deer" },
+            { label: "Lethbridge", value: "Lethbridge" }
+        ],
+        "British Columbia": [
+            { label: "Vancouver", value: "Vancouver" },
+            { label: "Victoria", value: "Victoria" },
+            { label: "Kelowna", value: "Kelowna" },
+            { label: "Burnaby", value: "Burnaby" }
+        ],
+        "Manitoba": [
+            { label: "Winnipeg", value: "Winnipeg" },
+            { label: "Brandon", value: "Brandon" },
+            { label: "Steinbach", value: "Steinbach" }
+        ],
+        "New Brunswick": [
+            { label: "Saint John", value: "Saint John" },
+            { label: "Moncton", value: "Moncton" },
+            { label: "Fredericton", value: "Fredericton" }
+        ],
+        "Newfoundland and Labrador": [
+            { label: "St. John's", value: "St. John's" },
+            { label: "Corner Brook", value: "Corner Brook" },
+            { label: "Mount Pearl", value: "Mount Pearl" }
+        ],
+        "Nova Scotia": [
+            { label: "Halifax", value: "Halifax" },
+            { label: "Dartmouth", value: "Dartmouth" },
+            { label: "Sydney", value: "Sydney" }
+        ],
+        "Ontario": [
+            { label: "Toronto", value: "Toronto" },
+            { label: "Ottawa", value: "Ottawa" },
+            { label: "Mississauga", value: "Mississauga" },
+            { label: "Hamilton", value: "Hamilton" }
+        ],
+        "Prince Edward Island": [
+            { label: "Charlottetown", value: "Charlottetown" },
+            { label: "Summerside", value: "Summerside" }
+        ],
+        "Quebec": [
+            { label: "Montreal", value: "Montreal" },
+            { label: "Quebec City", value: "Quebec City" },
+            { label: "Laval", value: "Laval" }
+        ],
+        "Saskatchewan": [
+            { label: "Saskatoon", value: "Saskatoon" },
+            { label: "Regina", value: "Regina" },
+            { label: "Prince Albert", value: "Prince Albert" }
+        ]
+    };
+
+    const [selectedCity, setSelectedCity] = useState("");
 
     const dispatch = useDispatch();
     const { loading, error, user } = useSelector((state) => state.auth);
@@ -187,6 +245,8 @@ const [selectedProvince , setSelectedProvince] = useState("")
                 password: form.password,
                 address1: form.address1,
                 address2: selectedProvince,
+                province: selectedProvince,
+                city: selectedCity,
                 postalcode: form.postalcode,
                 phoneNumber: form.phonenumber1 + form.phonenumber2,
                 deviceToken: deviceid,
@@ -252,11 +312,7 @@ const [selectedProvince , setSelectedProvince] = useState("")
             keyboardShouldPersistTaps="handled"
         >
             <View style={styles.logoContainer}>
-                <Image
-                    source={Images.logo}
-                    style={styles.logo}
-                    resizeMode="contain"
-                />
+                <Logo />
             </View>
 
             <View style={styles.toggleContainer}>
@@ -422,18 +478,19 @@ const [selectedProvince , setSelectedProvince] = useState("")
                 </View>
                 <View style={{ flexDirection: "row" , gap : Metrix.HorizontalSize(10) }}>
                     <View style={{flex :1}}>
-
-                        <DropdownComponent data={countries}
-                            placeholder={isMerchant ? "City" : "Country"} value={selectedCountry}
-                            onChange={(item) => setSelectedCountry(item.label)}
+                        <DropdownComponent data={provinces}
+                            placeholder={"Province"} value={selectedProvince}
+                            onChange={(item) => {
+                                setSelectedProvince(item.value);
+                                setSelectedCity(""); // Reset city when province changes
+                            }}
                             height={Metrix.VerticalSize(40)}
                         />
                     </View>
                     <View style={{flex :1}}>
-
-                        <DropdownComponent data={provinces}
-                            placeholder={"Province"} value={selectedProvince}
-                            onChange={(item) => setSelectedProvince(item.label)}
+                        <DropdownComponent data={selectedProvince ? citiesByProvince[selectedProvince] : []}
+                            placeholder={"City"} value={selectedCity}
+                            onChange={(item) => setSelectedCity(item.value)}
                             height={Metrix.VerticalSize(40)}
                         />
                     </View>

@@ -235,7 +235,7 @@ const Login = ({ navigation }) => {
 
             <View style={{ marginTop: Metrix.VerticalSize(30) }}>
                 <CustomButton
-                    title={"Don't have an account? Create an Account"}
+                    title={"Create an Account"}
                     width={Metrix.HorizontalSize(300)}
                     fontSize={Metrix.FontSmall}
                     onPress={() => navigation.navigate("Signup")}
