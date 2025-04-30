@@ -60,8 +60,8 @@ export default function PostTabScreen({ navigation, route }) {
     setTimeErrors(prev => ({ ...prev, [field]: '' }));
 
     if (field === 'days') {
-      if (parseInt(numericText) > 3) {
-        setTimeErrors(prev => ({ ...prev, days: 'Maximum 3 days allowed' }));
+      if (parseInt(numericText) > 14) {
+        setTimeErrors(prev => ({ ...prev, days: 'Maximum 14 days allowed' }));
         return;
       }
     }

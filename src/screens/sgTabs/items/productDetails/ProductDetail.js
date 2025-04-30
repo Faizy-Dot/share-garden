@@ -498,7 +498,7 @@ const ProductDetail = ({ route, navigation }) => {
             )}
             <View>
               <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>
-                {displayData.isSGPoints ? "Bid by" : "Posted by | SG Member"}
+                Posted by | SG Member
               </Text>
               <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterRegular, color: colors.buttonColor }}>
                 {`${displayData.seller?.firstName || ''} ${displayData.seller?.lastName || ''}`}

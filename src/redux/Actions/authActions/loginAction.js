@@ -19,6 +19,18 @@ export const login = createAsyncThunk('auth/login', async (userData, { rejectWit
   }
 });
 
+// Action for Google login that doesn't make an API call
+export const googleLogin = createAsyncThunk('auth/googleLogin', async (userData, { rejectWithValue }) => {
+  try {
+    if (!userData || !userData.token) {
+      return rejectWithValue({ message: 'Invalid user data' });
+    }
+    return userData;
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
+
 const loginSlice = createSlice({
   name: 'login',
   initialState: {
@@ -61,6 +73,18 @@ const loginSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message || 'Login failed';
+      })
+      .addCase(googleLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        if (action.payload && action.payload.token && action.payload.token !== '') {
+          state.user = action.payload;
+        } else {
+          state.error = 'Invalid user data';
+        }
+      })
+      .addCase(googleLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message || 'Google login failed';
       });
   }
 });

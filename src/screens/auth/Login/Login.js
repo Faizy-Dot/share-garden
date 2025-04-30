@@ -212,13 +212,13 @@ const Login = ({ navigation }) => {
                 <CustomButton
                     title={"Continue With Google"}
                     icon={<FontAwesome name="google" color="#fff" style={styles.socialButtonIcon}
-                    />} z
+                    />}
                     backgroundColor='#F8443E'
                     width={Metrix.HorizontalSize(300)}
                     height={Metrix.VerticalSize(50)}
                     fontSize={Metrix.FontExtraSmall}
                     fontFamily={fonts.InterRegular}
-                    onPress={onGoogleButtonPress}
+                    onPress={() => onGoogleButtonPress(navigation)}
                 />
 
                 {/* <CustomButton
