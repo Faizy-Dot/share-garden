@@ -52,7 +52,11 @@ export default function SgUserNotification() {
         return (
             <View style={styles.flatlistContainer}>
                 <View style={styles.imageContainer}>
-                    <Image source={getNotificationImage(item)} />
+                    <Image 
+                        source={getNotificationImage(item)} 
+                        style={styles.notificationImage}
+                        resizeMode="cover"
+                    />
                 </View>
                 <View>
                     <Text style={styles.title}>

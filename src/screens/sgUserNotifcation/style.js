@@ -39,7 +39,14 @@ const styles = StyleSheet.create({
         width : Metrix.HorizontalSize(56),
         height : Metrix.HorizontalSize(56),
         alignItems : "center",
-        justifyContent : "center"
+        justifyContent : "center",
+        borderRadius: Metrix.VerticalSize(8),
+        overflow: 'hidden',
+        backgroundColor: colors.lightGray
+    },
+    notificationImage: {
+        width: '100%',
+        height: '100%'
     }
 })
 
