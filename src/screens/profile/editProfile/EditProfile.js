@@ -31,38 +31,67 @@ export default function EditProfile({ navigation }) {
     const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber);
     const [gender, setGender] = useState(user?.gender);
     const [imageUri, setImageUri] = useState(null);
-    const [date, setDate] = useState(new Date()); // Current date
-    const [formattedDate, setFormattedDate] = useState(user?.dateOfBirth);
+    const [date, setDate] = useState(user?.dateOfBirth ? new Date(user.dateOfBirth) : new Date());
+    const [formattedDate, setFormattedDate] = useState(user?.dateOfBirth ? user.dateOfBirth.split('T')[0] : '');
     const [open, setOpen] = useState(false); // Modal visibility
     const [loading, setLoading] = useState(false)
     const dispatch = useDispatch();
     const [imageLoading, setImageLoading] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
-    const [selectedProvince , setSelectedProvince] = useState("")
+    const [selectedProvince, setSelectedProvince] = useState(user?.province || '');
+    const [selectedCity, setSelectedCity] = useState(user?.city || '');
+    const [cities, setCities] = useState([]);
+    const [address1, setAddress1] = useState(user?.address1 || '');
 
     const countries = [{
         label: "Canada"
     }]
 
     const provinces = [
-        { label: "Alberta" },
-        { label: "British Columbia" },
-        { label: "Manitoba" },
-        { label: "New Brunswick" },
-        { label: "Newfoundland and Labrador" },
-        { label: "Nova Scotia" },
-        { label: "Ontario" },
-        { label: "Prince Edward Island" },
-        { label: "Quebec" },
-        { label: "Saskatchewan" }
-      ];
+        { label: "Alberta", value: "Alberta" },
+        { label: "British Columbia", value: "British Columbia" },
+        { label: "Manitoba", value: "Manitoba" },
+        { label: "New Brunswick", value: "New Brunswick" },
+        { label: "Newfoundland and Labrador", value: "Newfoundland and Labrador" },
+        { label: "Nova Scotia", value: "Nova Scotia" },
+        { label: "Ontario", value: "Ontario" },
+        { label: "Prince Edward Island", value: "Prince Edward Island" },
+        { label: "Quebec", value: "Quebec" },
+        { label: "Saskatchewan", value: "Saskatchewan" }
+    ];
 
     const config = {
         headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'application/json' }
     }
 
-    console.log("user from edit profile==>>>", user.address2)
+    console.log("user from edit profile==>>>", user)
 
+    // Add useEffect to initialize cities when component mounts
+    useEffect(() => {
+        if (user?.province) {
+            const citiesForProvince = getCitiesForProvince(user.province);
+            setCities(citiesForProvince);
+            // Set the selected city if it exists in the user object
+            if (user?.city && citiesForProvince.some(city => city.value === user.city)) {
+                setSelectedCity(user.city);
+            }
+        }
+    }, []);
+
+    // Add useEffect to update cities when province changes
+    useEffect(() => {
+        if (selectedProvince) {
+            const citiesForProvince = getCitiesForProvince(selectedProvince);
+            setCities(citiesForProvince);
+            // Reset city if it's not in the new province's cities
+            if (!citiesForProvince.some(city => city.value === selectedCity)) {
+                setSelectedCity('');
+            }
+        } else {
+            setCities([]);
+            setSelectedCity('');
+        }
+    }, [selectedProvince]);
 
     const handleSubmit = async () => {
         if (!fname || !lname || !phoneNumber) {
@@ -85,10 +114,12 @@ export default function EditProfile({ navigation }) {
                     gender: gender,
                     dateOfBirth: formattedDate,
                     phoneNumber: phoneNumber,
+                    province: selectedProvince,
+                    city: selectedCity,
+                    address1: address1
                 },
                 config
             );
-
 
             if (response.status === 200) {
                 Toast.show({
@@ -103,6 +134,9 @@ export default function EditProfile({ navigation }) {
                     profileImage: imageUri ? imageUri : user.profileImage,
                     about,
                     phoneNumber,
+                    province: selectedProvince,
+                    city: selectedCity,
+                    address1: address1
                 };
                 dispatch(updateUserProfile(updatedUser));
                 navigation.navigate('Profile');
@@ -387,6 +421,15 @@ export default function EditProfile({ navigation }) {
                             />
                         </View>
                         <View style={{ gap: Metrix.VerticalSize(7) }}>
+                            <Text style={styles.userName}>Address</Text>
+                            <TextInput 
+                                style={styles.inputs}
+                                value={address1}
+                                onChangeText={setAddress1}
+                                placeholder="Enter your address"
+                            />
+                        </View>
+                        <View style={{ gap: Metrix.VerticalSize(7) }}>
                             <Text style={styles.userName}>Province</Text>
                             <Dropdown
                                 style={styles.dropdown}
@@ -398,14 +441,33 @@ export default function EditProfile({ navigation }) {
                                 valueField="value"
                                 renderItem={renderItem}
                                 onChange={item => {
-                                    setSelectedProvince(item.label);
+                                    setSelectedProvince(item.value);
+                                    setSelectedCity(''); // Reset city when province changes
+                                    setCities(getCitiesForProvince(item.value));
                                 }}
                                 value={selectedProvince}
-                                placeholder={user.address2}
+                                placeholder="Select Province"
                             />
                         </View>
-
-
+                        <View style={{ gap: Metrix.VerticalSize(7) }}>
+                            <Text style={styles.userName}>City</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                data={cities}
+                                maxHeight={300}
+                                labelField="label"
+                                valueField="value"
+                                renderItem={renderItem}
+                                onChange={item => {
+                                    setSelectedCity(item.value);
+                                }}
+                                value={selectedCity}
+                                placeholder="Select City"
+                                disabled={!selectedProvince}
+                            />
+                        </View>
                         <View style={{ gap: Metrix.VerticalSize(7) }}>
                             <Text style={styles.userName}>Date of birth</Text>
                             <TouchableOpacity onPress={() => setOpen(true)}>
@@ -508,4 +570,131 @@ export default function EditProfile({ navigation }) {
         </View>
     );
 }
+
+// Helper function to get cities for a province
+const getCitiesForProvince = (province) => {
+    const citiesByProvince = {
+        "Alberta": [
+            { label: "Calgary", value: "Calgary" },
+            { label: "Edmonton", value: "Edmonton" },
+            { label: "Red Deer", value: "Red Deer" },
+            { label: "Lethbridge", value: "Lethbridge" },
+            { label: "St. Albert", value: "St. Albert" },
+            { label: "Medicine Hat", value: "Medicine Hat" },
+            { label: "Grande Prairie", value: "Grande Prairie" },
+            { label: "Airdrie", value: "Airdrie" },
+            { label: "Spruce Grove", value: "Spruce Grove" },
+            { label: "Leduc", value: "Leduc" }
+        ],
+        "British Columbia": [
+            { label: "Vancouver", value: "Vancouver" },
+            { label: "Victoria", value: "Victoria" },
+            { label: "Surrey", value: "Surrey" },
+            { label: "Burnaby", value: "Burnaby" },
+            { label: "Richmond", value: "Richmond" },
+            { label: "Kelowna", value: "Kelowna" },
+            { label: "Abbotsford", value: "Abbotsford" },
+            { label: "Coquitlam", value: "Coquitlam" },
+            { label: "Saanich", value: "Saanich" },
+            { label: "Langley", value: "Langley" }
+        ],
+        "Manitoba": [
+            { label: "Winnipeg", value: "Winnipeg" },
+            { label: "Brandon", value: "Brandon" },
+            { label: "Steinbach", value: "Steinbach" },
+            { label: "Thompson", value: "Thompson" },
+            { label: "Portage la Prairie", value: "Portage la Prairie" },
+            { label: "Winkler", value: "Winkler" },
+            { label: "Selkirk", value: "Selkirk" },
+            { label: "Morden", value: "Morden" },
+            { label: "Dauphin", value: "Dauphin" },
+            { label: "The Pas", value: "The Pas" }
+        ],
+        "New Brunswick": [
+            { label: "Saint John", value: "Saint John" },
+            { label: "Moncton", value: "Moncton" },
+            { label: "Fredericton", value: "Fredericton" },
+            { label: "Dieppe", value: "Dieppe" },
+            { label: "Miramichi", value: "Miramichi" },
+            { label: "Edmundston", value: "Edmundston" },
+            { label: "Bathurst", value: "Bathurst" },
+            { label: "Campbellton", value: "Campbellton" },
+            { label: "Oromocto", value: "Oromocto" },
+            { label: "Quispamsis", value: "Quispamsis" }
+        ],
+        "Newfoundland and Labrador": [
+            { label: "St. John's", value: "St. John's" },
+            { label: "Conception Bay South", value: "Conception Bay South" },
+            { label: "Mount Pearl", value: "Mount Pearl" },
+            { label: "Paradise", value: "Paradise" },
+            { label: "Corner Brook", value: "Corner Brook" },
+            { label: "Grand Falls-Windsor", value: "Grand Falls-Windsor" },
+            { label: "Gander", value: "Gander" },
+            { label: "Happy Valley-Goose Bay", value: "Happy Valley-Goose Bay" },
+            { label: "Labrador City", value: "Labrador City" },
+            { label: "Stephenville", value: "Stephenville" }
+        ],
+        "Nova Scotia": [
+            { label: "Halifax", value: "Halifax" },
+            { label: "Cape Breton", value: "Cape Breton" },
+            { label: "Dartmouth", value: "Dartmouth" },
+            { label: "Sydney", value: "Sydney" },
+            { label: "Truro", value: "Truro" },
+            { label: "New Glasgow", value: "New Glasgow" },
+            { label: "Glace Bay", value: "Glace Bay" },
+            { label: "Kentville", value: "Kentville" },
+            { label: "Bridgewater", value: "Bridgewater" },
+            { label: "Yarmouth", value: "Yarmouth" }
+        ],
+        "Ontario": [
+            { label: "Toronto", value: "Toronto" },
+            { label: "Ottawa", value: "Ottawa" },
+            { label: "Mississauga", value: "Mississauga" },
+            { label: "Brampton", value: "Brampton" },
+            { label: "Hamilton", value: "Hamilton" },
+            { label: "London", value: "London" },
+            { label: "Markham", value: "Markham" },
+            { label: "Vaughan", value: "Vaughan" },
+            { label: "Kitchener", value: "Kitchener" },
+            { label: "Windsor", value: "Windsor" }
+        ],
+        "Prince Edward Island": [
+            { label: "Charlottetown", value: "Charlottetown" },
+            { label: "Summerside", value: "Summerside" },
+            { label: "Stratford", value: "Stratford" },
+            { label: "Cornwall", value: "Cornwall" },
+            { label: "Montague", value: "Montague" },
+            { label: "Kensington", value: "Kensington" },
+            { label: "Souris", value: "Souris" },
+            { label: "Alberton", value: "Alberton" },
+            { label: "Tignish", value: "Tignish" },
+            { label: "Georgetown", value: "Georgetown" }
+        ],
+        "Quebec": [
+            { label: "Montreal", value: "Montreal" },
+            { label: "Quebec City", value: "Quebec City" },
+            { label: "Laval", value: "Laval" },
+            { label: "Gatineau", value: "Gatineau" },
+            { label: "Longueuil", value: "Longueuil" },
+            { label: "Sherbrooke", value: "Sherbrooke" },
+            { label: "Saguenay", value: "Saguenay" },
+            { label: "Lévis", value: "Lévis" },
+            { label: "Trois-Rivières", value: "Trois-Rivières" },
+            { label: "Terrebonne", value: "Terrebonne" }
+        ],
+        "Saskatchewan": [
+            { label: "Saskatoon", value: "Saskatoon" },
+            { label: "Regina", value: "Regina" },
+            { label: "Prince Albert", value: "Prince Albert" },
+            { label: "Moose Jaw", value: "Moose Jaw" },
+            { label: "Swift Current", value: "Swift Current" },
+            { label: "Yorkton", value: "Yorkton" },
+            { label: "North Battleford", value: "North Battleford" },
+            { label: "Estevan", value: "Estevan" },
+            { label: "Weyburn", value: "Weyburn" },
+            { label: "Lloydminster", value: "Lloydminster" }
+        ]
+    };
+    return citiesByProvince[province] || [];
+};
 
