@@ -2,6 +2,7 @@ import { StyleSheet } from "react-native";
 import { color } from "react-native-elements/dist/helpers";
 import { Colors, Metrix } from "../../../config";
 import colors from "../../../config/Colors";
+import fonts from "../../../config/Fonts";
 
 
 const styles = StyleSheet.create({
@@ -19,7 +20,36 @@ const styles = StyleSheet.create({
     },
     categoryList:{
         gap : Metrix.VerticalSize(30),
-        marginBottom : Metrix.VerticalSize(30)
+        paddingBottom : Metrix.VerticalSize(30)
+    },
+    clearButton: {
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    searchButton: {
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: colors.buttonColor,
+        borderRadius: Metrix.LightRadius,
+        minWidth: 80
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: Metrix.VerticalSize(20)
+    },
+    emptyText: {
+        fontSize: Metrix.FontSmall,
+        color: colors.textColor,
+        fontFamily: fonts.InterRegular
     }
 })
 
