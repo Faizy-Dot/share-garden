@@ -273,12 +273,76 @@ export default function PostTabScreen({ navigation, route }) {
     }
   };
 
-  const handlePublishSGTip = () => {
-    setModalVisible(true)
-    setTimeout(() => {
-      setModalVisible(false)
-    }, 5000);
-  }
+  const handlePublishSGTip = async (isDraft = false) => {
+    try {
+        setLoading(true);
+        const formData = new FormData();
+
+        // Required fields for SG Tip
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('categoryId', categoryId);
+        formData.append('status', isDraft ? 'DRAFT' : 'PUBLISHED');
+
+        // Append images
+        images.filter(img => img !== null).forEach((image, index) => {
+            formData.append('images', {
+                uri: image,
+                type: 'image/jpeg',
+                name: `image${index}.jpg`,
+            });
+        });
+
+        const response = await axiosInstance.post(
+            '/api/sgtips',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+
+        console.log('SG Tip API Response:', response.data);
+
+        if (response.status === 201) {
+            setModalVisible(true);
+            if (isDraft) {
+                setDraft(true);
+                setPublish(false);
+            } else {
+                setDraft(false);
+                setPublish(true);
+            }
+
+            const timeout = setTimeout(() => {
+                setModalVisible(false);
+                resetPreviewForm();
+                onSuccess();
+                navigation.reset({
+                    index: 0,
+                    routes: [
+                        {
+                            name: 'PostList',
+                            params: { refresh: true }
+                        }
+                    ],
+                });
+            }, 7000);
+
+            setNavigateTimeout(timeout);
+        }
+    } catch (error) {
+        console.error('Error creating SG Tip:', error);
+        Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: error.response?.data?.message || 'Failed to create SG Tip',
+        });
+    } finally {
+        setLoading(false);
+    }
+  };
 
   const getDisplayCondition = (apiCondition) => {
     switch (apiCondition) {
@@ -529,7 +593,7 @@ export default function PostTabScreen({ navigation, route }) {
           borderRadius={Metrix.VerticalSize(4)}
           flex={1}
           disabled={loading}
-          onPress={() => activeButton === "SG Tip" ? handlePublishSGTip() : handlePublish(true)}
+          onPress={() => activeButton === "SG Tip" ? handlePublishSGTip(true) : handlePublish(true)}
         />
 
         <CustomButton
@@ -539,7 +603,7 @@ export default function PostTabScreen({ navigation, route }) {
           borderRadius={Metrix.VerticalSize(4)}
           flex={1}
           disabled={loading}
-          onPress={() => activeButton === "SG Tip" ? handlePublishSGTip() : handlePublish(false)}
+          onPress={() => activeButton === "SG Tip" ? handlePublishSGTip(false) : handlePublish(false)}
         />
       </View>
 
@@ -553,20 +617,25 @@ export default function PostTabScreen({ navigation, route }) {
               <CrossIcon />
             </TouchableOpacity>
             <ModalSuccessLogo />
-            {
-              draft ?
-                <Text style={styles.modalTitle}>Your SG item has been saved in drafts</Text>
-                :
-
-                activeButton === "SG Item" ?
-                  <Text style={styles.modalTitle}>Your SG item has been posted on <Text style={{ color: colors.buttonColor }}>SG marketplace</Text></Text>
-                  :
-                  <Text style={[styles.modalTitle, { width: "100%" }]}>Your SG Tips has been posted. </Text>
-            }
+            {draft ? (
+                <Text style={styles.modalTitle}>
+                    Your {activeButton === "SG Tip" ? "SG Tip" : "SG item"} has been saved in drafts
+                </Text>
+            ) : (
+                <Text style={styles.modalTitle}>
+                    {activeButton === "SG Item" ? (
+                        <>Your SG item has been posted on <Text style={{ color: colors.buttonColor }}>SG marketplace</Text></>
+                    ) : (
+                        "Your SG Tip has been posted"
+                    )}
+                </Text>
+            )}
 
             <View style={styles.bottomModalContainer}>
-              <ModalInfoIcon />
-              <Text style={styles.modalDescription}>You can access your {publish ? "posted" : "drafts"} item under <Text style={{ color: colors.redColor }}>Profile {">"} My posted items.</Text></Text>
+                <ModalInfoIcon />
+                <Text style={styles.modalDescription}>
+                    You can access your {publish ? "posted" : "drafts"} {activeButton === "SG Tip" ? "tip" : "item"} under <Text style={{ color: colors.redColor }}>Profile {">"} My {activeButton === "SG Tip" ? "SG Tips" : "posted items"}.</Text>
+                </Text>
             </View>
           </View>
         </View>
