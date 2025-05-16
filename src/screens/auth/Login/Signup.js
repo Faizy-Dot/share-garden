@@ -163,8 +163,6 @@ const [selectedProvince , setSelectedProvince] = useState("")
         console.log(error)
     }
 
-    const usertypeid = isSGMember ? "1" : "2"
-
     const [emailError, setEmailError] = useState('');
 
     // Add state for password

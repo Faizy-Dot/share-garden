@@ -21,6 +21,7 @@ import ProductDetail from "./items/productDetails/ProductDetail";
 import BidsReview from "../profile/myBids/bidsReview/BidsReview";
 import PreviewPostedSgItems from "../profile/mySGItems/previewPostedSGItems/PreviewPostedSgItems";
 import SubmitReview from "../profile/submitReview/SubmitReview";
+import TipsDetail from "./tips/tipsDetail/TipsDetail";
 
 
 
@@ -68,6 +69,7 @@ function PostStackScreen() {
          <ItemsStack.Screen name="BidsReview" component={BidsReview} />
          <ItemsStack.Screen name="PreviewPostedSgItems" component={PreviewPostedSgItems} />
          <ItemsStack.Screen name="SubmitReview" component={SubmitReview} />
+         <ItemsStack.Screen name="TipsDetail" component={TipsDetail} />
       </ItemsStack.Navigator>
     );
   }

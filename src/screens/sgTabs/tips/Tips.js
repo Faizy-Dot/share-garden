@@ -13,7 +13,7 @@ import axiosInstance from "../../../config/axios";
 import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
-export default function TipsTabScreen() {
+export default function TipsTabScreen({navigation}) {
     const [tips, setTips] = useState([]);
     const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState([]);
@@ -205,7 +205,7 @@ export default function TipsTabScreen() {
         const timeAgo = calculateTimeAgo(item.publishedAt);
         
         return (
-            <View style={styles.categoryContainer}>
+            <TouchableOpacity onPress={()=> navigation.navigate("TipsDetail",item)} style={styles.categoryContainer}>
                 <View style={{ flexDirection: "row", padding: 20, gap: Metrix.HorizontalSize(15), width: "100%" }}>
                     <Image 
                         source={firstImage ? { uri: firstImage } : Images.homePopularListing} 
@@ -219,28 +219,28 @@ export default function TipsTabScreen() {
                 </View>
 
                 <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                    <View style={{ flexDirection: "row", gap: 5 }}>
+                    <View style={styles.logoContainer}>
                         <ViewsIcon />
-                        <Text>{item.views || 0} Views</Text>
+                        <Text style={styles.containertext}>{item.views || 0} Views</Text>
                     </View>
                     <TouchableOpacity 
-                        style={{ flexDirection: "row", gap: 5 }}
+                        style={styles.logoContainer}
                         onPress={() => handleLike(item.id)}
                         disabled={likingTipId === item.id}
                     >
                         <LikesIcon fill={item.isLiked ? colors.redColor : 'none'} />
-                        <Text>{item._count.likes || 0} Likes</Text>
+                        <Text style={styles.containertext}>{item._count.likes || 0} Likes</Text>
                     </TouchableOpacity>
-                    <View style={{ flexDirection: "row", gap: 5 }}>
+                    <View style={styles.logoContainer}>
                         <ShareIcon />
-                        <Text>{item.shares || 0} Shared</Text>
+                        <Text style={styles.containertext}>{item.shares || 0} Shared</Text>
                     </View>
-                    <View style={{ flexDirection: "row", gap: 5 }}>
+                    <View style={styles.logoContainer}>
                         <TimeIcon />
-                        <Text>{timeAgo}</Text>
+                        <Text style={styles.containertext}>{timeAgo}</Text>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     };
 

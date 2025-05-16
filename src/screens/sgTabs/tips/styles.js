@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
         borderWidth : 1,
         borderColor : colors.borderColor,
         width:"100%",
-        height : Metrix.VerticalSize(200),
+        height : Metrix.VerticalSize(215),
         borderRadius : Metrix.LightRadius,
     },
     categoryList:{
@@ -50,6 +50,15 @@ const styles = StyleSheet.create({
         fontSize: Metrix.FontSmall,
         color: colors.textColor,
         fontFamily: fonts.InterRegular
+    },
+    containertext:{
+        fontSize:Metrix.FontExtraSmall,
+        fontFamily : fonts.InterRegular
+    },
+    logoContainer:{
+        flexDirection :"row",
+        alignItems :"center",
+        gap : Metrix.HorizontalSize(5)
     }
 })
 

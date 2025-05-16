@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ScrollView } from 'react-native';
 import NavBar from '../../../components/navBar/NavBar';
 import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
@@ -7,7 +7,9 @@ import { Images, Metrix } from '../../../config';
 import fonts from '../../../config/Fonts';
 import colors from '../../../config/Colors';
 import { EditIcon, GreenBitIcon, PointsEarnIcon, SgTipsIcon } from '../../../assets/svg';
-
+import axiosInstance from '../../../config/axios';
+import { ActivityIndicator } from 'react-native-paper';
+import { useSelector } from 'react-redux';
 
 const publishedSGTipsData = [
   {
@@ -71,6 +73,36 @@ const renderData = (item) => {
 }
 
 export default function MySGTips() {
+
+ const { user } = useSelector((state) => state.login);
+ const [loading, setLoading] = useState(true);
+
+//  console.log("user==>>",user)
+
+    const fetchData = async () => {
+        try {
+            const response = await axiosInstance.get(`/api/sgtips/user/${user.id}`);
+            console.log("response user tips==>>",response.data)
+        } catch (error) {
+            console.error('Failed to fetch SG Tip:', error?.response?.data || error.message);
+        } finally {
+            setLoading(false); 
+        }
+    }
+
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+
+    if (loading) {
+        return (
+            <View style={[styles.mainContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color={colors.buttonColor} />
+            </View>
+        );
+    }
+
   return (
     <View style={styles.myTipsContainer}>
       <View style={styles.topContainer}>

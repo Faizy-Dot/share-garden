@@ -18,6 +18,7 @@ export default function NavBar({
 }) {
     const { user } = useSelector((state) => state.login);
 
+
     const navigation = useNavigation()
     return (
         <View style={styles.userDetail}>
