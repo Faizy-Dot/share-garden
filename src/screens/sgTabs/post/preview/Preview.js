@@ -13,7 +13,7 @@ import styles from "./style";
 import fonts from "../../../../config/Fonts";
 import CustomButton from "../../../../components/Button/Button";
 import axiosInstance from '../../../../config/axios';
-import { BlackBitIcon, CashIcon, CrossIcon, ModalInfoIcon, ModalSuccessLogo, TimeIcon } from "../../../../assets/svg";
+import { BlackBitIcon, CashIcon, CrossIcon, ModalInfoIcon, ModalSuccessLogo, SgTipsIcon, TimeIcon, TipsTabIcon } from "../../../../assets/svg";
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 
@@ -47,10 +47,12 @@ export default function PostTabScreen({ navigation, route }) {
     categoryId,
     categoryName,
     onSuccess,
-    activeButton
+    activeButton,
+    fromSGTips
   } = route.params;
 
-  console.log("checked==>>>", activeButton)
+
+  console.log("checked==>>>", fromSGTips)
 
 
   const handleInput = (text, setter, field) => {
@@ -273,9 +275,14 @@ export default function PostTabScreen({ navigation, route }) {
     }
   };
 
+  console.log("images==>>>", images)
+
   const handlePublishSGTip = async (isDraft = false) => {
     try {
-        setLoading(true);
+      setLoading(true);
+    let response ;
+
+      if (fromSGTips) {
         const formData = new FormData();
 
         // Required fields for SG Tip
@@ -283,64 +290,91 @@ export default function PostTabScreen({ navigation, route }) {
         formData.append('description', description);
         formData.append('categoryId', categoryId);
         formData.append('status', isDraft ? 'DRAFT' : 'PUBLISHED');
-
-        // Append images
-        images.filter(img => img !== null).forEach((image, index) => {
-            formData.append('images', {
-                uri: image,
-                type: 'image/jpeg',
-                name: `image${index}.jpg`,
-            });
+        formData.append('existingImages', `${images[0] || null} ,${images[1] || null} ,${images[2] || null} , `); // If you want to keep specific images
+         images.filter(img => img !== null).forEach((image, index) => {
+          formData.append('images', {
+            uri: image,
+            type: 'image/jpeg',
+            name: `image${index}.jpg`,
+          });
         });
-
-        const response = await axiosInstance.post(
-            '/api/sgtips',
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
+         response = await axiosInstance.post(
+          `/api/sgtips/update-sgtip/${fromSGTips.id}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
         );
 
-        console.log('SG Tip API Response:', response.data);
+        console.log('updated SG Tip API Response:', response);
+      } else {
+        const formData = new FormData();
 
-        if (response.status === 201) {
-            setModalVisible(true);
-            if (isDraft) {
-                setDraft(true);
-                setPublish(false);
-            } else {
-                setDraft(false);
-                setPublish(true);
-            }
-
-            const timeout = setTimeout(() => {
-                setModalVisible(false);
-                resetPreviewForm();
-                onSuccess();
-                navigation.reset({
-                    index: 0,
-                    routes: [
-                        {
-                            name: 'PostList',
-                            params: { refresh: true }
-                        }
-                    ],
-                });
-            }, 7000);
-
-            setNavigateTimeout(timeout);
-        }
-    } catch (error) {
-        console.error('Error creating SG Tip:', error);
-        Toast.show({
-            type: 'error',
-            text1: 'Error',
-            text2: error.response?.data?.message || 'Failed to create SG Tip',
+        // Required fields for SG Tip
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('categoryId', categoryId);
+        formData.append('status', isDraft ? 'DRAFT' : 'PUBLISHED');
+        // Append images
+        images.filter(img => img !== null).forEach((image, index) => {
+          formData.append('images', {
+            uri: image,
+            type: 'image/jpeg',
+            name: `image${index}.jpg`,
+          });
         });
+         response = await axiosInstance.post(
+          '/api/sgtips',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+
+        console.log('New SG Tip API Response:', response.data);
+      }
+
+
+      if (response.status === 201 || response.status === 200) {
+        setModalVisible(true);
+        if (isDraft) {
+          setDraft(true);
+          setPublish(false);
+        } else {
+          setDraft(false);
+          setPublish(true);
+        }
+
+        const timeout = setTimeout(() => {
+          setModalVisible(false);
+          resetPreviewForm();
+          onSuccess();
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'PostList',
+                params: { refresh: true }
+              }
+            ],
+          });
+        }, 7000);
+
+        setNavigateTimeout(timeout);
+      }
+    } catch (error) {
+      console.error('Error creating SG Tip:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error.response?.data?.message || 'Failed to create SG Tip',
+      });
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -417,7 +451,7 @@ export default function PostTabScreen({ navigation, route }) {
       </View>
 
       {
-        activeButton === "SG Item" ? 
+        activeButton === "SG Item" ?
           <View style={styles.middleContainer}>
             <Text style={styles.middleHeading}>ITEMS PREVIEW</Text>
             <View style={styles.middleBox}>
@@ -525,7 +559,7 @@ export default function PostTabScreen({ navigation, route }) {
             <View style={{ paddingHorizontal: Metrix.HorizontalSize(10), gap: Metrix.HorizontalSize(25) }}>
               <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>Preview</Text>
               <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
-                <Image source={Images.tipsGreenTab} style={{ width: Metrix.HorizontalSize(24), height: Metrix.HorizontalSize(24) }} />
+                <TipsTabIcon width={24} height={24} color={colors.buttonColor} />
                 <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{title}</Text>
               </View>
             </View>
@@ -563,10 +597,10 @@ export default function PostTabScreen({ navigation, route }) {
 
               <View style={{ borderWidth: 1, borderColor: colors.borderColor, padding: Metrix.VerticalSize(20), borderRadius: Metrix.VerticalSize(3), flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
                 {
-                  user.profileImage ? 
-                  <Image source={{ uri: user?.profileImage }} style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64), borderRadius: 32 }} />
-                :
-                 <FontAwesomeIcon name="user-circle" size={Metrix.HorizontalSize(64)} color="#ccc" />
+                  user.profileImage ?
+                    <Image source={{ uri: user?.profileImage }} style={{ width: Metrix.HorizontalSize(64), height: Metrix.HorizontalSize(64), borderRadius: 32 }} />
+                    :
+                    <FontAwesomeIcon name="user-circle" size={Metrix.HorizontalSize(64)} color="#ccc" />
                 }
                 <View>
                   <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>Posted by | SG Member</Text>
@@ -618,24 +652,24 @@ export default function PostTabScreen({ navigation, route }) {
             </TouchableOpacity>
             <ModalSuccessLogo />
             {draft ? (
-                <Text style={styles.modalTitle}>
-                    Your {activeButton === "SG Tip" ? "SG Tip" : "SG item"} has been saved in drafts
-                </Text>
+              <Text style={styles.modalTitle}>
+                Your {activeButton === "SG Tip" ? "SG Tip" : "SG item"} has been saved in drafts
+              </Text>
             ) : (
-                <Text style={styles.modalTitle}>
-                    {activeButton === "SG Item" ? (
-                        <>Your SG item has been posted on <Text style={{ color: colors.buttonColor }}>SG marketplace</Text></>
-                    ) : (
-                        "Your SG Tip has been posted"
-                    )}
-                </Text>
+              <Text style={styles.modalTitle}>
+                {activeButton === "SG Item" ? (
+                  <>Your SG item has been posted on <Text style={{ color: colors.buttonColor }}>SG marketplace</Text></>
+                ) : (
+                  "Your SG Tip has been posted"
+                )}
+              </Text>
             )}
 
             <View style={styles.bottomModalContainer}>
-                <ModalInfoIcon />
-                <Text style={styles.modalDescription}>
-                    You can access your {publish ? "posted" : "drafts"} {activeButton === "SG Tip" ? "tip" : "item"} under <Text style={{ color: colors.redColor }}>Profile {">"} My {activeButton === "SG Tip" ? "SG Tips" : "posted items"}.</Text>
-                </Text>
+              <ModalInfoIcon />
+              <Text style={styles.modalDescription}>
+                You can access your {publish ? "posted" : "drafts"} {activeButton === "SG Tip" ? "tip" : "item"} under <Text style={{ color: colors.redColor }}>Profile {">"} My {activeButton === "SG Tip" ? "SG Tips" : "posted items"}.</Text>
+              </Text>
             </View>
           </View>
         </View>

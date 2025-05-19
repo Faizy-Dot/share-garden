@@ -44,6 +44,8 @@ import BidTitleIcon from "./BidTitleIcon";
 import DownArrowIcon from "./DownArrowIcon";
 import EditIcon from "./EditIcon";
 import DropDownGreenArrow from "./DropDownGreenArrow";
+import CommentLogo from "./CommentLogo";
+
 
 export{
     BellIcon,
@@ -91,6 +93,7 @@ export{
     BidTitleIcon,
     DownArrowIcon,
     EditIcon,
-    DropDownGreenArrow
+    DropDownGreenArrow,
+    CommentLogo
 
 }

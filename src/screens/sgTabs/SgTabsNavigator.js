@@ -29,7 +29,7 @@ const ItemsStack = createNativeStackNavigator();
 
 function PostStackScreen() {
     return (
-      <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
+      <ItemsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="PostList">
         <ItemsStack.Screen name="PostList" component={PostTabScreen} />
         <ItemsStack.Screen name="Profile" component={Profile} />
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />

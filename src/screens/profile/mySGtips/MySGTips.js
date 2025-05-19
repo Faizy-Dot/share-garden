@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import NavBar from '../../../components/navBar/NavBar';
 import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
 import styles from './style';
@@ -50,58 +50,85 @@ const draftsSGTipsData = [
   }
 ]
 
-const renderData = (item) => {
-  return (
-    <View key={item.id} style={styles.renderDataContainer}>
-      <View style={styles.renderLeftContainer}>
-        <SgTipsIcon />
-        <Text style={styles.renderTitle}>{item.title}</Text>
-      </View>
-      {
-        item.bids &&
-        <View style={styles.bidsContainer}>
-          <GreenBitIcon />
-          <Text>{item.bids}</Text>
+
+
+export default function MySGTips({ navigation }) {
+
+  const { user } = useSelector((state) => state.login);
+  const [loading, setLoading] = useState(true);
+  const [mySGTips, setMySGTips] = useState([])
+  const [activeTips, setActiveTips] = useState([]);
+  const [draftTips, setDraftTips] = useState([])
+  const [error, setError] = useState(null)
+
+  //  console.log("user==>>",user)
+
+  const renderData = (item) => {
+    return (
+      <TouchableOpacity onPress={() => navigation.navigate("Post", {
+        screen: "PostList",
+        params: { ...item }
+      })}
+       key={item.id} style={styles.renderDataContainer}>
+        <View style={styles.renderLeftContainer}>
+          <SgTipsIcon />
+          <Text style={styles.renderTitle}>{item.title}</Text>
         </View>
-      }
-      {
-        item.edit &&
-        <EditIcon />
-      }
-    </View>
-  )
-}
-
-export default function MySGTips() {
-
- const { user } = useSelector((state) => state.login);
- const [loading, setLoading] = useState(true);
-
-//  console.log("user==>>",user)
-
-    const fetchData = async () => {
-        try {
-            const response = await axiosInstance.get(`/api/sgtips/user/${user.id}`);
-            console.log("response user tips==>>",response.data)
-        } catch (error) {
-            console.error('Failed to fetch SG Tip:', error?.response?.data || error.message);
-        } finally {
-            setLoading(false); 
+        {
+          item.status === "PUBLISHED" &&
+          <View style={styles.bidsContainer}>
+            <GreenBitIcon />
+            <Text>600</Text>
+          </View>
         }
+        {
+          item.status === "DRAFT" &&
+          <EditIcon />
+        }
+      </TouchableOpacity>
+    )
+  }
+
+  const fetchData = async () => {
+    try {
+      const response = await axiosInstance.get(`/api/sgtips/user/${user.id}`);
+      // console.log("response user tips==>>", response.data)
+      setMySGTips(response.data)
+      const publishedTips = response.data.filter(tip => tip.status === "PUBLISHED");
+      const draftTips = response.data.filter(tip => tip.status === "DRAFT");
+      setActiveTips(publishedTips)
+      setDraftTips(draftTips)
+
+    } catch (error) {
+      console.error('Failed to fetch SG Tip:', error?.response?.data || error.message);
+      setError("Failed to fetch tips. Please try again later.")
+    } finally {
+      setLoading(false);
     }
+  }
 
-    useEffect(() => {
-        fetchData()
-    }, [])
+  useEffect(() => {
+    fetchData()
+  }, [])
 
+  console.log("mysgTips===>>>", mySGTips)
+  // console.log("activeTips===>>>", activeTips)
+  // console.log("draftTips===>>>", draftTips)
 
-    if (loading) {
-        return (
-            <View style={[styles.mainContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-                <ActivityIndicator size="large" color={colors.buttonColor} />
-            </View>
-        );
-    }
+  if (loading) {
+    return (
+      <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+        <ActivityIndicator size="large" color={colors.buttonColor} />
+      </View>
+    );
+  }
+  if (error) {
+    return (
+      <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+        <Text>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.myTipsContainer}>
@@ -122,8 +149,8 @@ export default function MySGTips() {
         </View>
         <View style={styles.middleTotalTips}>
           <View style={styles.middleTipsCount}>
-            <Text style={styles.middleHeading}>Total Tips : 06</Text>
-            <Text style={styles.middleHeading}>Active : 02</Text>
+            <Text style={styles.middleHeading}>Total Tips : 0{mySGTips.length}</Text>
+            <Text style={styles.middleHeading}>Active : 0{activeTips.length}</Text>
           </View>
         </View>
       </View>
@@ -132,11 +159,20 @@ export default function MySGTips() {
       <ScrollView style={styles.bottomContainer} contentContainerStyle={{ gap: Metrix.VerticalSize(20), }}>
         <View>
           <Text style={[styles.bottomSameText, { color: colors.buttonColor }]}>Published SG Tips</Text>
-          {publishedSGTipsData.map(renderData)}
+          {activeTips.map(renderData)}
+          {
+            activeTips.length === 0 &&
+            <Text style={styles.noPublishTips}>No Published Tips</Text>
+          }
+
         </View>
         <View>
           <Text style={[styles.bottomSameText, { color: colors.redColor }]}>Draft SG Tips</Text>
-          {draftsSGTipsData.map(renderData)}
+          {draftTips.map(renderData)}
+          {
+            draftTips.length === 0 &&
+            <Text style={styles.noPublishTips}>No Draft Tips</Text>
+          }
         </View>
         <View>
           <Text style={styles.bottomSameText}>Favourite SG Tips</Text>

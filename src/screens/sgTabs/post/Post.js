@@ -43,6 +43,8 @@ export default function PostTabScreen({ navigation, route }) {
 
     const { user } = useSelector((state) => state.login)
 
+    console.log("from mysgTips==>>", route.params)
+
     const resetForm = () => {
         setActiveButton("SG Item");
         setSGPoints(true);
@@ -232,6 +234,37 @@ export default function PostTabScreen({ navigation, route }) {
         return null;
     }
 
+    useEffect(() => {
+    if (route.params) {
+      
+  const receivedImages = route.params.imagesArray || [];
+    const paddedImages = [...receivedImages];
+    while (paddedImages.length < 3) {
+      paddedImages.push(null);
+    }
+
+      setActiveButton("SG Tip"); // or derive from params
+      setImages(paddedImages);
+      setTitle(route.params.title || "");
+      setDescription(route.params.description || "");
+      setSelectedCategory(route.params.categoryId || null);
+      setSelectedCategoryName(route.params.category?.name || "");
+      setChecked(route.params.condition || "");
+      // ...and so on for other fields
+    } else {
+      // Clear everything if no params
+      setActiveButton("SG Item");
+      setImages([null, null, null]);
+      setTitle("");
+      setDescription("");
+      setSelectedCategory(null);
+      setSelectedCategoryName("");
+      setChecked("");
+    }
+  }, [route.params]);
+
+  console.log(images)
+
 
 
     const handlePreview = () => {
@@ -253,7 +286,8 @@ export default function PostTabScreen({ navigation, route }) {
                 categoryName: selectedCategoryName,
                 isSGPoints: sgPoints,
                 onSuccess: resetForm,
-                activeButton: activeButton
+                activeButton: activeButton,
+                fromSGTips : route.params
             });
             return;
         }
@@ -278,7 +312,7 @@ export default function PostTabScreen({ navigation, route }) {
             condition: checked,
             pointOrCashValue: pointOrCashValue,
             onSuccess: resetForm,
-            activeButton: activeButton
+            activeButton: activeButton,
         });
     };
 

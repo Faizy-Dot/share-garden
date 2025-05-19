@@ -93,6 +93,13 @@ const styles = StyleSheet.create({
     editIcon:{
         height: Metrix.VerticalSize(19),
         width: Metrix.VerticalSize(16),
+    },
+    noPublishTips :{
+        textAlign : "center",
+        fontSize : Metrix.normalize(16),
+        fontFamily : fonts.InterRegular,
+        position : "relative",
+        top : Metrix.VerticalSize(10)
     }
 })
 

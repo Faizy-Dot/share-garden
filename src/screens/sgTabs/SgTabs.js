@@ -43,11 +43,95 @@ export default function SgTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Post" component={PostStackScreen} />
-      <Tab.Screen name="Tips" component={TipsStackScreen} />
-      <Tab.Screen name="Items" component={ItemsStackScreen} />
-      <Tab.Screen name="Rewards" component={RewardsStackScreen} />
-      <Tab.Screen name="Ads" component={AdsStackScreen} />
+    <Tab.Screen
+  name="Post"
+  component={PostStackScreen}
+  listeners={({ navigation, route }) => ({
+    tabPress: e => {
+      const state = navigation.getState();
+      const tab = state.routes.find(r => r.name === "Post");
+      const nestedState = tab?.state;
+
+      const isOnPostList = nestedState?.routes[nestedState.index]?.name === "PostList";
+
+      if (!isOnPostList) {
+        e.preventDefault(); // Prevent default tab behavior
+        navigation.navigate("Post", {
+          screen: "PostList" // <-- Reset to PostList screen
+        });
+      }
+    
+    }
+  })}
+/>
+     <Tab.Screen
+  name="Tips"
+  component={TipsStackScreen}
+  listeners={({ navigation }) => ({
+    tabPress: e => {
+      const state = navigation.getState();
+      const tab = state.routes.find(r => r.name === "Tips");
+      const nestedState = tab?.state;
+
+      const isOnTipsList = nestedState?.routes[nestedState.index]?.name === "TipsList"; // Adjust screen name
+      if (!isOnTipsList) {
+        e.preventDefault();
+        navigation.navigate("Tips", {
+          screen: "TipsList"
+        });
+      }
+    }
+  })}
+/>
+
+      <Tab.Screen name="Items" component={ItemsStackScreen} 
+       listeners={({ navigation }) => ({
+    tabPress: e => {
+      const state = navigation.getState();
+      const tab = state.routes.find(r => r.name === "Items");
+      const nestedState = tab?.state;
+
+      const isOnTipsList = nestedState?.routes[nestedState.index]?.name === "TipsList"; // Adjust screen name
+      if (!isOnTipsList) {
+        e.preventDefault();
+        navigation.navigate("Items", {
+          screen: "ItemsList"
+        });
+      }
+    }
+  })} />
+      <Tab.Screen name="Rewards" component={RewardsStackScreen}  
+       listeners={({ navigation }) => ({
+    tabPress: e => {
+      const state = navigation.getState();
+      const tab = state.routes.find(r => r.name === "Rewards");
+      const nestedState = tab?.state;
+
+      const isOnTipsList = nestedState?.routes[nestedState.index]?.name === "TipsList"; // Adjust screen name
+      if (!isOnTipsList) {
+        e.preventDefault();
+        navigation.navigate("Rewards", {
+          screen: "RewardsList"
+        });
+      }
+    }
+  })}/>
+      <Tab.Screen name="Ads" component={AdsStackScreen} 
+       listeners={({ navigation }) => ({
+    tabPress: e => {
+      const state = navigation.getState();
+      const tab = state.routes.find(r => r.name === "Ads");
+      const nestedState = tab?.state;
+
+      const isOnTipsList = nestedState?.routes[nestedState.index]?.name === "TipsList"; // Adjust screen name
+      if (!isOnTipsList) {
+        e.preventDefault();
+        navigation.navigate("Ads", {
+          screen: "AdsList"
+        });
+      }
+    }
+  })}/>
     </Tab.Navigator>
   );
 }

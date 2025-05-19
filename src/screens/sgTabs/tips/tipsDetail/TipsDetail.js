@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, FlatList } from 'react-native';
 import axiosInstance from '../../../../config/axios';
 import styles from './styles';
 import BackArrowIcon from '../../../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../../../components/navBar/NavBar';
-import { GreenBitIcon, TipsTabIcon } from '../../../../assets/svg';
+import { CommentLogo, GreenBitIcon, SgProfileLogo, TipsTabIcon } from '../../../../assets/svg';
 import colors from '../../../../config/Colors';
-import { Metrix } from '../../../../config';
+import { Images, Metrix } from '../../../../config';
 import fonts from '../../../../config/Fonts';
 import { ActivityIndicator } from 'react-native-paper';
+import { images } from '../../../../assets';
 
 export default function TipsDetail({ route }) {
-    console.log(route.params.imageArray)
+    // console.log(route.params.imageArray)
 
     const [sgtipDetail, setSgtipDetail] = useState("")
     const [loading, setLoading] = useState(true);
@@ -48,6 +49,32 @@ export default function TipsDetail({ route }) {
             </View>
         );
     }
+
+    const commentsList = [
+        {
+            comment: "This trick is totally works , Highly recommend",
+            time: "Recent 7pm"
+        },
+        {
+            comment: "Quick solution , Highly recommend",
+            time: "3 days ago"
+        },
+    ]
+
+    const commentsListRender = ({ item }) => {
+        return (
+            <View style={styles.commentListRenderConatiner}>
+                <View style={styles.renderImageText}>
+                    <Image source={Images.homeProfile} style={styles.profileImage} />
+                    <Text style={styles.commentText}>{item.comment}</Text>
+                </View>
+               <Text style={styles.timeText}>{item.time}</Text>
+            </View>
+        )
+    }
+
+
+
     return (
         <View style={styles.mainContainer}>
             <View style={styles.topContainer}>
@@ -77,27 +104,39 @@ export default function TipsDetail({ route }) {
             <View style={styles.descriptionImgContainer}>
                 <Text>{sgtipDetail.description}</Text>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: Metrix.VerticalSize(15) }}>
-                  <View style={styles.SGTipimageContainer}>
-                    {
-                      route.params.imageArray[0] &&
-                      <Image source={{ uri: route.params.imageArray[0] }} style={styles.SGTipupdateImage} />
-                    }
-                  </View>
-                  <View style={styles.SGTipimageContainer}>
-                    {
-                      route.params.imageArray[1] &&
-                      <Image source={{ uri: route.params.imageArray[1] }} style={styles.SGTipupdateImage} />
-                    }
-                  </View>
-                  <View style={styles.SGTipimageContainer}>
-                    {
-                      route.params.imageArray[2] &&
-                      <Image source={{ uri: route.params.imageArray[2] }} style={styles.SGTipupdateImage} />
-                    }
-                  </View>
+                    <View style={styles.SGTipimageContainer}>
+                        {
+                            route.params.imageArray[0] &&
+                            <Image source={{ uri: route.params.imageArray[0] }} style={styles.SGTipupdateImage} />
+                        }
+                    </View>
+                    <View style={styles.SGTipimageContainer}>
+                        {
+                            route.params.imageArray[1] &&
+                            <Image source={{ uri: route.params.imageArray[1] }} style={styles.SGTipupdateImage} />
+                        }
+                    </View>
+                    <View style={styles.SGTipimageContainer}>
+                        {
+                            route.params.imageArray[2] &&
+                            <Image source={{ uri: route.params.imageArray[2] }} style={styles.SGTipupdateImage} />
+                        }
+                    </View>
                 </View>
             </View>
 
+            <View style={styles.commentContainer}>
+                <View style={styles.commentTopContainer}>
+                    <CommentLogo />
+                    <Text style={styles.commentHeading}>Comments</Text>
+                </View>
+
+                <View style={styles.commentsSection}>
+                    <FlatList data={commentsList}
+                        renderItem={commentsListRender}
+                        contentContainerStyle={{ gap: Metrix.VerticalSize(15) }} />
+                </View>
+            </View>
 
         </View>
     );
