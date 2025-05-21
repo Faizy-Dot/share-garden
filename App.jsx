@@ -12,17 +12,23 @@ import store from './src/redux/store';
 import ForgotPassword from './src/screens/auth/Login/frogotPassword/ForgotPassword';
 import OneTimePassword from './src/screens/auth/Login/frogotPassword/OneTimePassword';
 import ResetPassword from './src/screens/auth/Login/frogotPassword/ResetPassword';
+import MerchantTabNavigtor from './src/screens/merchantScreens/merchantTabs/MerchantTabs';
 
 const Stack = createNativeStackNavigator();
 
 function AppNavigator() {
   const { user } = useSelector((state) => state.login); // Fetch user from Redux state
-
   useEffect(() => {
     setTimeout(() => {
       SplashScreen.hide();
     }, 2000);
   }, []);
+
+  const getInitialRoute = () => {
+    if (!user) return 'OnBoarding';
+    if (user.role === 'MERCHANT') return 'MerchantTabs';
+    return 'SgTabs';
+  };
 
   return (
     <NavigationContainer
@@ -30,23 +36,28 @@ function AppNavigator() {
       onStateChange={() => {
         const currentRoute = NavigationService.getCurrentRoute();
         if (currentRoute.name === 'OnBoarding') {
-            if (Platform.OS === 'android') {
+          if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.white); // Android-specific
-            }
+          }
           StatusBar.setBarStyle('light-content');
         } else {
-            if (Platform.OS === 'android') {
+          if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.white); // Android-specific
-            }
+          }
           StatusBar.setBarStyle('dark-content');
         }
       }}
     >
-      <Stack.Navigator initialRouteName={user ? 'SgTabs' : 'OnBoarding'} screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={getInitialRoute()} screenOptions={{ headerShown: false }}>
         {user ? (
           // Authenticated user screens
           <>
-            <Stack.Screen name="SgTabs" component={SgTabNavigator} />
+            {
+              user?.role === "MERCHANT" ?
+                <Stack.Screen name="MerchantTabs" component={MerchantTabNavigtor} />
+                :
+                <Stack.Screen name="SgTabs" component={SgTabNavigator} />
+            }
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
             <Stack.Screen name="OneTimePassword" component={OneTimePassword} />
@@ -55,12 +66,12 @@ function AppNavigator() {
         ) : (
           // Unauthenticated user screens
           <>
-            <Stack.Screen name="SgTabs" component={SgTabNavigator} />
+            {/* <Stack.Screen name="SgTabs" component={SgTabNavigator} /> */}
             <Stack.Screen name="OnBoarding" component={OnboardingScreen} />
             <Stack.Screen name="GetStarted" component={GetStarted} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Signup" component={Signup} />
-            <Stack.Screen name="SuccessSignup" component={SuccessSignupScreen}/>
+            <Stack.Screen name="SuccessSignup" component={SuccessSignupScreen} />
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
             <Stack.Screen name="OneTimePassword" component={OneTimePassword} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />

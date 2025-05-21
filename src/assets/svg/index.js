@@ -45,9 +45,16 @@ import DownArrowIcon from "./DownArrowIcon";
 import EditIcon from "./EditIcon";
 import DropDownGreenArrow from "./DropDownGreenArrow";
 import CommentLogo from "./CommentLogo";
-
+import MerchantHomeIcon from "./MerchanyHomeIcon";
+import MerchantCouponIcon from "./MerchantCouponIcon";
+import MerchantOfferIcon from "./MerchantOfferIcon";
+import MerchantAccountIcon from "./MerchantAccountIcon";
 
 export{
+    MerchantAccountIcon,
+    MerchantOfferIcon,
+    MerchantCouponIcon,
+    MerchantHomeIcon,
     BellIcon,
     DescriptionLogo,
     Logo,

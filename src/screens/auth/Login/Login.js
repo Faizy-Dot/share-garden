@@ -123,9 +123,15 @@ const Login = ({ navigation }) => {
                     type: 'success',
                     text1: res.message,
                 });
-                setTimeout(() => {
-                    navigation.navigate('SgTabs');
-                }, 2000);
+                if (res.role === "MERCHANT") {
+                    setTimeout(() => {
+                        navigation.navigate('MerchantTabs');
+                    }, 2000);
+                } else {
+                    setTimeout(() => {
+                        navigation.navigate('SgTabs');
+                    }, 2000);
+                }
             } else {
                 Toast.show({
                     type: 'error',
@@ -160,7 +166,7 @@ const Login = ({ navigation }) => {
                     placeholderTextColor="#999"
                     onChangeText={setEmail}
                 />
-                <View style={{flexDirection : "row" , alignItems:"center"}}>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
@@ -170,7 +176,7 @@ const Login = ({ navigation }) => {
                     />
                     <TouchableOpacity
                         onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                        style={{position : "absolute" , right:Metrix.HorizontalSize(10), paddingBottom : Metrix.VerticalSize(10)}}
+                        style={{ position: "absolute", right: Metrix.HorizontalSize(10), paddingBottom: Metrix.VerticalSize(10) }}
                     >
                         <Icon
                             name={isPasswordVisible ? "visibility" : "visibility-off"}
