@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-export default function MerchantAccount() {
+export default function MerchantTips() {
   return (
     <View>
-      <Text>MerchantAccount</Text>
+      <Text>MerchantTips</Text>
      </View>
   );
 }

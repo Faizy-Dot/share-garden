@@ -1,17 +1,17 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import MerchantHome from "./home/MerchantHome";
 import MerchantCoupons from "./coupons/MerchantCoupons";
-import MerchantOffers from "./offers/MerchantOffers";
 import MerchantAds from "./ads/MerchantAds";
-import MerchantAccount from "./account/MerchantAccount";
+import MerchantTips from "./tips/MerchantTips";
+import MerchantItems from "./items/MerchantItems";
+import MerchantPostAD from "./PostAD/MerchantPostAD";
 
 
 const ItemsStack = createNativeStackNavigator();
 
-function MerchantHomeStackScreen() {
+function MerchantItemsStackScreen() {
     return (
       <ItemsStack.Navigator screenOptions={{ headerShown: false }} >
-        <ItemsStack.Screen name="MerchantHomeScreen" component={MerchantHome} />
+        <ItemsStack.Screen name="MerchantItemsScreen" component={MerchantItems} />
        
       </ItemsStack.Navigator>
     );
@@ -24,10 +24,10 @@ function MerchantHomeStackScreen() {
       </ItemsStack.Navigator>
     );
   }
-  function MerchantOfferStackScreen() {
+  function MerchantPostADStackScreen() {
     return (
       <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
-        <ItemsStack.Screen name="MerchantOffersScreen" component={MerchantOffers} />
+        <ItemsStack.Screen name="MerchantPostADScreen" component={MerchantPostAD} />
       
       </ItemsStack.Navigator>
     );
@@ -40,13 +40,13 @@ function MerchantHomeStackScreen() {
       </ItemsStack.Navigator>
     );
   }
-  function MerchantAccountStackScreen() {
+  function MerchantTipsStackScreen() {
     return (
       <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
-        <ItemsStack.Screen name="MerchantAccountScreen" component={MerchantAccount} />
+        <ItemsStack.Screen name="MerchantTipsScreen" component={MerchantTips} />
        
       </ItemsStack.Navigator>
     );
   }
 
-export {MerchantHomeStackScreen,MerchantCouponsStackScreen,MerchantOfferStackScreen,MerchantAdsStackScreen,MerchantAccountStackScreen}
+export {MerchantItemsStackScreen,MerchantCouponsStackScreen,MerchantPostADStackScreen,MerchantAdsStackScreen,MerchantTipsStackScreen}

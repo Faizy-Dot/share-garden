@@ -49,8 +49,10 @@ import MerchantHomeIcon from "./MerchanyHomeIcon";
 import MerchantCouponIcon from "./MerchantCouponIcon";
 import MerchantOfferIcon from "./MerchantOfferIcon";
 import MerchantAccountIcon from "./MerchantAccountIcon";
+import MerchantHomeAdImage from "./MerchantHomeAdImage";
 
 export{
+    MerchantHomeAdImage,
     MerchantAccountIcon,
     MerchantOfferIcon,
     MerchantCouponIcon,
