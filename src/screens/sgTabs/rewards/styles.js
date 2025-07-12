@@ -37,6 +37,9 @@ const styles = StyleSheet.create({
     profile: {
         width: Metrix.HorizontalSize(62),
         height: Metrix.HorizontalSize(62),
+        borderRadius: Metrix.HorizontalSize(62) / 2,
+        borderWidth: 2,
+        borderColor: colors.buttonColor,
     },
     sameText1: {
         fontSize: Metrix.FontSmall,

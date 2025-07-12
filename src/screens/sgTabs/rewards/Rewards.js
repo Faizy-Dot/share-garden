@@ -97,8 +97,8 @@ export default function RewardsTabScreen({ navigation }) {
 
             <View style={styles.middleContainer}>
 
-                <Image source={Images.homeProfile} style={styles.profile} />
-                <Text style={styles.sameText2}>Ashley Simson</Text>
+                <Image source={user.profileImage ? { uri: user.profileImage } : Images.homeProfile} style={styles.profile} />
+                <Text style={styles.sameText2}>{user.firstName} {user.lastName}</Text>
 
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
                     <StarIcon fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
@@ -111,7 +111,7 @@ export default function RewardsTabScreen({ navigation }) {
 
                 <View style={{ gap: 3, alignItems: "center" }}>
                     <Text style={styles.sameText1}>Your SG Balance is</Text>
-                    <Text style={styles.sameText2}>10,300</Text>
+                    <Text style={styles.sameText2}>{user.sgPoints}</Text>
                 </View>
 
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
