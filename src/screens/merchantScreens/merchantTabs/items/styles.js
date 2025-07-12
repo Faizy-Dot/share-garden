@@ -12,21 +12,7 @@ const styles = StyleSheet.create({
         marginTop: Metrix.VerticalSize(15),
         gap: Metrix.VerticalSize(15)
     },
-    merchantName: {
-        fontSize: Metrix.FontLarge,
-        fontFamily: fonts.InterRegular
-    },
-    profileImage: {
-        width: Metrix.HorizontalSize(45),
-        height: Metrix.HorizontalSize(45),
-        backgroundColor: "darkblue",
-        borderRadius: Metrix.HorizontalSize(22.5),
-        color: colors.white,
-        textAlign: "center",
-        textAlignVertical: "center",
-        fontSize: Metrix.FontLarge,
-        fontFamily: fonts.InterBold
-    },
+ 
     topBottomContainer: {
         height: Metrix.VerticalSize(96),
         backgroundColor: "#BADEEE",

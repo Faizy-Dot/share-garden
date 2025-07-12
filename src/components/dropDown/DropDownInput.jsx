@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
         height: Metrix.VerticalSize(58),
         borderWidth: 1,
         paddingHorizontal: Metrix.HorizontalSize(20),
-        borderRadius: Metrix.LightRadius,
+        borderRadius: Metrix.VerticalSize(4),
         borderColor: colors.borderColor,
         fontFamily: fonts.InterRegular,
     },
@@ -67,9 +67,9 @@ const styles = StyleSheet.create({
         borderColor: colors.borderColor
     },
     placeholderStyle: {
-        fontFamily: fonts.InterLight,
         color : "#6E6E6E",
-        fontSize : Metrix.FontExtraSmall
+        fontSize : Metrix.FontRegular,
+        fontFamily : fonts.InterRegular , 
     },
     selectedTextStyle: {
         fontSize: Metrix.FontSmall

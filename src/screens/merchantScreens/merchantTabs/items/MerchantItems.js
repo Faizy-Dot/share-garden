@@ -1,15 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, FlatList, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput } from 'react-native';
 import styles from './styles';
-import BackArrowIcon from '../../../../components/backArrowIcon/BackArrowIcon';
 import { useSelector } from 'react-redux';
-import { BellIcon, MerchantHomeAdImage, NotificationIcon } from '../../../../assets/svg';
+import {  MerchantHomeAdImage} from '../../../../assets/svg';
 import { Metrix } from '../../../../config';
 import CustomButton from '../../../../components/Button/Button';
 import fonts from '../../../../config/Fonts';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import colors from '../../../../config/Colors';
-import CustomInput from '../../../../components/customInput/CustomInput';
+import MerchantNavbar from '../../../../components/navBar/MerchantNavbar';
 
 
 
@@ -81,18 +79,9 @@ export default function MerchantItems() {
 
   return (
     <View style={styles.MerchantItemsContainer}>
-      <View style={{ paddingHorizontal: Metrix.HorizontalSize(15), gap: Metrix.VerticalSize(10), marginTop: Metrix.VerticalSize(15) }}>
-        <BackArrowIcon />
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <Text style={styles.merchantName}>Hi, {user.firstName}</Text>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
-            <BellIcon width={22} height={23} />
 
-            <Text style={styles.profileImage}>{user.firstName.charAt(0).toUpperCase()}</Text>
-          </View>
-        </View>
+    <MerchantNavbar />
 
-      </View>
       <KeyboardAwareScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
         <View style={styles.topContainer}>
