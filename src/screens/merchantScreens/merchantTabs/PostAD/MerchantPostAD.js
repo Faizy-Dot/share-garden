@@ -12,7 +12,7 @@ import DropdownComponent from '../../../../components/dropDown/DropDownInput';
 import fonts from '../../../../config/Fonts';
 import Icon from "react-native-vector-icons/MaterialIcons";
 import CustomButton from '../../../../components/Button/Button';
-
+import { useNavigation } from '@react-navigation/native';
 
 export default function MerchantPostAD() {
   const [image, setImage] = useState(null);
@@ -117,133 +117,144 @@ export default function MerchantPostAD() {
   };
   const inputRef = useRef(null);
 
+  const navigation = useNavigation()
+
 
 
   return (
     <View style={styles.merchantPostContainer}>
       <MerchantNavbar title="Create an Ad" />
 
-     <KeyboardAwareScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-  <View style={styles.formContainer}>
-    <View style={styles.imageContainer}>
-      <TouchableOpacity onPress={handleImagePicker} activeOpacity={0.8} style={styles.uploadButton}>
-        <UploadImgIcon width={30} height={30} />
-        <Text style={styles.uploadText}>Upload an Ad Image</Text>
-      </TouchableOpacity>
+      <KeyboardAwareScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <View style={styles.formContainer}>
+          <View style={styles.imageContainer}>
+            <TouchableOpacity onPress={handleImagePicker} activeOpacity={0.8} style={styles.uploadButton}>
+              <UploadImgIcon width={30} height={30} />
+              <Text style={styles.uploadText}>Upload an Ad Image</Text>
+            </TouchableOpacity>
 
-      {image ? (
-        <Image source={{ uri: image }} style={styles.uploadedImage} resizeMode="cover" />
-      ) : (
-        <View style={styles.uploadedImage}></View>
-      )}
-    </View>
-
-    <TextInput style={styles.inputs} placeholder="Ad Title*" />
-    <DropdownComponent placeholder={"Select Category*"} />
-
-    <TouchableOpacity activeOpacity={1} style={styles.fakeInputWrapper} onPress={() => inputRef.current?.focus()}>
-      {description === '' ? (
-        <View>
-          <Text style={styles.label}>Describe Your Offerings</Text>
-          <Text style={styles.placeholderLine}>1. Describe your ad,</Text>
-          <Text style={styles.placeholderLine}>2. Website address if online</Text>
-          <Text style={styles.placeholderLine}>3. Physical location of the store</Text>
-        </View>
-      ) : null}
-
-      <TextInput
-        ref={inputRef}
-        style={[styles.hiddenTextInput, description !== '' && { color: 'black' }]}
-        multiline
-        value={description}
-        onChangeText={setDescription}
-        textAlignVertical="top"
-      />
-    </TouchableOpacity>
-  </View>
-
-  <View style={styles.switchRow}>
-    <Text style={styles.switchLabel}>Would you like to Add a Coupon with you Post?</Text>
-    <Switch
-      value={addCoupon}
-      onValueChange={() => setAddCoupon(!addCoupon)}
-      thumbColor={addCoupon ? "#F8443E" : "gray"}
-      trackColor={{ false: '#ccc', true: 'gray' }}
-    />
-  </View>
-
-  {addCoupon && (
-    <View style={styles.couponSection}>
-      <TextInput style={styles.inputs} placeholder='Coupon Title*' />
-      <DropdownComponent placeholder={"Discount type"} />
-
-      <View style={styles.percentageRow}>
-        <TextInput style={[styles.inputs, styles.flex1]} placeholder='Enter Percentage Value' />
-        <TextInput style={[styles.inputs, styles.flex1]} placeholder='Fixed Amount Value' />
-      </View>
-
-      <Text style={styles.offerText}>
-        Your are offering: 30% OFF with this ad / Your are offering: $30 off with this Ad
-      </Text>
-
-      <View style={styles.redeemRow}>
-        <Text style={styles.checkBoxText}>Redeem by</Text>
-
-        <View style={styles.redeemOptions}>
-          <TouchableOpacity
-            onPress={() => setCheckOnline(!checkOnline)}
-            activeOpacity={1}
-            style={styles.checkBoxWrapper}
-          >
-            <View style={styles.checkBox} />
-            {checkOnline && (
-              <Icon name="check" size={25} color="black" style={styles.checkIcon} />
+            {image ? (
+              <Image source={{ uri: image }} style={styles.uploadedImage} resizeMode="cover" />
+            ) : (
+              <View style={styles.uploadedImage}></View>
             )}
-            <Text style={styles.checkBoxText}>Online</Text>
-          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity
-            onPress={() => setCheckInStore(!checkInStore)}
-            activeOpacity={1}
-            style={styles.checkBoxWrapper}
-          >
-            <View style={styles.checkBox} />
-            {checkInStore && (
-              <Icon name="check" size={25} color="black" style={styles.checkIcon} />
-            )}
-            <Text style={styles.checkBoxText}>In Store</Text>
+          <TextInput style={styles.inputs} placeholder="Ad Title*" />
+          <DropdownComponent placeholder={"Select Category*"} />
+
+          <TouchableOpacity activeOpacity={1} style={styles.fakeInputWrapper} onPress={() => inputRef.current?.focus()}>
+            {description === '' ? (
+              <View>
+                <Text style={styles.label}>Describe Your Offerings</Text>
+                <Text style={styles.placeholderLine}>1. Describe your ad,</Text>
+                <Text style={styles.placeholderLine}>2. Website address if online</Text>
+                <Text style={styles.placeholderLine}>3. Physical location of the store</Text>
+              </View>
+            ) : null}
+
+            <TextInput
+              ref={inputRef}
+              style={[styles.hiddenTextInput, description !== '' && { color: 'black' }]}
+              multiline
+              value={description}
+              onChangeText={setDescription}
+              textAlignVertical="top"
+            />
           </TouchableOpacity>
         </View>
-      </View>
 
-      <View style={styles.redeemValueRow}>
-        <Text style={styles.checkBoxText}>Redemption Value</Text>
-        <View style={styles.redeemInputWrap}>
-          <TextInput style={[styles.inputs, styles.redeemInput]} />
-          <Text style={styles.checkBoxText}>Points</Text>
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>Would you like to Add a Coupon with you Post?</Text>
+          <Switch
+            value={addCoupon}
+            onValueChange={() => setAddCoupon(!addCoupon)}
+            thumbColor={addCoupon ? "#F8443E" : "gray"}
+            trackColor={{ false: '#ccc', true: 'gray' }}
+          />
         </View>
-      </View>
 
-      <TextInput style={styles.inputs} placeholder='Coupon Code' />
-      <TextInput style={styles.inputs} placeholder='Expiry Date' />
-      <TextInput style={styles.inputs} placeholder='Disclaimer' />
-    </View>
-  )}
+        {addCoupon && (
+          <View style={styles.couponSection}>
+            <TextInput style={styles.inputs} placeholder='Coupon Title*' />
+            <DropdownComponent placeholder={"Discount type"} />
 
-  <View style={styles.buttonRow}>
-    <CustomButton
-      flex={1}
-      title={"Preview"}
-      height={Metrix.VerticalSize(42)}
-      borderRadius={4}
-      color={colors.black}
-      backgroundColor={colors.white}
-      borderColor={"#D0D0D0"}
-      borderWidth={1}
-    />
-    <CustomButton flex={1} title={"Publish"} height={Metrix.VerticalSize(42)} borderRadius={4} />
-  </View>
-</KeyboardAwareScrollView>
+            <View style={styles.percentageRow}>
+              <TextInput style={[styles.inputs, styles.flex1]} placeholder='Enter Percentage Value' />
+              <TextInput style={[styles.inputs, styles.flex1]} placeholder='Fixed Amount Value' />
+            </View>
+
+            <Text style={styles.offerText}>
+              Your are offering: 30% OFF with this ad / Your are offering: $30 off with this Ad
+            </Text>
+
+            <View style={styles.redeemRow}>
+              <Text style={styles.checkBoxText}>Redeem by</Text>
+
+              <View style={styles.redeemOptions}>
+                <TouchableOpacity
+                  onPress={() => setCheckOnline(!checkOnline)}
+                  activeOpacity={1}
+                  style={styles.checkBoxWrapper}
+                >
+                  <View style={styles.checkBox} />
+                  {checkOnline && (
+                    <Icon name="check" size={25} color="black" style={styles.checkIcon} />
+                  )}
+                  <Text style={styles.checkBoxText}>Online</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setCheckInStore(!checkInStore)}
+                  activeOpacity={1}
+                  style={styles.checkBoxWrapper}
+                >
+                  <View style={styles.checkBox} />
+                  {checkInStore && (
+                    <Icon name="check" size={25} color="black" style={styles.checkIcon} />
+                  )}
+                  <Text style={styles.checkBoxText}>In Store</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.redeemValueRow}>
+              <Text style={styles.checkBoxText}>Redemption Value</Text>
+              <View style={styles.redeemInputWrap}>
+                <TextInput style={[styles.inputs, styles.redeemInput]} />
+                <Text style={styles.checkBoxText}>Points</Text>
+              </View>
+            </View>
+
+            <TextInput style={styles.inputs} placeholder='Coupon Code' />
+            <TextInput style={styles.inputs} placeholder='Expiry Date' />
+            <TextInput style={styles.inputs} placeholder='Disclaimer' />
+          </View>
+        )}
+
+        <View style={styles.buttonRow}>
+          <CustomButton
+            flex={1}
+            title={"PREVIEW"}
+            height={Metrix.VerticalSize(42)}
+            borderRadius={4}
+            color={colors.black}
+            backgroundColor={colors.white}
+            borderColor={"#D0D0D0"}
+            fontSize={Metrix.FontSmall}
+            borderWidth={1}
+            onPress={() =>
+              navigation.navigate("MerchantPreviewADScreen", {
+                image: image,
+              })
+            }
+          />
+          <CustomButton flex={1} title={"PUBLISH"}
+            height={Metrix.VerticalSize(42)}
+            borderRadius={4}
+            fontSize={Metrix.FontSmall} />
+        </View>
+      </KeyboardAwareScrollView>
 
     </View>
   );

@@ -4,6 +4,7 @@ import MerchantAds from "./ads/MerchantAds";
 import MerchantTips from "./tips/MerchantTips";
 import MerchantItems from "./items/MerchantItems";
 import MerchantPostAD from "./PostAD/MerchantPostAD";
+import PreviewMerchantAd from "./PostAD/PreviewMerchantAd";
 
 
 const ItemsStack = createNativeStackNavigator();
@@ -28,6 +29,7 @@ function MerchantItemsStackScreen() {
     return (
       <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
         <ItemsStack.Screen name="MerchantPostADScreen" component={MerchantPostAD} />
+        <ItemsStack.Screen name="MerchantPreviewADScreen" component={PreviewMerchantAd} />
       
       </ItemsStack.Navigator>
     );

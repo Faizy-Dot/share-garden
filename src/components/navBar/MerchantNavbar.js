@@ -28,7 +28,6 @@ const { user } = useSelector((state) => state.login)
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: Metrix.HorizontalSize(15),
-        gap: Metrix.VerticalSize(10),
         marginTop: Metrix.VerticalSize(15),
     },
     row: {

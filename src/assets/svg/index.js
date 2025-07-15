@@ -50,8 +50,12 @@ import MerchantCouponIcon from "./MerchantCouponIcon";
 import MerchantOfferIcon from "./MerchantOfferIcon";
 import MerchantAccountIcon from "./MerchantAccountIcon";
 import MerchantHomeAdImage from "./MerchantHomeAdImage";
+import PurchaseIcon from "./PurchaseIcon";
+import BlackEyeIcon from "./BlackEyeIcon";
 
 export{
+    BlackEyeIcon,
+    PurchaseIcon,
     MerchantHomeAdImage,
     MerchantAccountIcon,
     MerchantOfferIcon,
