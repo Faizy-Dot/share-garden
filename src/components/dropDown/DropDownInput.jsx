@@ -6,20 +6,20 @@ import colors from '../../config/Colors';
 import fonts from '../../config/Fonts';
 import { DropDownGreenArrow } from '../../assets/svg';
 
-const DropdownComponent = ({ data, value, onChange, placeholder,height = Metrix.VerticalSize(58) }) => {
+const DropdownComponent = ({ data, value, onChange, paddingHorizontal = Metrix.HorizontalSize(20), placeholder, listText, height = Metrix.VerticalSize(58), width = "100%", fontSize, fontFamily }) => {
     const renderItem = item => {
         return (
             <View style={styles.item}>
-                <Text style={styles.textItem}>{item.label}</Text>
+                <Text style={[styles.textItem, { fontSize: listText, fontFamily: fonts.InterRegular }]}>{item.label}</Text>
             </View>
         );
     };
 
     return (
         <Dropdown
-            style={[styles.dropdown , {height : height}]}
+            style={[styles.dropdown, { height: height, width: width, paddingHorizontal: paddingHorizontal }]}
             placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
+            selectedTextStyle={[styles.selectedTextStyle, { fontSize, fontFamily }]}
             inputSearchStyle={styles.inputSearchStyle}
             data={data || []}
             // search
@@ -34,7 +34,7 @@ const DropdownComponent = ({ data, value, onChange, placeholder,height = Metrix.
             renderRightIcon={() => (
                 <View>
 
-                    <DropDownGreenArrow/>
+                    <DropDownGreenArrow />
                 </View>
             )}
         />
@@ -67,9 +67,9 @@ const styles = StyleSheet.create({
         borderColor: colors.borderColor
     },
     placeholderStyle: {
-        color : "#6E6E6E",
-        fontSize : Metrix.FontRegular,
-        fontFamily : fonts.InterRegular , 
+        color: "#6E6E6E",
+        fontSize: Metrix.FontRegular,
+        fontFamily: fonts.InterRegular,
     },
     selectedTextStyle: {
         fontSize: Metrix.FontSmall
