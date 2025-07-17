@@ -6,6 +6,7 @@ import MerchantItems from "./items/MerchantItems";
 import MerchantPostAD from "./PostAD/MerchantPostAD";
 import PreviewMerchantAd from "./PostAD/PreviewMerchantAd";
 import AdsTabScreen from "../../sgTabs/ads/Ads";
+import TipsTabScreen from "../../sgTabs/tips/Tips";
 
 
 const ItemsStack = createNativeStackNavigator();
@@ -46,8 +47,7 @@ function MerchantItemsStackScreen() {
   function MerchantTipsStackScreen() {
     return (
       <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
-        <ItemsStack.Screen name="MerchantTipsScreen" component={MerchantTips} />
-       
+        <ItemsStack.Screen name="TipsList" component={TipsTabScreen} />
       </ItemsStack.Navigator>
     );
   }
