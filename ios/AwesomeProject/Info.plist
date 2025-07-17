@@ -60,5 +60,25 @@
 <string>App needs camera access to take product photos</string>
 <key>NSPhotoLibraryUsageDescription</key>
 <string>App needs photo library access to select product images</string>
+	
+	<!-- URL Scheme for deep linking -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>sharegarden</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sharegarden</string>
+			</array>
+		</dict>
+	</array>
+	
+	<!-- Associated Domains for Universal Links -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:sharegarden.com</string>
+		<string>applinks:www.sharegarden.com</string>
+	</array>
 </dict>
 </plist>

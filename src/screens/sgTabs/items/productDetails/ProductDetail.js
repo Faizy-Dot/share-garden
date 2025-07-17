@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, FlatList, Dimensions, TextInput, TouchableOpacity, Linking, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, FlatList, Dimensions, TextInput, TouchableOpacity, Linking, StyleSheet, Alert, Share, Platform } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Images, Metrix } from '../../../../config';
 import styles from './style';
@@ -17,7 +17,9 @@ import Toast from 'react-native-toast-message';
 
 
 const ProductDetail = ({ route, navigation }) => {
-  const { item } = route.params;
+  // Handle both route params and deep link params
+  const { item, id } = route.params;
+  const productId = id || (item ? item.id : null);
   const [productDetail, setProductDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -82,8 +84,14 @@ const ProductDetail = ({ route, navigation }) => {
   };
 
   const fetchProductDetail = async () => {
+    if (!productId) {
+      console.error('No product ID available');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await axiosInstance.get(`/api/products/${item.id}`);
+      const response = await axiosInstance.get(`/api/products/${productId}`);
       setProductDetail(response.data);
       // Set initial favorite status if your API returns this information
       setIsFavorite(response.data.isFavorited || false);
@@ -111,7 +119,7 @@ const ProductDetail = ({ route, navigation }) => {
   // Fetch product details and update time
   useEffect(() => {
     fetchProductDetail();
-  }, [item.id]);
+  }, [productId]);
 
   // Update countdown timer every second
   useEffect(() => {
@@ -163,12 +171,44 @@ const ProductDetail = ({ route, navigation }) => {
   // Add function to handle favorite toggle
   const handleFavoritePress = async () => {
     try {
-      const response = await axiosInstance.post(`/api/products/favorites/${item.id}`);
+      const response = await axiosInstance.post(`/api/products/favorites/${productId}`);
       setIsFavorite(!isFavorite); // Toggle favorite status
       // Optionally show some feedback to user
     } catch (error) {
       console.log('Error toggling favorite:', error);
       // Optionally show error message to user
+    }
+  };
+
+  // Add function to handle product sharing
+  const handleSharePress = async () => {
+    try {
+      // Use hosted web URL that redirects to app (replace with your actual hosted URL)
+      const webLink = `https://your-sharegarden-site.netlify.app?id=${productId}`;
+
+      const shareMessage = `Check out this amazing product on ShareGarden!\n\n${displayData.title}\n\n${displayData.description}\n\nPrice: ${displayData.isSGPoints ? `${displayData.minBid} SG Points` : `$${displayData.price}`}\n\nCondition: ${getDisplayCondition(displayData.condition)}\n\nSeller: ${displayData.seller?.firstName || ''} ${displayData.seller?.lastName || ''}\n\nView in ShareGarden app:\n${webLink}`;
+
+      const result = await Share.share({
+        message: shareMessage,
+        title: displayData.title,
+      });
+
+      if (result.action === Share.sharedAction) {
+        // Optionally increment share count on your backend
+        try {
+          await axiosInstance.post(`/api/products/${productId}/shares`);
+        } catch (error) {
+          if (error?.response?.status === 404) {
+            // Endpoint does not exist, ignore
+            console.log('Share count endpoint not implemented on backend. Skipping.');
+          } else {
+            console.log('Error incrementing share count:', error);
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Error sharing product:', error);
+      Alert.alert('Error', 'Failed to share product. Please try again.');
     }
   };
 
@@ -359,7 +399,9 @@ const ProductDetail = ({ route, navigation }) => {
                 <TouchableOpacity onPress={handleFavoritePress}>
                   <LikesIcon stroke={colors.white} fill={isFavorite ? colors.white : 'none'} />
                 </TouchableOpacity>
-                <ShareIcon stroke={colors.white} />
+                <TouchableOpacity onPress={handleSharePress}>
+                  <ShareIcon stroke={colors.white} />
+                </TouchableOpacity>
               </View>
             </View>
           </View>
