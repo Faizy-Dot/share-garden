@@ -6796,6 +6796,11 @@ react-native-date-picker@^5.0.8:
   resolved "https://registry.npmjs.org/react-native-date-picker/-/react-native-date-picker-5.0.8.tgz"
   integrity sha512-1l4w4+iLuhOZUSyQrt5DclXnNx3RwEyp+wUrSaBfaHr/3FWtRWjLjS0E9FL4FWuq6vn09Hy9hn8lZJ1DmPc9YQ==
 
+react-native-deep-linking@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/react-native-deep-linking/-/react-native-deep-linking-2.2.0.tgz"
+  integrity sha512-PKShbOsa/oxjSzZ/Bag98O/J+jaZOI6ic5YdanPirTpRAraAvKUzJWQUhE5Yy0Isl9yfIkSogOClE9BRfSyUbA==
+
 react-native-device-info@^14.0.2:
   version "14.0.2"
   resolved "https://registry.npmjs.org/react-native-device-info/-/react-native-device-info-14.0.2.tgz"

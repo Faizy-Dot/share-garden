@@ -9,6 +9,7 @@ import fonts from "../../../config/Fonts";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { BlackBitIcon, PointsEarnIcon, StarIcon } from "../../../assets/svg";
+import axiosInstance from "../../../config/axios";
 
 export default function RewardsTabScreen({ navigation }) {
 
@@ -18,38 +19,122 @@ export default function RewardsTabScreen({ navigation }) {
         sgCoupons: false
     })
 
+    // State for API data
+    const [reviewData, setReviewData] = useState({
+        averageRating: 4.5,
+        totalReviews: 0
+    });
+    const [rewardsSummary, setRewardsSummary] = useState({
+        currentBalance: 0,
+        totalEarned: 0,
+        totalSpent: 0,
+        totalTransactions: 0
+    });
+    const [transactionHistory, setTransactionHistory] = useState([]);
+    const [recentReward, setRecentReward] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const buttonOptions = [
         { key: 'sgPoints', label: 'SG Points', color: colors.buttonColor },
         { key: 'sgCoupons', label: 'SG Coupons', color: colors.yellowColor },
     ];
 
-    const results = [
-        { title: "Offic Chair", itemId: 20243, bit: 300, id: 1 },
-        { title: "Offic Chair", itemId: 20243, bit: 1800, id: 2 },
-        { title: "Offic Chair", itemId: 20243, bit: 750, id: 3 },
-        { title: "Offic Chair", itemId: 20243, bit: 2250, id: 4 },
-        { title: "Offic Chair", itemId: 20243, bit: 1230, id: 5 },
-        { title: "Offic Chair", itemId: 20243, bit: 250, id: 6 },
-        { title: "Offic Chair", itemId: 20243, bit: 97, id: 7 },
-    ]
+    // Fetch user reviews
+    const fetchUserReviews = async () => {
+        try {
+            const response = await axiosInstance.get(`/api/reviews/user/${user.id}`);
+            setReviewData({
+                averageRating: response.data.averageRating || 4.5,
+                totalReviews: response.data.totalReviews || 0
+            });
+        } catch (error) {
+            console.log('Error fetching user reviews:', error);
+        }
+    };
+
+    // Fetch rewards summary
+    const fetchRewardsSummary = async () => {
+        try {
+            const response = await axiosInstance.get('/api/rewards/summary');
+            setRewardsSummary(response.data);
+        } catch (error) {
+            console.log('Error fetching rewards summary:', error);
+        }
+    };
+
+    // Fetch transaction history
+    const fetchTransactionHistory = async () => {
+        try {
+            const response = await axiosInstance.get('/api/rewards/history?page=1&limit=20');
+            setTransactionHistory(response.data.transactions || []);
+        } catch (error) {
+            console.log('Error fetching transaction history:', error);
+        }
+    };
+
+    // Fetch recent reward
+    const fetchRecentReward = async () => {
+        try {
+            const response = await axiosInstance.get('/api/rewards/recent?limit=1');
+            if (response.data && response.data.length > 0) {
+                setRecentReward(response.data[0]);
+            }
+        } catch (error) {
+            console.log('Error fetching recent reward:', error);
+        }
+    };
+
+    // Fetch all data
+    const fetchData = async () => {
+        setLoading(true);
+        await Promise.all([
+            fetchUserReviews(),
+            fetchRewardsSummary(),
+            fetchTransactionHistory(),
+            fetchRecentReward()
+        ]);
+        setLoading(false);
+    };
+
+    // Render star rating
+    const renderStars = () => {
+        const rating = reviewData.averageRating;
+        const stars = [];
+        for (let i = 1; i <= 5; i++) {
+            stars.push(
+                <StarIcon 
+                    key={i}
+                    fillColor={i <= rating ? colors.buttonColor : "none"} 
+                    strokeColor={i <= rating ? colors.buttonColor : "#D3D3D3"} 
+                />
+            );
+        }
+        return stars;
+    };
 
     const renderResults = ({ item }) => {
         return (
             <View style={styles.resultsContainer}>
                 <View>
-                    <Text style={styles.titleText}>{item.title}</Text>
-                    <Text style={styles.itemsIdText}>itemID #{item.itemId}</Text>
+                    <Text style={styles.titleText}>{item.description}</Text>
+                    <Text style={styles.itemsIdText}>
+                        {item.type === 'EARNED' ? 'Earned' : 'Spent'} • {new Date(item.createdAt).toLocaleDateString()}
+                    </Text>
                 </View>
                 <View style={styles.bitContainer}>
-                    <BlackBitIcon width={16}
-                        height={16} />
-                    <Text style={[styles.bitText, item.bit > 1000 ? { color: colors.redColor } : { color: colors.buttonColor }]}>{item.bit}</Text>
+                    <BlackBitIcon width={16} height={16} />
+                    <Text style={[
+                        styles.bitText, 
+                        item.type === 'EARNED' 
+                            ? { color: colors.buttonColor } 
+                            : { color: colors.redColor }
+                    ]}>
+                        {item.type === 'EARNED' ? '+' : '-'}{item.amount}
+                    </Text>
                 </View>
             </View>
         )
     }
-
 
     useEffect(() => {
         if (!user) {
@@ -59,6 +144,8 @@ export default function RewardsTabScreen({ navigation }) {
                 text1: 'Login or Signup',
                 text2: 'First Login plz',
             });
+        } else {
+            fetchData();
         }
     }, [user, navigation]);
 
@@ -101,28 +188,31 @@ export default function RewardsTabScreen({ navigation }) {
                 <Text style={styles.sameText2}>{user.firstName} {user.lastName}</Text>
 
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-                    <StarIcon fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
-                    <StarIcon fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
-                    <StarIcon fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
-                    <StarIcon fillColor={colors.buttonColor} strokeColor={colors.buttonColor} />
-                    <StarIcon />
-                    <Text style={styles.ratingText}>4.5</Text>
+                    {renderStars()}
+                    <Text style={styles.ratingText}>{reviewData.averageRating.toFixed(1)}</Text>
                 </View>
 
                 <View style={{ gap: 3, alignItems: "center" }}>
                     <Text style={styles.sameText1}>Your SG Balance is</Text>
-                    <Text style={styles.sameText2}>{user.sgPoints}</Text>
+                    <Text style={styles.sameText2}>{rewardsSummary.currentBalance}</Text>
                 </View>
 
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <PointsEarnIcon />
-                    <Text style={[styles.sameText1, { marginLeft: Metrix.HorizontalSize(10) }]}>Points earned<Text style={{ fontFamily: fonts.InterBold }}> +300</Text> from last sales</Text>
+                    <Text style={[styles.sameText1, { marginLeft: Metrix.HorizontalSize(10) }]}>
+                        {recentReward ? (
+                            <>Points earned<Text style={{ fontFamily: fonts.InterBold }}> +{recentReward.amount}</Text> from {recentReward.category.toLowerCase()}</>
+                        ) : (
+                            <>Points earned<Text style={{ fontFamily: fonts.InterBold }}> +0</Text> from last sales</>
+                        )}
+                    </Text>
                 </View>
 
             </View>
 
             <View style={styles.bottomContainer}>
-                <FlatList data={results}
+                <FlatList 
+                    data={transactionHistory}
                     renderItem={renderResults}
                     showsVerticalScrollIndicator={false}
                     keyExtractor={(item) => item.id}

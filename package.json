@@ -24,6 +24,7 @@
     "react": "18.3.1",
     "react-native": "0.77.0",
     "react-native-date-picker": "^5.0.8",
+    "react-native-deep-linking": "^2.2.0",
     "react-native-device-info": "^14.0.2",
     "react-native-element-dropdown": "^2.12.2",
     "react-native-elements": "^3.4.3",
