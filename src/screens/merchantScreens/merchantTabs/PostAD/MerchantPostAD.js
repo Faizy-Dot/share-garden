@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, Alert, Platform, PermissionsAndroid, TextInput, Switch, StyleSheet } from 'react-native';
 import MerchantNavbar from '../../../../components/navBar/MerchantNavbar';
 import styles from './styles';
@@ -13,16 +13,23 @@ import fonts from '../../../../config/Fonts';
 import Icon from "react-native-vector-icons/MaterialIcons";
 import CustomButton from '../../../../components/Button/Button';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import Axios from 'axios';
+import axiosInstance from '../../../../config/axios';
 
 export default function MerchantPostAD() {
   const [image, setImage] = useState(null);
+  const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [addCoupon, setAddCoupon] = useState(false)
   const [checkOnline, setCheckOnline] = useState(false)
   const [checkInStore, setCheckInStore] = useState(false)
+  const [categories, setCategories] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategoryName, setSelectedCategoryName] = useState('');
 
-  console.log("checkOnline===>>", checkOnline)
-  console.log("checkInStore==>>", checkInStore)
+  const { user } = useSelector((state) => state.login)
+
 
 
   const requestCameraPermission = async () => {
@@ -120,6 +127,104 @@ export default function MerchantPostAD() {
   const navigation = useNavigation()
 
 
+  const fetchCategories = async () => {
+    try {
+      const response = await Axios.get(
+        'https://api.sharegarden.ca/api/categories/getCategories',
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      const formattedCategories = response.data.map(cat => ({
+        label: cat.name,
+        value: cat.id,
+        icon: cat.icon,
+        slug: cat.slug,
+        _count: cat._count
+      }));
+
+      setCategories(formattedCategories);
+
+
+
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to load categories',
+      });
+    }
+  };
+
+  useEffect(() => { fetchCategories() }, [])
+
+  const handlePublish = async () => {
+    if (!image || !title || !selectedCategory || !description) {
+      return Toast.show({
+        type: 'error',
+        text1: 'Missing Fields',
+        text2: 'Please fill all required fields',
+      });
+    }
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('categoryId', selectedCategory);
+    formData.append('images', {
+      uri: image,
+      type: 'image/jpeg',
+      name: 'photo.jpg',
+    });
+
+    try {
+
+      const response = await axiosInstance.post(
+        '/api/ads',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      
+      console.log( "response first api ==>>",response.data)
+
+      if(response.status === 201){
+       const responsePublish = await axiosInstance.patch(`api/ads/${response.data.id}/publish`)
+      console.log("reponse from second api==>>",responsePublish.data)
+      }
+
+
+      Toast.show({
+        type: 'success',
+        text1: 'Ad Published',
+        text2: 'Your ad has been successfully posted!',
+      });
+
+      // optionally reset form or navigate
+      setTitle('');
+      setDescription('');
+      setImage(null);
+    } catch (error) {
+      console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Upload Failed',
+        text2: 'Please try again later',
+      });
+    }
+  };
+
+
+
+
+
 
   return (
     <View style={styles.merchantPostContainer}>
@@ -140,8 +245,14 @@ export default function MerchantPostAD() {
             )}
           </View>
 
-          <TextInput style={styles.inputs} placeholder="Ad Title*" />
-          <DropdownComponent placeholder={"Select Category*"} />
+          <TextInput onChangeText={setTitle} value={title} style={styles.inputs} placeholder="Ad Title*" />
+          <DropdownComponent placeholder={"Select Category*"}
+            data={categories}
+            value={selectedCategory}
+            onChange={item => {
+              setSelectedCategory(item.value);
+              setSelectedCategoryName(item.label);
+            }} />
 
           <TouchableOpacity activeOpacity={1} style={styles.fakeInputWrapper} onPress={() => inputRef.current?.focus()}>
             {description === '' ? (
@@ -252,7 +363,8 @@ export default function MerchantPostAD() {
           <CustomButton flex={1} title={"PUBLISH"}
             height={Metrix.VerticalSize(42)}
             borderRadius={4}
-            fontSize={Metrix.FontSmall} />
+            fontSize={Metrix.FontSmall}
+            onPress={handlePublish} />
         </View>
       </KeyboardAwareScrollView>
 

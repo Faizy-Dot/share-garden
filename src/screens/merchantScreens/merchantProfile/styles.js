@@ -140,10 +140,10 @@ const styles = StyleSheet.create({
         borderRadius: Metrix.HorizontalSize(40),
         borderWidth: 2,
         borderColor: colors.buttonColor,
-        fontSize : Metrix.normalize(32),
-        fontFamily : fonts.InterBold,
-        backgroundColor : "darkblue" , 
-        color : colors.white
+        fontSize: Metrix.normalize(32),
+        fontFamily: fonts.InterBold,
+        backgroundColor: "darkblue",
+        color: colors.white
 
     },
     camerIconConatiner: {

@@ -7,6 +7,9 @@ import CategoryFlatList from "../../../components/categoryFlatList/CategoryFlatL
 import { Images, Metrix } from "../../../config";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { AdsLocationIcon, AdsStickerIcon } from "../../../assets/svg";
+import { useCallback, useEffect, useState } from "react";
+import axiosInstance from "../../../config/axios";
+import { useFocusEffect } from "@react-navigation/native";
 
 
 
@@ -36,6 +39,37 @@ const adsData = [
 
 
 export default function AdsTabScreen() {
+
+    const [loading, setLoading] = useState(false)
+    const [ads, setAds] = useState([])
+
+    const fetchAds = async () => {
+        setLoading(true);
+        try {
+            const response = await axiosInstance.get('/api/ads');
+            if (response.data) {
+                setAds(response.data);
+            }
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || 'Failed to fetch products';
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: errorMessage,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchAds();
+        }, [])
+    );
+
+    console.log("Ads==>>", ads)
 
     const renderAdsData = ({ item }) => {
         return (
