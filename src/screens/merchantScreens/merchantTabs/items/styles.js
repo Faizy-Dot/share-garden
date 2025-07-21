@@ -131,6 +131,59 @@ referralsConatiner:{
     paddingHorizontal: Metrix.HorizontalSize(10),
     borderColor: colors.borderColor,
   },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Metrix.VerticalSize(20),
+  },
+  loadingText: {
+    fontSize: Metrix.FontSmall,
+    fontFamily: fonts.InterRegular,
+    color: colors.textColor,
+    marginTop: Metrix.VerticalSize(10),
+  },
+  popularBadge: {
+    backgroundColor: '#FF6B35',
+    paddingHorizontal: Metrix.HorizontalSize(8),
+    paddingVertical: Metrix.VerticalSize(2),
+    borderRadius: 3,
+    position: 'absolute',
+    top: -5,
+    right: -5,
+  },
+  popularText: {
+    fontSize: Metrix.normalize(8),
+    fontFamily: fonts.InterBold,
+    color: colors.white,
+  },
+  noPackagesContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Metrix.VerticalSize(20),
+    gap: Metrix.VerticalSize(10),
+  },
+  noPackagesText: {
+    fontSize: Metrix.FontSmall,
+    fontFamily: fonts.InterRegular,
+    color: colors.textColor,
+    textAlign: 'center',
+  },
+  processingPaymentContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Metrix.VerticalSize(20),
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    marginHorizontal: Metrix.HorizontalSize(15),
+    borderRadius: Metrix.VerticalSize(5),
+    marginTop: Metrix.VerticalSize(10),
+  },
+  processingPaymentText: {
+    fontSize: Metrix.FontSmall,
+    fontFamily: fonts.InterRegular,
+    color: colors.textColor,
+    marginTop: Metrix.VerticalSize(10),
+    textAlign: 'center',
+  },
 
 })
 

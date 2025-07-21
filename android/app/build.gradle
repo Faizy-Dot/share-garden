@@ -48,10 +48,14 @@ android {
     }
     configurations.all {
         resolutionStrategy {
-            force 'androidx.core:core:1.9.0'
-            force 'androidx.core:core-ktx:1.9.0'
-            force 'androidx.appcompat:appcompat:1.6.1'
-            force 'androidx.fragment:fragment:1.6.0'
+            force 'androidx.core:core:1.13.0'
+            force 'androidx.core:core-ktx:1.13.0'
+            force 'androidx.appcompat:appcompat:1.7.0'
+            force 'androidx.fragment:fragment:1.7.0'
+            force 'androidx.activity:activity:1.9.0'
+            force 'androidx.activity:activity-ktx:1.9.0'
+            force 'androidx.lifecycle:lifecycle-runtime:2.8.0'
+            force 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.0'
             exclude group: 'com.android.support'
         }
     }
@@ -69,10 +73,14 @@ dependencies {
     }
 
     // AndroidX dependencies
-    implementation "androidx.core:core:1.9.0"
-    implementation "androidx.core:core-ktx:1.9.0"
-    implementation "androidx.appcompat:appcompat:1.6.1"
-    implementation "androidx.fragment:fragment:1.6.0"
+    implementation "androidx.core:core:1.13.0"
+    implementation "androidx.core:core-ktx:1.13.0"
+    implementation "androidx.appcompat:appcompat:1.7.0"
+    implementation "androidx.fragment:fragment:1.7.0"
+    implementation "androidx.activity:activity:1.9.0"
+    implementation "androidx.activity:activity-ktx:1.9.0"
+    implementation "androidx.lifecycle:lifecycle-runtime:2.8.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.0"
     implementation 'com.facebook.react:react-native:+'
   
 }

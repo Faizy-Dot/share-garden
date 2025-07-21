@@ -52,6 +52,9 @@ const loginSlice = createSlice({
     updateUserProfile: (state, action) => {
       state.user = { ...state.user, ...action.payload }; // Update the user with new data
     },
+    updateUserSubscription: (state, action) => {
+      state.user = { ...state.user, subscription: action.payload }; // Update the user's subscription data
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -89,5 +92,5 @@ const loginSlice = createSlice({
   }
 });
 
-export const { clearError, logout,updateUserProfile } = loginSlice.actions;
+export const { clearError, logout, updateUserProfile, updateUserSubscription } = loginSlice.actions;
 export default loginSlice.reducer;

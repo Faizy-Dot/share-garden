@@ -15,19 +15,19 @@ export const styles = StyleSheet.create({
         gap: Metrix.HorizontalSize(10),
         width: "100%"
     },
-    bottomContainer: {
-        marginTop: Metrix.VerticalSize(5),
-        gap : Metrix.VerticalSize(12)
-
-    },
+    // bottomContainer removed since we're using ListHeaderComponent
     adsDataStyle: {
-        gap: Metrix.HorizontalSize(12),
-
+        paddingBottom: Metrix.VerticalSize(20),
+    },
+    rowContainer: {
+        justifyContent: 'space-between',
+        marginBottom: Metrix.VerticalSize(10),
     },
     image: {
-        height: Metrix.VerticalSize(178),
-        width: Metrix.HorizontalSize(136),
-        resizeMode: "contain",
+        height: Metrix.VerticalSize(120),
+        width: '100%',
+        resizeMode: "cover",
+        borderRadius: 8,
     },
     textContainer: {
         
@@ -43,19 +43,99 @@ export const styles = StyleSheet.create({
         height : 22
     },
     adsDataContainer: {
-        height: Metrix.VerticalSize(270),
-        width: Metrix.HorizontalSize(136),
-        gap: Metrix.VerticalSize(15)
-
+        flex: 1,
+        marginHorizontal: Metrix.HorizontalSize(2),
+        gap: Metrix.VerticalSize(8),
+        backgroundColor: colors.white,
+        borderRadius: 8,
+        padding: Metrix.HorizontalSize(5),
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     locationContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
+        flexDirection: "column",
+        gap: Metrix.VerticalSize(2),
+        marginTop: Metrix.VerticalSize(4),
     },
     locationText:{
         fontSize: Metrix.normalize(8),
         fontFamily : fonts.InterRegular,
         color : "#646262"
+    },
+    categoryText: {
+        fontSize: Metrix.normalize(8),
+        fontFamily: fonts.InterRegular,
+        color: "#168679"
+    },
+    loadingContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: Metrix.VerticalSize(50),
+    },
+    loadingText: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.textColor,
+        marginTop: Metrix.VerticalSize(10),
+    },
+    noAdsContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: Metrix.VerticalSize(50),
+    },
+    noAdsText: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.textColor,
+        textAlign: 'center',
+    },
+    filterStatusContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: colors.lightGray,
+        paddingHorizontal: Metrix.HorizontalSize(10),
+        paddingVertical: Metrix.VerticalSize(8),
+        borderRadius: 5,
+        marginTop: Metrix.VerticalSize(5),
+    },
+    filterStatusText: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.textColor,
+        flex: 1,
+    },
+    clearFiltersButton: {
+        backgroundColor: colors.buttonColor,
+        paddingHorizontal: Metrix.HorizontalSize(12),
+        paddingVertical: Metrix.VerticalSize(4),
+        borderRadius: 3,
+    },
+    clearFiltersText: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterBold,
+        color: colors.white,
+    },
+    loadMoreContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: Metrix.VerticalSize(20),
+    },
+    loadMoreButton: {
+        backgroundColor: colors.buttonColor,
+        paddingHorizontal: Metrix.HorizontalSize(20),
+        paddingVertical: Metrix.VerticalSize(10),
+        borderRadius: 5,
+    },
+    loadMoreText: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterBold,
+        color: colors.white,
     }
 })

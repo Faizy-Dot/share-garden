@@ -5,8 +5,8 @@ import MerchantTips from "./tips/MerchantTips";
 import MerchantItems from "./items/MerchantItems";
 import MerchantPostAD from "./PostAD/MerchantPostAD";
 import PreviewMerchantAd from "./PostAD/PreviewMerchantAd";
-import AdsTabScreen from "../../sgTabs/ads/Ads";
-import TipsTabScreen from "../../sgTabs/tips/Tips";
+// Remove this import since we're using MerchantAds instead
+// Remove this import since we're using MerchantTips instead
 import MerchantProfile from "../merchantProfile/MerchantProfile";
 
 
@@ -41,7 +41,7 @@ function MerchantItemsStackScreen() {
   function MerchantAdsStackScreen() {
     return (
       <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
-        <ItemsStack.Screen name="AdsList" component={AdsTabScreen} />
+        <ItemsStack.Screen name="MerchantAdsList" component={MerchantAds} />
         <ItemsStack.Screen name="MerchantProfileScreen" component={MerchantProfile} />
       </ItemsStack.Navigator>
     );
@@ -49,7 +49,7 @@ function MerchantItemsStackScreen() {
   function MerchantTipsStackScreen() {
     return (
       <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
-        <ItemsStack.Screen name="TipsList" component={TipsTabScreen} />
+        <ItemsStack.Screen name="MerchantTipsList" component={MerchantTips} />
          <ItemsStack.Screen name="MerchantProfileScreen" component={MerchantProfile} />
       </ItemsStack.Navigator>
     );
