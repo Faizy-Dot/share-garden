@@ -8,6 +8,7 @@ const AdsStickerIcon = (props) => (
     height={19}
     fill="none"
     {...props}
+    viewBox="0 0 19 19"
   >
     <Path fill="url(#a)" d="M0 0h19v19H0z" />
     <Defs>

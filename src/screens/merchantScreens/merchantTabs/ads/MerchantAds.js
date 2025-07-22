@@ -35,43 +35,43 @@ export default function MerchantAds() {
         if (!isLoadMore) {
             setLoading(true);
         }
-        
+
         try {
             console.log('Fetching ads...', { search, categoryId, page });
-            
+
             // Build query parameters
             let url = '/api/ads';
             const params = [];
-            
+
             if (search && search.trim()) {
                 params.push(`search=${encodeURIComponent(search.trim())}`);
             }
-            
+
             if (categoryId) {
                 params.push(`categoryId=${categoryId}`);
             }
-            
+
             // Add pagination parameters
             params.push(`page=${page}`);
             params.push(`limit=${pagination.limit}`);
-            
+
             if (params.length > 0) {
                 url += '?' + params.join('&');
             }
-            
+
             console.log('API URL:', url);
             const response = await ApiCaller.Get(url);
             console.log('Ads response:', response);
-            
+
             if (response.data) {
                 const { ads: newAds, pagination: newPagination } = response.data;
-                
+
                 if (isLoadMore) {
                     setAds(prevAds => [...prevAds, ...newAds]);
                 } else {
                     setAds(newAds);
                 }
-                
+
                 setPagination(newPagination);
                 console.log('Ads set:', newAds.length, 'ads, Page:', newPagination.currentPage);
             } else {
@@ -128,30 +128,45 @@ export default function MerchantAds() {
 
     console.log("MerchantAds==>>", ads)
 
+    const formatAdsData = (data, columns) => {
+        const numberOfFullRows = Math.floor(data.length / columns);
+        let numberOfElementsLastRow = data.length - numberOfFullRows * columns;
+
+        while (numberOfElementsLastRow !== 0 && numberOfElementsLastRow !== columns) {
+            data.push({ id: `blank-${numberOfElementsLastRow}`, empty: true });
+            numberOfElementsLastRow++;
+        }
+
+        return data;
+    };
+
+    const formattedAds = formatAdsData([...ads], 3);
+
     const renderAdsData = ({ item }) => {
         // Use API image or fallback
         const imageSource = item.images ? { uri: item.images } : fallbackImage;
-        
-        // Get merchant name
-        const merchantName = item.merchant ? 
-            `${item.merchant.firstName} ${item.merchant.lastName}` : 
-            'Unknown Merchant';
-        
-        // Get category name
-        const categoryName = item.category ? item.category.name : 'Uncategorized';
+      
+        if (item.empty) {
+            return <View style={{ flex: 1, margin: 5 }} />; // Invisible placeholder
+        }
         
         return (
             <View style={[styles.adsDataContainer, { width: itemWidth }]}>
-                <Image source={imageSource} style={styles.image} />
+                <View style={{ padding: Metrix.VerticalSize(5) }}>
+                    <Image source={imageSource} style={styles.image} />
+
+                </View>
                 <View style={styles.textContainer}>
                     <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
                     <Text style={styles.description} numberOfLines={2}>{item.description}</Text>
                     <View style={styles.locationContainer}>
-                        <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(2) }}>
-                            <AdsLocationIcon />
-                            <Text style={styles.locationText} numberOfLines={1}>{merchantName}</Text>
+                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5) }}>
+                                <AdsLocationIcon />
+                                <Text style={styles.locationText} numberOfLines={1}>Markham On</Text>
+                            </View>
+                            <AdsStickerIcon width={17} height={17} />
                         </View>
-                        <Text style={styles.categoryText} numberOfLines={1}>{categoryName}</Text>
                     </View>
                 </View>
             </View>
@@ -160,7 +175,7 @@ export default function MerchantAds() {
 
     const renderFooter = () => {
         if (!pagination.hasNextPage) return null;
-        
+
         return (
             <View style={styles.loadMoreContainer}>
                 {loading ? (
@@ -181,8 +196,8 @@ export default function MerchantAds() {
             </View>
 
             <View>
-                <CustomInput 
-                    iconCondition={true} 
+                <CustomInput
+                    iconCondition={true}
                     justifyContent={"space-between"}
                     value={searchQuery}
                     onChangeText={handleSearch}
@@ -191,7 +206,7 @@ export default function MerchantAds() {
             </View>
 
             <View style={{ marginTop: Metrix.VerticalSize(10) }}>
-                <CategoryFlatList 
+                <CategoryFlatList
                     onCategorySelect={handleCategorySelect}
                     selectedCategory={selectedCategory}
                 />
@@ -213,6 +228,9 @@ export default function MerchantAds() {
         </View>
     );
 
+
+
+
     return (
         <View style={styles.adsContainer}>
             {loading && ads.length === 0 ? (
@@ -221,7 +239,7 @@ export default function MerchantAds() {
                     <Text style={styles.loadingText}>Loading ads...</Text>
                 </View>
             ) : ads.length > 0 ? (
-                <FlatList 
+                <FlatList
                     data={ads}
                     keyExtractor={(item) => item.id}
                     renderItem={renderAdsData}
@@ -239,8 +257,8 @@ export default function MerchantAds() {
             ) : (
                 <View style={styles.noAdsContainer}>
                     <Text style={styles.noAdsText}>
-                        {searchQuery || selectedCategory 
-                            ? 'No ads found matching your search criteria.' 
+                        {searchQuery || selectedCategory
+                            ? 'No ads found matching your search criteria.'
                             : 'No ads available at the moment.'
                         }
                     </Text>

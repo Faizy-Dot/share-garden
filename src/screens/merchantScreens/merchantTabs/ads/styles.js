@@ -1,5 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Metrix } from "../../../../config";
+import fonts from "../../../../config/Fonts";
+import colors from "../../../../config/Colors";
 
 export const styles = StyleSheet.create({
     adsContainer: {
@@ -17,12 +19,13 @@ export const styles = StyleSheet.create({
         paddingTop: Metrix.VerticalSize(10)
     },
     rowContainer: {
-        justifyContent: 'space-between',
-        marginBottom: Metrix.VerticalSize(10)
+        marginBottom: Metrix.VerticalSize(10),
+        justifyContent : "space-between"
     },
     adsDataContainer: {
         backgroundColor: "#FFFFFF",
         borderRadius: Metrix.VerticalSize(8),
+        height: Metrix.VerticalSize(260),
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -31,37 +34,37 @@ export const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3.84,
         elevation: 5,
-        overflow: 'hidden'
+        overflow: 'hidden',
     },
     image: {
         width: "100%",
-        height: Metrix.VerticalSize(100),
-        borderTopLeftRadius: Metrix.VerticalSize(8),
-        borderTopRightRadius: Metrix.VerticalSize(8),
-        resizeMode: 'cover'
+        height: Metrix.VerticalSize(148),
+        borderRadius: Metrix.VerticalSize(8),
+        resizeMode: 'cover',
     },
     textContainer: {
-        padding: Metrix.VerticalSize(8),
-        gap: Metrix.VerticalSize(4)
+        padding: Metrix.VerticalSize(6),
+        flex : 1,
+        justifyContent : "space-between"
     },
     title: {
-        fontSize: Metrix.FontRegular,
-        fontWeight: "600",
-        color: "#003034",
-        lineHeight: Metrix.VerticalSize(16)
+        fontSize: Metrix.FontSmall,
+        fontWeight: fonts.InterSemiBold,
+        lineHeight: Metrix.VerticalSize(16),
+        
     },
     description: {
-        fontSize: Metrix.FontSmall,
-        color: "#666666",
-        lineHeight: Metrix.VerticalSize(14)
+        fontSize: Metrix.normalize(8),
+        color: colors.buttonColor,
+        lineHeight: Metrix.VerticalSize(14),
     },
     locationContainer: {
-        gap: Metrix.VerticalSize(2)
+        gap: Metrix.VerticalSize(2),
     },
     locationText: {
-        fontSize: Metrix.FontSmall,
-        color: "#003034",
-        fontWeight: "500"
+        fontSize: Metrix.normalize(8),
+        color: "#646262",
+        fontWeight: fonts.InterRegular
     },
     categoryText: {
         fontSize: Metrix.FontSmall,
