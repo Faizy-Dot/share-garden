@@ -14,7 +14,7 @@ import OneTimePassword from './src/screens/auth/Login/frogotPassword/OneTimePass
 import ResetPassword from './src/screens/auth/Login/frogotPassword/ResetPassword';
 import MerchantTabNavigtor from './src/screens/merchantScreens/merchantTabs/MerchantTabs';
 // Stripe Provider - will be uncommented after installing the package
-// import { StripeProvider } from '@stripe/stripe-react-native';
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -118,11 +118,10 @@ function AppNavigator() {
 export default function App() {
   return (
     <Provider store={store}>
-      {/* StripeProvider will be added here after installing the package */}
-      {/* <StripeProvider publishableKey="pk_test_51RkTv5BSnkvyM8bzS2oWw7fJjCGx63akot9KZANcw7iZDs84R1ifvEmhw3uoi7q8dTrGmkM4BEAUPHIWVjj48qCa00NAqg6aFC"> */}
+      <StripeProvider publishableKey="pk_test_51RkTv5BSnkvyM8bzS2oWw7fJjCGx63akot9KZANcw7iZDs84R1ifvEmhw3uoi7q8dTrGmkM4BEAUPHIWVjj48qCa00NAqg6aFC"> 
         <AppNavigator />
         <Toast />
-      {/* </StripeProvider> */}
+      </StripeProvider>
     </Provider>
   );
 }

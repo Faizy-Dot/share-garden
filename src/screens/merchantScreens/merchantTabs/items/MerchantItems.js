@@ -4,7 +4,7 @@ import styles from './styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUserSubscription } from '../../../../redux/Actions/authActions/loginAction';
 import { isMerchantSubscribed, formatCurrency } from '../../../../utils/subscriptionUtils';
-import {  MerchantHomeAdImage} from '../../../../assets/svg';
+import { MerchantHomeAdImage } from '../../../../assets/svg';
 import { Metrix } from '../../../../config';
 import CustomButton from '../../../../components/Button/Button';
 import fonts from '../../../../config/Fonts';
@@ -13,11 +13,12 @@ import MerchantNavbar from '../../../../components/navBar/MerchantNavbar';
 import ApiCaller from '../../../../config/ApiCaller';
 import { useFocusEffect } from '@react-navigation/native';
 import SubscriptionService from '../../../../services/subscriptionService';
+import axiosInstance from '../../../../config/axios';
 
 // Package colors for different tiers
 const packageColors = {
   "Basic": "#FEEDD2",
-  "Premium": "#DCF3E9", 
+  "Premium": "#DCF3E9",
   "Ultimate": "#E8EBFE"
 };
 
@@ -99,15 +100,16 @@ export default function MerchantItems() {
   const fetchSubscriptionPlans = async () => {
     try {
       setLoading(true);
+
       console.log('Fetching subscription plans...');
       const plans = await SubscriptionService.getSubscriptionPlans();
       console.log('Subscription plans response:', plans);
-      
+
       // Check if plans is in a nested structure
       const plansArray = plans?.data || plans?.plans || plans || staticPackages;
       console.log('Plans array:', plansArray);
       console.log('Plans array length:', plansArray.length);
-      
+
       setSubscriptionPlans(plansArray);
     } catch (error) {
       console.error('Error fetching subscription plans:', error);
@@ -127,7 +129,7 @@ export default function MerchantItems() {
     try {
       setSendingReferral(true);
       console.log('Referral email:', referralEmail.trim());
-      
+
       Alert.alert('Success', 'Referral invitation sent successfully!');
       setReferralEmail('');
     } catch (error) {
@@ -138,10 +140,19 @@ export default function MerchantItems() {
     }
   };
 
+  const purchasePlanFunc = async (item) => {
+    try {
+      const response = await SubscriptionService.createSubscription(item.id)
+      console.log(response)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   const renderPackgesData = ({ item, index }) => {
     const color = packageColors[item.name] || "#FEEDD2";
     const priceInDollars = formatCurrency(item.price, item.currency);
-    
+
     return (
       <View key={index} style={[styles.renderPackgesData, { backgroundColor: color }]}>
         <View style={styles.packageTopSection}>
@@ -164,11 +175,11 @@ export default function MerchantItems() {
         <CustomButton
           width={Metrix.HorizontalSize(92)}
           height={Metrix.VerticalSize(26)}
-          title="View Details"
+          title="Purchase"
           fontSize={Metrix.normalize(10)}
           fontFamily={fonts.InterBold}
           borderRadius={3}
-          onPress={() => Alert.alert('Package Details', `${item.name} package selected`)}
+          onPress={purchasePlanFunc}
         />
       </View>
     );
@@ -214,7 +225,7 @@ export default function MerchantItems() {
               onPress={fetchSubscriptionPlans}
             />
           </View>
-          
+
           {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#003034" />
