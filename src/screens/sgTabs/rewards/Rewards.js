@@ -3,13 +3,14 @@ import BackArrowIcon from "../../../components/backArrowIcon/BackArrowIcon";
 import NavBar from "../../../components/navBar/NavBar";
 import styles from "./styles";
 import colors from "../../../config/Colors";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Images, Metrix } from "../../../config";
 import fonts from "../../../config/Fonts";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { BlackBitIcon, PointsEarnIcon, StarIcon } from "../../../assets/svg";
 import axiosInstance from "../../../config/axios";
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function RewardsTabScreen({ navigation }) {
 
@@ -52,31 +53,49 @@ export default function RewardsTabScreen({ navigation }) {
         }
     };
 
-    // Fetch rewards summary
+    // Fetch rewards summary - GET /api/rewards/summary
     const fetchRewardsSummary = async () => {
         try {
+            console.log('Fetching rewards summary...');
             const response = await axiosInstance.get('/api/rewards/summary');
+            console.log('Rewards summary response:', response.data);
             setRewardsSummary(response.data);
         } catch (error) {
             console.log('Error fetching rewards summary:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to load rewards summary',
+            });
         }
     };
 
-    // Fetch transaction history
+    // Fetch transaction history - GET /api/rewards/history
     const fetchTransactionHistory = async () => {
         try {
-            const response = await axiosInstance.get('/api/rewards/history?page=1&limit=20');
-            setTransactionHistory(response.data.transactions || []);
+            console.log('Fetching transaction history...');
+            const response = await axiosInstance.get('/api/rewards/history');
+            console.log('Transaction history response:', response.data);
+            setTransactionHistory(response.data.transactions || response.data || []);
         } catch (error) {
             console.log('Error fetching transaction history:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to load transaction history',
+            });
         }
     };
 
-    // Fetch recent reward
+    // Fetch recent reward - GET /api/rewards/history?type=EARNED&category=SGTIP_PUBLISH&page=1&limit=10
     const fetchRecentReward = async () => {
         try {
-            const response = await axiosInstance.get('/api/rewards/recent?limit=1');
-            if (response.data && response.data.length > 0) {
+            console.log('Fetching recent reward...');
+            const response = await axiosInstance.get('/api/rewards/history?type=EARNED&category=SGTIP_PUBLISH&page=1&limit=10');
+            console.log('Recent reward response:', response.data);
+            if (response.data && response.data.transactions && response.data.transactions.length > 0) {
+                setRecentReward(response.data.transactions[0]);
+            } else if (response.data && response.data.length > 0) {
                 setRecentReward(response.data[0]);
             }
         } catch (error) {
@@ -87,13 +106,18 @@ export default function RewardsTabScreen({ navigation }) {
     // Fetch all data
     const fetchData = async () => {
         setLoading(true);
-        await Promise.all([
-            fetchUserReviews(),
-            fetchRewardsSummary(),
-            fetchTransactionHistory(),
-            fetchRecentReward()
-        ]);
-        setLoading(false);
+        try {
+            await Promise.all([
+                fetchUserReviews(),
+                fetchRewardsSummary(),
+                fetchTransactionHistory(),
+                fetchRecentReward()
+            ]);
+        } catch (error) {
+            console.log('Error fetching data:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Render star rating
@@ -116,9 +140,9 @@ export default function RewardsTabScreen({ navigation }) {
         return (
             <View style={styles.resultsContainer}>
                 <View>
-                    <Text style={styles.titleText}>{item.description}</Text>
+                    <Text style={styles.titleText}>{item.description || item.category || 'Transaction'}</Text>
                     <Text style={styles.itemsIdText}>
-                        {item.type === 'EARNED' ? 'Earned' : 'Spent'} • {new Date(item.createdAt).toLocaleDateString()}
+                        {item.type === 'EARNED' ? 'Earned' : 'Spent'} • {new Date(item.createdAt || item.date).toLocaleDateString()}
                     </Text>
                 </View>
                 <View style={styles.bitContainer}>
@@ -136,6 +160,16 @@ export default function RewardsTabScreen({ navigation }) {
         )
     }
 
+    // Use useFocusEffect to refresh data when screen is focused
+    useFocusEffect(
+        useCallback(() => {
+            if (user) {
+                console.log('Screen focused - refreshing rewards data...');
+                fetchData();
+            }
+        }, [user])
+    );
+
     useEffect(() => {
         if (!user) {
             navigation.navigate("Login")
@@ -144,8 +178,6 @@ export default function RewardsTabScreen({ navigation }) {
                 text1: 'Login or Signup',
                 text2: 'First Login plz',
             });
-        } else {
-            fetchData();
         }
     }, [user, navigation]);
 
@@ -194,14 +226,14 @@ export default function RewardsTabScreen({ navigation }) {
 
                 <View style={{ gap: 3, alignItems: "center" }}>
                     <Text style={styles.sameText1}>Your SG Balance is</Text>
-                    <Text style={styles.sameText2}>{rewardsSummary.currentBalance}</Text>
+                    <Text style={styles.sameText2}>{rewardsSummary.currentBalance || 0}</Text>
                 </View>
 
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <PointsEarnIcon />
                     <Text style={[styles.sameText1, { marginLeft: Metrix.HorizontalSize(10) }]}>
                         {recentReward ? (
-                            <>Points earned<Text style={{ fontFamily: fonts.InterBold }}> +{recentReward.amount}</Text> from {recentReward.category.toLowerCase()}</>
+                            <>Points earned<Text style={{ fontFamily: fonts.InterBold }}> +{recentReward.amount}</Text> from {recentReward.category?.toLowerCase() || 'recent activity'}</>
                         ) : (
                             <>Points earned<Text style={{ fontFamily: fonts.InterBold }}> +0</Text> from last sales</>
                         )}
@@ -215,7 +247,9 @@ export default function RewardsTabScreen({ navigation }) {
                     data={transactionHistory}
                     renderItem={renderResults}
                     showsVerticalScrollIndicator={false}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item.id || item._id || Math.random().toString()}
+                    refreshing={loading}
+                    onRefresh={fetchData}
                 />
             </View>
 
