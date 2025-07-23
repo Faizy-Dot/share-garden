@@ -20,7 +20,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { CameraIcon } from '../../../assets/svg';
 
 
-var baseUrl = 'https://api.sharegarden.ca';
+var baseUrl = 'http://192.168.1.8:4500';
 
 
 export default function EditProfile({ navigation }) {

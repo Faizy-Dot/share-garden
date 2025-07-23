@@ -3,8 +3,8 @@ import Axios from 'axios';
 // For iOS simulator and web
 // var baseUrl = 'http://localhost:4500';
 // For Android emulator and physical devices, use your computer's IP address
-// var baseUrl = 'http://192.168.1.8:4500'; // Replace xxx with your actual IP address
-var baseUrl = 'https://api.sharegarden.ca'; // Production URL
+var baseUrl = 'http://192.168.1.8:4500'; // Replace xxx with your actual IP address
+// var baseUrl = 'https://api.sharegarden.ca'; // Production URL
 export const Img_url = '';
 
 export default class ApiCaller {

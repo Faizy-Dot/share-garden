@@ -13,7 +13,8 @@ import MerchantNavbar from '../../../../components/navBar/MerchantNavbar';
 import ApiCaller from '../../../../config/ApiCaller';
 import { useFocusEffect } from '@react-navigation/native';
 import SubscriptionService from '../../../../services/subscriptionService';
-import axiosInstance from '../../../../config/axios';
+// Stripe imports
+import { useStripe } from '@stripe/stripe-react-native';
 
 // Package colors for different tiers
 const packageColors = {
@@ -81,19 +82,23 @@ const referralsData = [{
 export default function MerchantItems() {
   const { user } = useSelector((state) => state.login);
   const dispatch = useDispatch();
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   const [subscriptionPlans, setSubscriptionPlans] = useState(staticPackages);
   const [loading, setLoading] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [currentSubscription, setCurrentSubscription] = useState(null);
   const [referralEmail, setReferralEmail] = useState('');
   const [sendingReferral, setSendingReferral] = useState(false);
 
   // Check if merchant is subscribed using utility function
   const checkMerchantSubscribed = () => isMerchantSubscribed(user);
 
-  // Fetch subscription plans when screen comes into focus
+  // Fetch subscription plans and current subscription when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
       fetchSubscriptionPlans();
+      fetchCurrentSubscription();
     }, [])
   );
 
@@ -140,27 +145,130 @@ export default function MerchantItems() {
     }
   };
 
-  const purchasePlanFunc = async (item) => {
+  const fetchCurrentSubscription = async () => {
     try {
-      const response = await SubscriptionService.createSubscription(item.id)
-      console.log(response)
-    } catch (err) {
-      console.log(err)
+      const subscription = await SubscriptionService.getCurrentSubscription();
+      setCurrentSubscription(subscription);
+      console.log('Current subscription:', subscription);
+    } catch (error) {
+      console.error('Error fetching current subscription:', error);
     }
-  }
+  };
 
-  const renderPackgesData = ({ item, index }) => {
+  const initializePaymentSheet = async (clientSecret) => {
+    try {
+      const { error } = await initPaymentSheet({
+        merchantDisplayName: 'Share Garden',
+        paymentIntentClientSecret: clientSecret,
+        defaultBillingDetails: {
+          name: `${user?.firstName} ${user?.lastName}`,
+          email: user?.email,
+        },
+      });
+
+      if (error) {
+        console.error('Payment sheet initialization error:', error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Initialize payment sheet error:', error);
+      return false;
+    }
+  };
+
+  const purchasePlanFunc = async (item) => {
+    if (processingPayment) return;
+
+    try {
+      setProcessingPayment(true);
+      
+      // Step 1: Create subscription and get client secret
+      console.log('Creating subscription for plan:', item);
+      const response = await SubscriptionService.createSubscription(item.id);
+      console.log('Subscription response:', response);
+
+      if (!response.success || !response.clientSecret) {
+        Alert.alert('Error', response.message || 'Failed to create subscription');
+        return;
+      }
+
+      // Step 2: Initialize payment sheet
+      const paymentSheetInitialized = await initializePaymentSheet(response.clientSecret);
+      if (!paymentSheetInitialized) {
+        Alert.alert('Error', 'Failed to initialize payment sheet');
+        return;
+      }
+
+      // Step 3: Present payment sheet
+      const { error } = await presentPaymentSheet();
+
+      if (error) {
+        console.error('Payment failed:', error);
+        Alert.alert('Payment Failed', error.message || 'Payment was cancelled or failed');
+        return;
+      }
+
+      // Step 4: Payment successful
+      Alert.alert(
+        'Success!',
+        `Your ${item.name} subscription has been activated successfully!`,
+        [{ text: 'OK' }]
+      );
+
+      // Step 5: Update user state and refresh data
+      const updatedSubscription = {
+        id: response.subscriptionId,
+        planName: item.name,
+        status: 'active',
+        amount: item.price,
+        currency: item.currency,
+        currentPeriodStart: new Date().toISOString(),
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+      };
+
+      dispatch(updateUserSubscription(updatedSubscription));
+      setCurrentSubscription(updatedSubscription);
+      
+      // Refresh subscription data
+      fetchCurrentSubscription();
+      
+    } catch (error) {
+      console.error('Purchase error:', error);
+      Alert.alert('Error', 'Failed to process purchase. Please try again.');
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
+
+    const renderPackgesData = ({ item, index }) => {
     const color = packageColors[item.name] || "#FEEDD2";
     const priceInDollars = formatCurrency(item.price, item.currency);
-
+    const isCurrentPlan = currentSubscription?.planName === item.name;
+    const hasActiveSubscription = currentSubscription && currentSubscription.status === 'active';
+    
     return (
-      <View key={index} style={[styles.renderPackgesData, { backgroundColor: color }]}>
+      <View 
+        key={index} 
+        style={[
+          styles.renderPackgesData, 
+          { 
+            backgroundColor: color,
+            opacity: hasActiveSubscription && !isCurrentPlan ? 0.5 : 1
+          }
+        ]}
+      >
         <View style={styles.packageTopSection}>
           <Text style={styles.packageTitle}>{item.name}</Text>
           <Text style={styles.packagePrice}>{priceInDollars}</Text>
           {item.popular && (
             <View style={styles.popularBadge}>
               <Text style={styles.popularText}>Popular</Text>
+            </View>
+          )}
+          {isCurrentPlan && (
+            <View style={[styles.popularBadge, { backgroundColor: '#4CAF50' }]}>
+              <Text style={styles.popularText}>Current</Text>
             </View>
           )}
         </View>
@@ -175,11 +283,13 @@ export default function MerchantItems() {
         <CustomButton
           width={Metrix.HorizontalSize(92)}
           height={Metrix.VerticalSize(26)}
-          title="Purchase"
+          title={processingPayment ? "Processing..." : isCurrentPlan ? "Current Plan" : "Purchase"}
           fontSize={Metrix.normalize(10)}
           fontFamily={fonts.InterBold}
           borderRadius={3}
-          onPress={purchasePlanFunc}
+          onPress={() => !isCurrentPlan && !hasActiveSubscription && purchasePlanFunc(item)}
+          disabled={processingPayment || isCurrentPlan || hasActiveSubscription}
+          backgroundColor={isCurrentPlan ? "#ccc" : hasActiveSubscription ? "#ccc" : undefined}
         />
       </View>
     );
@@ -210,20 +320,18 @@ export default function MerchantItems() {
           </View>
         </View>
 
+        {processingPayment && (
+          <View style={styles.processingPaymentContainer}>
+            <ActivityIndicator size="large" color="#003034" />
+            <Text style={styles.processingPaymentText}>Processing your payment...</Text>
+          </View>
+        )}
+
         <View style={styles.packageContainer}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Metrix.VerticalSize(10) }}>
+          <View style={{ marginBottom: Metrix.VerticalSize(10) }}>
             <Text style={{ fontSize: Metrix.normalize(20), fontFamily: fonts.InterBold }}>
               Available Packages
             </Text>
-            <CustomButton
-              width={Metrix.HorizontalSize(80)}
-              height={Metrix.VerticalSize(30)}
-              title="Refresh"
-              fontSize={Metrix.FontExtraSmall}
-              fontFamily={fonts.InterBold}
-              borderRadius={3}
-              onPress={fetchSubscriptionPlans}
-            />
           </View>
 
           {loading ? (

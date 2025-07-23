@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://api.sharegarden.ca'; // Replace with your actual API domain 
+export const BASE_URL = 'http://192.168.1.8:4500'; // Replace with your actual API domain 

@@ -33,18 +33,14 @@ class SubscriptionService {
   }
 
   // Create a new subscription
-  static async createSubscription(planId, paymentMethodId = null) {
+  static async createSubscription(priceId) {
     try {
       const headers = this.getAuthHeaders();
       const payload = {
-        planId: planId
+        priceId: priceId
       };
       
-      if (paymentMethodId) {
-        payload.paymentMethodId = paymentMethodId;
-      }
-      
-      const response = await ApiCaller.Post('/api/subscriptions/create', payload, headers);
+      const response = await ApiCaller.Post('/api/subscriptions', payload, headers);
       return response.data;
     } catch (error) {
       console.error('Error creating subscription:', error);

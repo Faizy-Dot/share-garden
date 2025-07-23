@@ -8,14 +8,16 @@ import colors from '../../../../config/Colors';
 import { UploadImgIcon } from '../../../../assets/svg';
 import Toast from "react-native-toast-message";
 import { launchImageLibrary, launchCamera } from "react-native-image-picker";
-import DropdownComponent from '../../../../components/dropDown/DropDownInput';
+import DropDownInput from '../../../../components/dropDown/DropDownInput.jsx';
 import fonts from '../../../../config/Fonts';
 import Icon from "react-native-vector-icons/MaterialIcons";
 import CustomButton from '../../../../components/Button/Button';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
-import Axios from 'axios';
 import axiosInstance from '../../../../config/axios';
+import Axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
+import DatePicker from 'react-native-date-picker';
 
 export default function MerchantPostAD() {
   const [image, setImage] = useState(null);
@@ -27,10 +29,22 @@ export default function MerchantPostAD() {
   const [categories, setCategories] = useState([])
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [expiryDate, setExpiryDate] = useState(new Date());
+  const [openDatePicker, setOpenDatePicker] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [discountType, setDiscountType] = useState(null);
+  const [percentageValue, setPercentageValue] = useState('');
+  const [fixedValue, setFixedValue] = useState('');
 
   const { user } = useSelector((state) => state.login)
+  const navigation = useNavigation();
+  const inputRef = useRef(null);
 
-
+  const discountTypes = [
+    { label: 'PERCENTAGE', value: 'PERCENTAGE' },
+    { label: 'FIXED', value: 'FIXED' }
+  ];
 
   const requestCameraPermission = async () => {
     if (Platform.OS === 'android') {
@@ -122,22 +136,35 @@ export default function MerchantPostAD() {
       ]
     );
   };
-  const inputRef = useRef(null);
 
-  const navigation = useNavigation()
-
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('Screen focused, checking user:', user);
+      if (!user) {
+        navigation.navigate("Login")
+        Toast.show({
+          type: 'error',
+          text1: 'Login Required',
+          text2: 'Please login first',
+        });
+        return;
+      }
+      console.log('Fetching categories...');
+      fetchCategories();
+    }, [user, navigation])
+  );
 
   const fetchCategories = async () => {
+    setLoadingCategories(true);
     try {
-      const response = await Axios.get(
-        'https://api.sharegarden.ca/api/categories/getCategories',
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+      console.log('User token:', user?.token);
+      console.log('Making API call to get categories...');
+      const response = await axiosInstance.get('/api/categories/getCategories');
 
+      console.log('Raw API response:', response);
+      console.log('Categories data:', response.data);
+
+      // Transform categories for dropdown while preserving all data
       const formattedCategories = response.data.map(cat => ({
         label: cat.name,
         value: cat.id,
@@ -146,21 +173,23 @@ export default function MerchantPostAD() {
         _count: cat._count
       }));
 
+      console.log('Formatted categories:', formattedCategories);
       setCategories(formattedCategories);
-
-
-
     } catch (error) {
       console.error('Error fetching categories:', error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+      }
       Toast.show({
         type: 'error',
         text1: 'Error',
         text2: 'Failed to load categories',
       });
+    } finally {
+      setLoadingCategories(false);
     }
   };
-
-  useEffect(() => { fetchCategories() }, [])
 
   const handlePublish = async () => {
     if (!image || !title || !selectedCategory || !description) {
@@ -182,7 +211,6 @@ export default function MerchantPostAD() {
     });
 
     try {
-
       const response = await axiosInstance.post(
         '/api/ads',
         formData,
@@ -193,13 +221,12 @@ export default function MerchantPostAD() {
         }
       );
       
-      console.log( "response first api ==>>",response.data)
+      console.log("response first api ==>>", response.data);
 
       if(response.status === 201){
-       const responsePublish = await axiosInstance.patch(`api/ads/${response.data.id}/publish`)
-      console.log("reponse from second api==>>",responsePublish.data)
+        const responsePublish = await axiosInstance.patch(`api/ads/${response.data.id}/publish`);
+        console.log("response from second api==>>", responsePublish.data);
       }
-
 
       Toast.show({
         type: 'success',
@@ -207,10 +234,23 @@ export default function MerchantPostAD() {
         text2: 'Your ad has been successfully posted!',
       });
 
-      // optionally reset form or navigate
+      // Reset form
       setTitle('');
       setDescription('');
       setImage(null);
+      setSelectedCategory(null);
+      setSelectedCategoryName('');
+      setDiscountType(null);
+      setPercentageValue('');
+      setFixedValue('');
+      setAddCoupon(false);
+      setCheckOnline(false);
+      setCheckInStore(false);
+      setCouponCode('');
+      setExpiryDate(new Date());
+
+      // Navigate to MerchantItems screen
+      navigation.navigate('MerchantItems');
     } catch (error) {
       console.error(error);
       Toast.show({
@@ -246,13 +286,22 @@ export default function MerchantPostAD() {
           </View>
 
           <TextInput onChangeText={setTitle} value={title} style={styles.inputs} placeholder="Ad Title*" />
-          <DropdownComponent placeholder={"Select Category*"}
-            data={categories}
-            value={selectedCategory}
-            onChange={item => {
-              setSelectedCategory(item.value);
-              setSelectedCategoryName(item.label);
-            }} />
+          <View style={styles.dropdownContainer}>
+            <Text style={styles.label}>Category*</Text>
+            {console.log('Rendering dropdown with categories:', categories)}
+            <DropDownInput 
+              data={categories}
+              value={selectedCategory}
+              onChange={item => {
+                console.log('Selected category:', item);
+                setSelectedCategory(item.value);
+                setSelectedCategoryName(item.label);
+              }}
+              placeholder="Select category"
+              fontSize={Metrix.FontSmall}
+              fontFamily={fonts.InterRegular}
+            />
+          </View>
 
           <TouchableOpacity activeOpacity={1} style={styles.fakeInputWrapper} onPress={() => inputRef.current?.focus()}>
             {description === '' ? (
@@ -288,15 +337,60 @@ export default function MerchantPostAD() {
         {addCoupon && (
           <View style={styles.couponSection}>
             <TextInput style={styles.inputs} placeholder='Coupon Title*' />
-            <DropdownComponent placeholder={"Discount type"} />
+            <DropDownInput 
+              placeholder={"Discount type"}
+              data={discountTypes}
+              value={discountType}
+              onChange={item => {
+                setDiscountType(item.value);
+                // Reset values when type changes
+                setPercentageValue('');
+                setFixedValue('');
+              }}
+            />
 
             <View style={styles.percentageRow}>
-              <TextInput style={[styles.inputs, styles.flex1]} placeholder='Enter Percentage Value' />
-              <TextInput style={[styles.inputs, styles.flex1]} placeholder='Fixed Amount Value' />
+              {discountType === 'PERCENTAGE' ? (
+                <TextInput 
+                  style={[styles.inputs, styles.flex1]} 
+                  placeholder='Enter Percentage Value'
+                  value={percentageValue}
+                  onChangeText={(text) => {
+                    // Only allow numbers and limit to 100
+                    const numValue = text.replace(/[^0-9]/g, '');
+                    if (numValue === '' || (parseInt(numValue) <= 100)) {
+                      setPercentageValue(numValue);
+                    }
+                  }}
+                  keyboardType="numeric"
+                  maxLength={3}
+                />
+              ) : discountType === 'FIXED' ? (
+                <TextInput 
+                  style={[styles.inputs, styles.flex1]} 
+                  placeholder='Fixed Amount Value'
+                  value={fixedValue}
+                  onChangeText={(text) => {
+                    // Only allow numbers
+                    const numValue = text.replace(/[^0-9]/g, '');
+                    setFixedValue(numValue);
+                  }}
+                  keyboardType="numeric"
+                />
+              ) : (
+                <View style={[styles.inputs, styles.flex1, { justifyContent: 'center', alignItems: 'center' }]}>
+                  <Text style={{ color: '#6E6E6E' }}>Select discount type first</Text>
+                </View>
+              )}
             </View>
 
             <Text style={styles.offerText}>
-              Your are offering: 30% OFF with this ad / Your are offering: $30 off with this Ad
+              {discountType === 'PERCENTAGE' && percentageValue ? 
+                `You are offering: ${percentageValue}% OFF with this ad` :
+                discountType === 'FIXED' && fixedValue ?
+                `You are offering: $${fixedValue} off with this Ad` :
+                'Select discount type and enter value'
+              }
             </Text>
 
             <View style={styles.redeemRow}>
@@ -337,11 +431,40 @@ export default function MerchantPostAD() {
               </View>
             </View>
 
-            <TextInput style={styles.inputs} placeholder='Coupon Code' />
-            <TextInput style={styles.inputs} placeholder='Expiry Date' />
+            <TextInput 
+              style={styles.inputs} 
+              placeholder='Coupon Code'
+              value={couponCode}
+              onChangeText={(text) => setCouponCode(text.toUpperCase())}
+              autoCapitalize="characters"
+              maxLength={15}
+            />
+            <TouchableOpacity 
+              style={styles.inputs} 
+              onPress={() => setOpenDatePicker(true)}
+            >
+              <Text style={[styles.dateText, !expiryDate && { color: '#6E6E6E' }]}>
+                {expiryDate ? expiryDate.toLocaleDateString() : 'Expiry Date'}
+              </Text>
+            </TouchableOpacity>
             <TextInput style={styles.inputs} placeholder='Disclaimer' />
           </View>
         )}
+
+        <DatePicker
+          modal
+          open={openDatePicker}
+          date={expiryDate}
+          mode="date"
+          minimumDate={new Date()}
+          onConfirm={(date) => {
+            setOpenDatePicker(false)
+            setExpiryDate(date)
+          }}
+          onCancel={() => {
+            setOpenDatePicker(false)
+          }}
+        />
 
         <View style={styles.buttonRow}>
           <CustomButton

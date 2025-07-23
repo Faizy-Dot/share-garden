@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TextInput, TouchableOpacity, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import styles from './styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -104,10 +104,13 @@ const Login = ({ navigation }) => {
 
         // Prepare user data
 
+        // Get FCM token
+        const fcmToken = await getFcmToken();
+
         const userData = {
             email: email,
             password,
-            deviceToken: getFcmToken(),
+            deviceToken: fcmToken,
             deviceType: devicetype,
         };
 

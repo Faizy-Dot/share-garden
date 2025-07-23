@@ -47,7 +47,22 @@ const styles = StyleSheet.create({
         paddingLeft: Metrix.HorizontalSize(10),
         fontSize: Metrix.FontSmall,
         fontFamily: fonts.InterRegular,
-        borderRadius: Metrix.VerticalSize(4)
+        borderRadius: Metrix.VerticalSize(4),
+        justifyContent: 'center'
+    },
+    dateText: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.black,
+    },
+    dropdownContainer: {
+        marginBottom: Metrix.VerticalSize(10),
+    },
+    label: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterRegular,
+        marginBottom: Metrix.VerticalSize(5),
+        color: colors.black,
     },
     fakeInputWrapper: {
         borderWidth: 1,
@@ -56,12 +71,6 @@ const styles = StyleSheet.create({
         padding: Metrix.VerticalSize(12),
         justifyContent: 'flex-start',
         height: Metrix.VerticalSize(106)
-    },
-
-    label: {
-        fontSize: Metrix.FontSmall,
-        fontFamily: fonts.InterRegular,
-        marginBottom: Metrix.VerticalSize(4),
     },
 
     placeholderLine: {

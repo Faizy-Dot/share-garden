@@ -176,7 +176,7 @@ export default function PostTabScreen({ navigation, route }) {
     const fetchCategories = async () => {
         try {
             const response = await Axios.get(
-                'https://api.sharegarden.ca/api/categories/getCategories',
+                'http://192.168.1.8:4500/api/categories/getCategories',
                 {
                     headers: {
                         Authorization: `Bearer ${user.token}`,
