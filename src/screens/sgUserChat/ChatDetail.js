@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { Images, Metrix } from '../../config';
 import BackArrowIcon from '../../components/backArrowIcon/BackArrowIcon';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -9,10 +9,12 @@ import colors from '../../config/Colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage } from '../../store/actions/chatActions';
 import moment from 'moment';
-import { ChevronRightIcon } from '../../assets/svg';
+import { CashIcon, ChevronRightIcon, NotificationIcon } from '../../assets/svg';
 import axiosInstance from '../../config/axios';
 import io from 'socket.io-client';
 import { BASE_URL } from '../../config/constants';
+import NavBar from '../../components/navBar/NavBar';
+import { images } from '../../assets';
 
 const getInitialLetter = (name) => {
   return name ? name.charAt(0).toUpperCase() : '?';
@@ -127,21 +129,21 @@ const ChatDetail = ({ route, navigation }) => {
         time: moment(newMessage.createdAt).format('h:mm A'),
         isSender: newMessage.senderId === user.id
       };
-      
+
       setMessages(prevMessages => {
         // Check if we have a temporary message with the same text
-        const hasTempMessage = prevMessages.some(msg => 
-          msg.id.startsWith('temp-') && 
-          msg.text === newMessage.message && 
+        const hasTempMessage = prevMessages.some(msg =>
+          msg.id.startsWith('temp-') &&
+          msg.text === newMessage.message &&
           msg.isSender === (newMessage.senderId === user.id)
         );
 
         if (hasTempMessage) {
           // Replace the temporary message with the real one
-          return prevMessages.map(msg => 
-            msg.id.startsWith('temp-') && 
-            msg.text === newMessage.message && 
-            msg.isSender === (newMessage.senderId === user.id)
+          return prevMessages.map(msg =>
+            msg.id.startsWith('temp-') &&
+              msg.text === newMessage.message &&
+              msg.isSender === (newMessage.senderId === user.id)
               ? formattedMessage
               : msg
           );
@@ -150,7 +152,7 @@ const ChatDetail = ({ route, navigation }) => {
           return [...prevMessages, formattedMessage];
         }
       });
-      
+
       if (!userScrolled) {
         scrollToBottom();
       }
@@ -166,7 +168,7 @@ const ChatDetail = ({ route, navigation }) => {
   const handleScroll = (event) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
     const distanceFromBottom = contentSize.height - (contentOffset.y + layoutMeasurement.height);
-    
+
     if (distanceFromBottom > 50) {
       setShowScrollButton(true);
       setUserScrolled(true);
@@ -188,18 +190,18 @@ const ChatDetail = ({ route, navigation }) => {
       }
 
       const response = await axiosInstance.get(`/api/chat/${chatUserId}`);
-      
+
       const formattedMessages = response.data.map(msg => ({
         id: msg.id,
         text: msg.message,
         time: moment(msg.createdAt).format('h:mm A'),
         isSender: msg.isSentByMe
       }));
-      
-      formattedMessages.sort((a, b) => 
+
+      formattedMessages.sort((a, b) =>
         moment(a.createdAt).valueOf() - moment(b.createdAt).valueOf()
       );
-      
+
       setMessages(formattedMessages);
     } catch (error) {
       console.error('Error fetching chat history:', error);
@@ -242,12 +244,12 @@ const ChatDetail = ({ route, navigation }) => {
         receiverId: chatUserId,
         message: newMessage.text
       });
-      
+
       // No need to update the message here as it will be handled by the socket
     } catch (error) {
       console.error('Failed to send message:', error);
       // Remove the temporary message if sending fails
-      setMessages(prevMessages => 
+      setMessages(prevMessages =>
         prevMessages.filter(msg => msg.id !== tempId)
       );
     } finally {
@@ -275,53 +277,38 @@ const ChatDetail = ({ route, navigation }) => {
     </View>
   );
 
+  const renderChatHeader = () => (
+    <View style={styles.chatHeader}>
+      <Image
+        source={{ uri: chatUser.image }} // Replace with your actual image URL or source
+        style={styles.chatUserImage}
+      />
+      <Text style={styles.chatUserName}>{chatUser.name}</Text>
+      <NotificationIcon  stroke={colors.buttonColor}/>
+    </View>
+  );
+
+
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <View style={styles.navbarContainer}>
           <BackArrowIcon />
-        </TouchableOpacity>
-        <View style={styles.headerInfo}>
-          <View style={styles.userInfo}>
-            {getChatUserInfo().image ? (
-              <Image 
-                source={{ uri: getChatUserInfo().image }} 
-                style={styles.userImage} 
-              />
-            ) : (
-              <View style={{
-                width: Metrix.HorizontalSize(40),
-                height: Metrix.HorizontalSize(40),
-                borderRadius: Metrix.HorizontalSize(20),
-                backgroundColor: '#E8F3FF',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: Metrix.HorizontalSize(10)
-              }}>
-                <Text style={{
-                  fontSize: Metrix.FontMedium,
-                  fontFamily: fonts.InterBold,
-                  color: colors.buttonColor,
-                }}>
-                  {getInitialLetter(getChatUserInfo().name?.split(' ')[0])}
-                </Text>
-              </View>
-            )}
-            <Text style={styles.headerTitle}>{getChatUserInfo().name}</Text>
+          <NavBar title={"Chats"} />
+        </View>
+
+        <View style={styles.infoContainer}>
+          <View style={styles.productInfoContainer}>
+            <Image source={Images.homePopularListing} style={styles.productImage} />
+            <Text style={styles.infoText}>7 Seater Sofa Set</Text>
           </View>
-          <View style={styles.productInfo}>
-            <Image 
-              source={
-                getProductInfo().image 
-                  ? { uri: getProductInfo().image } 
-                  : Images.homePopularListing
-              } 
-              style={styles.productImage} 
-            />
-            <Text style={styles.productTitle}>{getProductInfo().title}</Text>
-            <Text style={styles.productPrice}>$ {getProductInfo().price}</Text>
+          <View style={[styles.productInfoContainer, { gap: 5 }]}>
+            <CashIcon />
+            <Text style={[styles.infoText, { color: colors.buttonColor }]}>2200</Text>
           </View>
         </View>
+
       </View>
 
       {isLoadingMessages ? (
@@ -329,30 +316,34 @@ const ChatDetail = ({ route, navigation }) => {
           <ActivityIndicator size="large" color={colors.buttonColor} />
         </View>
       ) : (
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={renderMessage}
-          keyExtractor={item => item.id.toString()}
-          contentContainerStyle={styles.messagesList}
-          onContentSizeChange={() => {
-            if (!userScrolled) {
-              scrollToBottom();
-            }
-          }}
-          onLayout={() => scrollToBottom()}
-          onScroll={handleScroll}
-          scrollEventThrottle={400}
-          ListEmptyComponent={() => (
-            <View style={styles.emptyMessageContainer}>
-              <Text style={styles.emptyMessageText}>No messages yet. Start a conversation!</Text>
-            </View>
-          )}
-        />
+        <View style={{ flex: 1, paddingHorizontal: Metrix.HorizontalSize(15) }}>
+
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            renderItem={renderMessage}
+            keyExtractor={item => item.id.toString()}
+            contentContainerStyle={[styles.messagesList , {flexGrow :1}]}
+            onContentSizeChange={() => {
+              if (!userScrolled) {
+                scrollToBottom();
+              }
+            }}
+            ListHeaderComponent={renderChatHeader}
+            onLayout={() => scrollToBottom()}
+            onScroll={handleScroll}
+            scrollEventThrottle={400}
+            ListEmptyComponent={() => (
+              <View style={styles.emptyMessageContainer}>
+                <Text style={styles.emptyMessageText}>No messages yet. Start a conversation!</Text>
+              </View>
+            )}
+          />
+        </View>
       )}
 
       {showScrollButton && (
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.scrollButton}
           onPress={scrollToBottom}
         >
@@ -368,7 +359,7 @@ const ChatDetail = ({ route, navigation }) => {
           onChangeText={setMessage}
           multiline
         />
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.sendButton, isSending && styles.sendButtonDisabled]}
           onPress={handleSendMessage}
           disabled={isSending}
@@ -376,7 +367,7 @@ const ChatDetail = ({ route, navigation }) => {
           {isSending ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Icon name="chevron-right" size={20} color={colors.black} />
+            <Icon name="chevron-right" size={30} color={colors.buttonColor} />
           )}
         </TouchableOpacity>
       </View>

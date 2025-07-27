@@ -76,12 +76,15 @@ const ProductDetail = ({ route, navigation }) => {
   };
 
   const calculateTimeRemaining = (durationInSeconds) => {
-    const days = Math.floor(durationInSeconds / (24 * 60 * 60));
-    const hours = Math.floor((durationInSeconds % (24 * 60 * 60)) / (60 * 60));
-    const minutes = Math.floor((durationInSeconds % (60 * 60)) / 60);
-    const seconds = durationInSeconds % 60;
-    return { days, hours, minutes, seconds };
-  };
+  const clampedDuration = Math.max(0, durationInSeconds); // Prevent negatives
+
+  const days = Math.floor(clampedDuration / (24 * 60 * 60));
+  const hours = Math.floor((clampedDuration % (24 * 60 * 60)) / (60 * 60));
+  const minutes = Math.floor((clampedDuration % (60 * 60)) / 60);
+  const seconds = clampedDuration % 60;
+
+  return { days, hours, minutes, seconds };
+};
 
   const fetchProductDetail = async () => {
     if (!productId) {

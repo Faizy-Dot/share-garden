@@ -426,7 +426,7 @@ export default function MerchantPostAD() {
             <View style={styles.redeemValueRow}>
               <Text style={styles.checkBoxText}>Redemption Value</Text>
               <View style={styles.redeemInputWrap}>
-                <TextInput style={[styles.inputs, styles.redeemInput]} />
+                <TextInput style={[styles.inputs, styles.redeemInput]}  keyboardType="numeric" />
                 <Text style={styles.checkBoxText}>Points</Text>
               </View>
             </View>

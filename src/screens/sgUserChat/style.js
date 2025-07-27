@@ -22,11 +22,7 @@ const styles = StyleSheet.create({
         position: "relative",
         right: Metrix.HorizontalSize(10)
     },
-    navBarContainer: {
-        flexDirection: "row",
-        width: Metrix.HorizontalSize(290),
-        alignItems: "center",
-    },
+    
     searchInput: {
         height: Metrix.HorizontalSize(40),
         backgroundColor: colors.inputBackgroundColor,
@@ -91,10 +87,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: Metrix.VerticalSize(12.5)
     },
-    count:{
+    count: {
         fontSize: Metrix.normalize(15),
         fontFamily: fonts.InterBold,
-        color : colors.white
+        color: colors.white
+    },
+    noChatText: {
+        textAlign: "center",
+        fontSize: Metrix.FontRegular,
+        fontFamily: fonts.InterRegular,
+        marginTop : Metrix.VerticalSize(20)
     }
 })
 

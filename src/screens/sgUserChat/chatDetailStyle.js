@@ -6,101 +6,129 @@ import colors from '../../config/Colors';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F4F4F4',
   },
   header: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
+
+
   },
-  headerInfo: {
-    marginTop: 10,
-  },
-  headerTitle: {
-    fontSize: Metrix.FontLarge,
-    fontFamily: fonts.InterBold,
-    marginBottom: 10,
-  },
-  productInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+  productInfoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Metrix.HorizontalSize(10)
   },
   productImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: Metrix.HorizontalSize(64),
+    height: Metrix.HorizontalSize(64),
+    borderRadius: Metrix.HorizontalSize(32),
+    borderWidth: 1,
+    borderColor: colors.buttonColor
   },
-  productTitle: {
-    fontSize: Metrix.FontSmall,
-    fontFamily: fonts.InterMedium,
+  infoText: {
+    fontSize: Metrix.FontMedium,
+    fontFamily: fonts.InterSemiBold
   },
-  productPrice: {
-    fontSize: Metrix.FontSmall,
-    fontFamily: fonts.InterBold,
-    color: colors.buttonColor,
+  infoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Metrix.VerticalSize(15),
+    justifyContent: "space-between"
   },
+
+  navbarContainer: {
+    backgroundColor: colors.white,
+    gap: Metrix.VerticalSize(15),
+    padding: Metrix.VerticalSize(15),
+    borderBottomWidth: 1,
+    borderBottomColor: "#EAEAEA"
+
+  },
+  chatHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: '#EAEAEA',
+    backgroundColor: '#fff',
+    justifyContent: "space-between"
+  },
+  chatUserImage: {
+    width: Metrix.HorizontalSize(42),
+    height: Metrix.HorizontalSize(42),
+    borderRadius: Metrix.VerticalSize(21),
+  },
+  chatUserName: {
+    fontSize: Metrix.FontRegular,
+    fontWeight: fonts.InterBold,
+  },
+
   messagesList: {
-    padding: 15,
+    padding: Metrix.VerticalSize(10),
+    backgroundColor: colors.white,
+    flex: 1,
+    borderTopLeftRadius: Metrix.VerticalSize(24),
+    borderTopRightRadius: Metrix.VerticalSize(24),
+
   },
   messageContainer: {
-    maxWidth: '80%',
-    marginVertical: 5,
-    padding: 12,
-    borderRadius: 12,
+    padding: Metrix.VerticalSize(8),
   },
   senderMessage: {
     alignSelf: 'flex-end',
-    backgroundColor: colors.buttonColor,
   },
   receiverMessage: {
     alignSelf: 'flex-start',
-    backgroundColor: '#F5F5F5',
   },
-  messageText: {
-    fontSize: Metrix.FontSmall,
-    fontFamily: fonts.InterRegular,
-  },
+
   senderText: {
     color: '#fff',
+    backgroundColor: colors.buttonColor,
+    fontSize: Metrix.FontExtraSmall,
+    fontFamily: fonts.InterLight,
+    padding: Metrix.VerticalSize(7),
+    borderRadius: Metrix.VerticalSize(16),
+    textAlign: "center"
   },
   receiverText: {
     color: '#000',
+    backgroundColor: '#F5F5F5',
+    fontSize: Metrix.FontExtraSmall,
+    fontFamily: fonts.InterLight,
+    padding: Metrix.VerticalSize(7),
+    borderRadius: Metrix.VerticalSize(16),
+    textAlign: "center"
+
   },
   messageTime: {
-    fontSize: Metrix.FontExtraSmall,
+    fontSize: Metrix.normalize(10),
     marginTop: 4,
     alignSelf: 'flex-end',
   },
   senderTime: {
-    color: '#fff',
+    color: '#A8A7B0',
   },
   receiverTime: {
-    color: '#888',
+    color: '#A8A7B0',
   },
   inputContainer: {
     flexDirection: 'row',
     padding: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
     alignItems: 'center',
+    backgroundColor: colors.white,
+    marginHorizontal: Metrix.HorizontalSize(15)
   },
   input: {
     flex: 1,
     backgroundColor: '#F5F5F5',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    marginRight: 10,
-    fontSize: Metrix.FontSmall,
+    borderRadius: Metrix.VerticalSize(20.5),
+    fontSize: Metrix.FontExtraSmall,
+    height: Metrix.VerticalSize(41),
+    paddingLeft: Metrix.HorizontalSize(10)
+
   },
   sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.buttonColor,
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: "absolute",
+    right : Metrix.HorizontalSize(20)
   },
   sendIcon: {
     width: 20,
@@ -119,8 +147,8 @@ export default StyleSheet.create({
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
-        width: 0,
-        height: 2,
+      width: 0,
+      height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -129,17 +157,8 @@ export default StyleSheet.create({
   sendButtonDisabled: {
     opacity: 0.7
   },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Metrix.VerticalSize(10),
-  },
-  userImage: {
-    width: Metrix.HorizontalSize(40),
-    height: Metrix.HorizontalSize(40),
-    borderRadius: Metrix.HorizontalSize(20),
-    marginRight: Metrix.HorizontalSize(10),
-  },
+
+
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

@@ -44,7 +44,7 @@ export default function SgUserChat() {
 
   const renderChatData = ({ item }) => {
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.chatBox}
         onPress={() => navigation.navigate('ChatDetail', {
           chatId: item.id,
@@ -55,11 +55,11 @@ export default function SgUserChat() {
           }
         })}
       >
-        <View style={{flexDirection: "row", gap: Metrix.HorizontalSize(15)}}>
+        <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(15) }}>
           {item.otherUser.profileImage ? (
-            <Image 
-              source={{ uri: item.otherUser.profileImage }} 
-              style={styles.chatImage} 
+            <Image
+              source={{ uri: item.otherUser.profileImage }}
+              style={styles.chatImage}
             />
           ) : (
             <View style={{
@@ -96,8 +96,7 @@ export default function SgUserChat() {
       <View style={styles.topContainer}>
         <BackArrowIcon />
         <View style={styles.navBarContainer}>
-          <Text style={styles.chatLogo}>Chat</Text>
-          <NavBar />
+          <NavBar title={"Chats"}/>
         </View>
 
         <View style={styles.searchInputContainer}>
@@ -109,16 +108,19 @@ export default function SgUserChat() {
 
         {loading ? (
           <ActivityIndicator size="large" color={colors.buttonColor} style={{ marginTop: 20 }} />
-        ) : (
-          <FlatList 
+        ) : chats && chats.length > 0 ? (
+          <FlatList
             data={chats}
             renderItem={renderChatData}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item, index) => item.id?.toString() || index.toString()}
             showsVerticalScrollIndicator={false}
             onRefresh={fetchChats}
             refreshing={loading}
           />
+        ) : (
+          <Text style={styles.noChatText}>No Chats found</Text>
         )}
+
       </View>
     </View>
   );
