@@ -52,8 +52,10 @@ import MerchantAccountIcon from "./MerchantAccountIcon";
 import MerchantHomeAdImage from "./MerchantHomeAdImage";
 import PurchaseIcon from "./PurchaseIcon";
 import BlackEyeIcon from "./BlackEyeIcon";
+import EmojiIcon from "./EmojiIcon";
 
 export{
+    EmojiIcon,
     BlackEyeIcon,
     PurchaseIcon,
     MerchantHomeAdImage,

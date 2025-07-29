@@ -9,12 +9,14 @@ import colors from '../../config/Colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage } from '../../store/actions/chatActions';
 import moment from 'moment';
-import { CashIcon, ChevronRightIcon, NotificationIcon } from '../../assets/svg';
+import { CashIcon, ChevronRightIcon, EmojiIcon, NotificationIcon } from '../../assets/svg';
 import axiosInstance from '../../config/axios';
 import io from 'socket.io-client';
 import { BASE_URL } from '../../config/constants';
 import NavBar from '../../components/navBar/NavBar';
 import { images } from '../../assets';
+import EmojiSelector, { Categories } from 'react-native-emoji-selector';
+
 
 const getInitialLetter = (name) => {
   return name ? name.charAt(0).toUpperCase() : '?';
@@ -31,6 +33,7 @@ const ChatDetail = ({ route, navigation }) => {
   const [messages, setMessages] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   // Get the correct user ID based on the chatUser object structure
   const getChatUserId = () => {
@@ -218,6 +221,8 @@ const ChatDetail = ({ route, navigation }) => {
     if (!message.trim() || isSending) return;
 
     setIsSending(true);
+    setShowEmojiPicker(false);
+
     try {
       const chatUserId = getChatUserId();
       if (!chatUserId) {
@@ -284,7 +289,7 @@ const ChatDetail = ({ route, navigation }) => {
         style={styles.chatUserImage}
       />
       <Text style={styles.chatUserName}>{chatUser.name}</Text>
-      <NotificationIcon  stroke={colors.buttonColor}/>
+      <NotificationIcon stroke={colors.buttonColor} />
     </View>
   );
 
@@ -323,7 +328,7 @@ const ChatDetail = ({ route, navigation }) => {
             data={messages}
             renderItem={renderMessage}
             keyExtractor={item => item.id.toString()}
-            contentContainerStyle={[styles.messagesList , {flexGrow :1}]}
+            contentContainerStyle={[styles.messagesList, { flexGrow: 1 }]}
             onContentSizeChange={() => {
               if (!userScrolled) {
                 scrollToBottom();
@@ -344,9 +349,13 @@ const ChatDetail = ({ route, navigation }) => {
         </View>
       )}
 
-     
+
 
       <View style={styles.inputContainer}>
+        <TouchableOpacity activeOpacity={0.8} onPress={() => setShowEmojiPicker(prev => !prev)} style={styles.emojiButton}>
+          <EmojiIcon />
+        </TouchableOpacity>
+
         <TextInput
           style={styles.input}
           placeholder="Message..."
@@ -365,7 +374,18 @@ const ChatDetail = ({ route, navigation }) => {
             <Icon name="chevron-right" size={30} color={colors.buttonColor} />
           )}
         </TouchableOpacity>
+      
       </View>
+        {showEmojiPicker && (
+          <EmojiSelector
+            onEmojiSelected={emoji => setMessage(prev => prev + emoji)}
+            showSearchBar={false}
+            showTabs={true}
+            category={Categories.all}
+            columns={8}
+            style={{ height: 250 }}
+          />
+        )}
     </View>
   );
 };

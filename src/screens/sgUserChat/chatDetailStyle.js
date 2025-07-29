@@ -71,7 +71,7 @@ export default StyleSheet.create({
   },
   messageContainer: {
     padding: Metrix.VerticalSize(8),
-    alignItems :"center", 
+    alignItems: "center",
   },
   senderMessage: {
     alignSelf: 'flex-end',
@@ -87,7 +87,7 @@ export default StyleSheet.create({
     fontFamily: fonts.InterLight,
     padding: Metrix.VerticalSize(7),
     borderRadius: Metrix.VerticalSize(16),
-    paddingHorizontal : Metrix.HorizontalSize(10)
+    paddingHorizontal: Metrix.HorizontalSize(10)
   },
   receiverText: {
     backgroundColor: '#F4F4F4',
@@ -95,7 +95,7 @@ export default StyleSheet.create({
     fontFamily: fonts.InterLight,
     padding: Metrix.VerticalSize(7),
     borderRadius: Metrix.VerticalSize(16),
-    paddingHorizontal : Metrix.HorizontalSize(10)
+    paddingHorizontal: Metrix.HorizontalSize(10)
   },
   messageTime: {
     fontSize: Metrix.normalize(10),
@@ -110,7 +110,7 @@ export default StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
-    padding:  Metrix.HorizontalSize(15),
+    padding: Metrix.HorizontalSize(15),
     alignItems: 'center',
     backgroundColor: colors.white,
     marginHorizontal: Metrix.HorizontalSize(15)
@@ -121,13 +121,13 @@ export default StyleSheet.create({
     borderRadius: Metrix.VerticalSize(20.5),
     fontSize: Metrix.FontExtraSmall,
     height: Metrix.VerticalSize(41),
-    paddingLeft: Metrix.HorizontalSize(10),
+    paddingLeft: Metrix.HorizontalSize(30),
     paddingRight: Metrix.HorizontalSize(35),
 
   },
   sendButton: {
     position: "absolute",
-    right : Metrix.HorizontalSize(20)
+    right: Metrix.HorizontalSize(20)
   },
   sendIcon: {
     width: 20,
@@ -175,5 +175,10 @@ export default StyleSheet.create({
     fontSize: Metrix.FontRegular,
     color: colors.lightGrey,
     textAlign: 'center',
+  },
+  emojiButton: {
+    position: "absolute",
+    zIndex: 1,
+    left : Metrix.HorizontalSize(25)
   },
 }); 
