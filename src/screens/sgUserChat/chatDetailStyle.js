@@ -65,13 +65,13 @@ export default StyleSheet.create({
   messagesList: {
     padding: Metrix.VerticalSize(10),
     backgroundColor: colors.white,
-    flex: 1,
     borderTopLeftRadius: Metrix.VerticalSize(24),
     borderTopRightRadius: Metrix.VerticalSize(24),
 
   },
   messageContainer: {
     padding: Metrix.VerticalSize(8),
+    alignItems :"center", 
   },
   senderMessage: {
     alignSelf: 'flex-end',
@@ -87,21 +87,19 @@ export default StyleSheet.create({
     fontFamily: fonts.InterLight,
     padding: Metrix.VerticalSize(7),
     borderRadius: Metrix.VerticalSize(16),
-    textAlign: "center"
+    paddingHorizontal : Metrix.HorizontalSize(10)
   },
   receiverText: {
-    color: '#000',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F4F4F4',
     fontSize: Metrix.FontExtraSmall,
     fontFamily: fonts.InterLight,
     padding: Metrix.VerticalSize(7),
     borderRadius: Metrix.VerticalSize(16),
-    textAlign: "center"
-
+    paddingHorizontal : Metrix.HorizontalSize(10)
   },
   messageTime: {
     fontSize: Metrix.normalize(10),
-    marginTop: 4,
+    marginTop: Metrix.VerticalSize(4),
     alignSelf: 'flex-end',
   },
   senderTime: {
@@ -112,7 +110,7 @@ export default StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
-    padding: 15,
+    padding:  Metrix.HorizontalSize(15),
     alignItems: 'center',
     backgroundColor: colors.white,
     marginHorizontal: Metrix.HorizontalSize(15)
@@ -123,7 +121,8 @@ export default StyleSheet.create({
     borderRadius: Metrix.VerticalSize(20.5),
     fontSize: Metrix.FontExtraSmall,
     height: Metrix.VerticalSize(41),
-    paddingLeft: Metrix.HorizontalSize(10)
+    paddingLeft: Metrix.HorizontalSize(10),
+    paddingRight: Metrix.HorizontalSize(35),
 
   },
   sendButton: {

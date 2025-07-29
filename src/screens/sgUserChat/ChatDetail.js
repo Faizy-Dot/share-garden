@@ -329,8 +329,10 @@ const ChatDetail = ({ route, navigation }) => {
                 scrollToBottom();
               }
             }}
+            showsVerticalScrollIndicator={false}
             ListHeaderComponent={renderChatHeader}
             onLayout={() => scrollToBottom()}
+            stickyHeaderIndices={[0]}
             onScroll={handleScroll}
             scrollEventThrottle={400}
             ListEmptyComponent={() => (
@@ -342,14 +344,7 @@ const ChatDetail = ({ route, navigation }) => {
         </View>
       )}
 
-      {showScrollButton && (
-        <TouchableOpacity
-          style={styles.scrollButton}
-          onPress={scrollToBottom}
-        >
-          <Text style={{ fontSize: 20, color: colors.black }}>›</Text>
-        </TouchableOpacity>
-      )}
+     
 
       <View style={styles.inputContainer}>
         <TextInput
