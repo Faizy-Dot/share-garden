@@ -51,8 +51,9 @@ export default function PostTabScreen({ navigation, route }) {
     fromSGTips
   } = route.params;
 
+  console.log("fromSGTips==>>>",fromSGTips)
+  
 
-  console.log("checked==>>>", fromSGTips)
 
 
   const handleInput = (text, setter, field) => {
@@ -275,7 +276,6 @@ export default function PostTabScreen({ navigation, route }) {
     }
   };
 
-  console.log("images==>>>", images)
 
   const handlePublishSGTip = async (isDraft = false) => {
     try {
@@ -378,9 +378,9 @@ export default function PostTabScreen({ navigation, route }) {
     }
   };
 
-  const getDisplayCondition = (apiCondition) => {
+  const getDisplayCondition =  (apiCondition) => {
     switch (apiCondition) {
-      case 'FAIRLY_USED':
+      case 'FAIRLY_GOOD':
         return 'Fairly Used';
       case 'GOOD':
         return 'Good';

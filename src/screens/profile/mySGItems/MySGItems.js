@@ -48,10 +48,10 @@ const favouritesData = [
 
 const NoItemsMessage = ({ text }) => (
     <View style={{ padding: 20, alignItems: 'center' }}>
-        <Text style={{ 
-            fontFamily: fonts.InterRegular, 
+        <Text style={{
+            fontFamily: fonts.InterRegular,
             fontSize: Metrix.FontSmall,
-            color: colors.grey 
+            color: colors.grey
         }}>
             {text}
         </Text>
@@ -63,6 +63,8 @@ export default function MySGItems({ navigation }) {
     const [draftItems, setDraftItems] = useState([]);
     const [favouritesData, setFavouritesData] = useState([]);
     const { user } = useSelector((state) => state.login);
+
+    console.log("drafts items==>>", draftItems)
 
     useEffect(() => {
         const fetchUserProducts = async () => {
@@ -98,28 +100,28 @@ export default function MySGItems({ navigation }) {
     }, []);
 
     const renderPostedItems = (item) => (
-        <TouchableOpacity 
-            key={item.id} 
+        <TouchableOpacity
+            key={item.id}
             style={styles.itemsContainer}
             activeOpacity={0.8}
             onPress={() => navigation.navigate('PreviewPostedSgItems', { item })}
         >
             <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(10), paddingHorizontal: Metrix.HorizontalSize(10) }}>
-                <Image 
-                    source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing} 
-                    style={styles.postedImg} 
+                <Image
+                    source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
+                    style={styles.postedImg}
                 />
                 <View style={{ gap: Metrix.VerticalSize(15) }}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                         <Text style={styles.title}>{item.title}</Text>
                         {item.isSGPoints ? (
                             <View style={styles.amount}>
-<BlackBitIcon/>
+                                <BlackBitIcon />
                                 <Text>{item.minBid}</Text>
                             </View>
                         ) : (
                             <View style={styles.amount}>
-<CashIcon/>
+                                <CashIcon />
                                 <Text>{item.price}</Text>
                             </View>
                         )}
@@ -145,19 +147,19 @@ export default function MySGItems({ navigation }) {
             )}
             <View style={styles.bottomContainer}>
                 <View style={styles.bottomIcon}>
-<TimeIcon/>
+                    <TimeIcon />
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.bidDuration ? `${Math.floor(item.bidDuration / (24 * 3600))} d` : "N/A"}</Text>
                 </View>
                 <View style={styles.bottomIcon}>
-<ViewsIcon/>
+                    <ViewsIcon />
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.views || 0} views</Text>
                 </View>
                 <View style={styles.bottomIcon}>
-<LikesIcon/>
+                    <LikesIcon />
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.likes || 0} likes</Text>
                 </View>
                 <View style={styles.bottomIcon}>
-<ShareIcon/>
+                    <ShareIcon />
                     <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.shares || 0}</Text>
                 </View>
             </View>
@@ -166,29 +168,29 @@ export default function MySGItems({ navigation }) {
 
     const renderDrafts = (item) => {
         return (
-            <TouchableOpacity 
-                key={item.id} 
+            <TouchableOpacity
+                key={item.id}
                 style={styles.draftsContainer}
                 activeOpacity={0.8}
                 onPress={() => navigation.navigate('ProductDetail', { item })}
             >
                 <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(10), }}>
-                    <Image 
-                        source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing} 
-                        style={styles.postedImg} 
+                    <Image
+                        source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
+                        style={styles.postedImg}
                     />
                     <View style={{ gap: Metrix.VerticalSize(15) }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             <Text style={styles.title}>{item.title}</Text>
-                            {item.bids ? (
+                            {item.isSGPoints ? (
                                 <View style={styles.amount}>
                                     <Image source={Images.homeBitLogo} />
-                                    <Text>{item.bids}</Text>
+                                    <Text>{item.minBid}</Text>
                                 </View>
                             ) : (
                                 <View style={styles.amount}>
                                     <Image source={Images.homeDollarLogo} />
-                                    <Text>{item.dollar}</Text>
+                                    <Text>{item.price}</Text>
                                 </View>
                             )}
                         </View>
@@ -202,7 +204,11 @@ export default function MySGItems({ navigation }) {
                         height={Metrix.VerticalSize(36)}
                         borderRadius={Metrix.VerticalSize(4)}
                         fontSize={Metrix.FontSmall}
-                        fontFamily={fonts.InterBold} />
+                        fontFamily={fonts.InterBold}
+                        onPress={() => navigation.navigate("Post", {
+                            screen: "PostList",
+                            params: { ...item }
+                        })} />
                     <CustomButton title={"PUBLISH"}
                         backgroundColor={colors.buttonColor}
                         width={Metrix.HorizontalSize(100)}
@@ -219,28 +225,28 @@ export default function MySGItems({ navigation }) {
     const renderFavourites = (item) => {
         const product = item.product;
         return (
-            <TouchableOpacity 
-                key={product.id} 
+            <TouchableOpacity
+                key={product.id}
                 style={styles.draftsContainer}
                 activeOpacity={0.8}
                 onPress={() => navigation.navigate('ProductDetail', { item: product })}
             >
                 <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(10), }}>
-                    <Image 
+                    <Image
                         source={{ uri: product.images.split(',')[0] }}
-                        style={styles.postedImg} 
+                        style={styles.postedImg}
                     />
                     <View style={{ gap: Metrix.VerticalSize(15) }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             <Text style={styles.title}>{product.title}</Text>
                             {product.isSGPoints ? (
                                 <View style={styles.amount}>
-                                    <BlackBitIcon/>
+                                    <BlackBitIcon />
                                     <Text>{product.minBid}</Text>
                                 </View>
                             ) : (
                                 <View style={styles.amount}>
-                                    <CashIcon/>
+                                    <CashIcon />
                                     <Text>{product.price}</Text>
                                 </View>
                             )}
@@ -251,20 +257,20 @@ export default function MySGItems({ navigation }) {
                 <View style={styles.favouritesButtonContainer}>
                     {(product.isSGPoints || product.isBidding) && (
                         <>
-                            <Text style={{ 
+                            <Text style={{
                                 fontSize: Metrix.FontRegular,
                                 fontFamily: fonts.InterSemiBold
                             }}>
                                 Highest bid {product.highestBid}
                             </Text>
-                            <CustomButton 
+                            <CustomButton
                                 title={"PLACE BIDS"}
                                 backgroundColor={colors.buttonColor}
                                 width={Metrix.HorizontalSize(100)}
                                 height={Metrix.VerticalSize(36)}
                                 borderRadius={Metrix.VerticalSize(4)}
                                 fontSize={Metrix.FontSmall}
-                                fontFamily={fonts.InterBold} 
+                                fontFamily={fonts.InterBold}
                             />
                         </>
                     )}
@@ -282,15 +288,15 @@ export default function MySGItems({ navigation }) {
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: Metrix.VerticalSize(25), paddingBottom: Metrix.VerticalSize(20) }}>
                 <View style={styles.Container}>
                     <Text style={styles.titleContainerText}>Posted SG Items</Text>
-                    {publishedItems.length > 0 ? 
-                        publishedItems.map(renderPostedItems) : 
+                    {publishedItems.length > 0 ?
+                        publishedItems.map(renderPostedItems) :
                         <NoItemsMessage text="No posted items found" />
                     }
                 </View>
                 <View style={styles.Container}>
                     <Text style={styles.titleContainerText}>Drafts</Text>
-                    {draftItems.length > 0 ? 
-                        draftItems.map(renderDrafts) : 
+                    {draftItems.length > 0 ?
+                        draftItems.map(renderDrafts) :
                         <NoItemsMessage text="No drafts found" />
                     }
                 </View>

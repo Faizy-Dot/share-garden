@@ -33,7 +33,7 @@ export default function PostTabScreen({ navigation, route }) {
     const [description, setDescription] = useState("");
     const [checked, setChecked] = useState("");
     const checkBoxNames = [
-        { display: "Fairly Used", value: "FAIRLY_GOOD" },
+        { display: "Fairly Used", value: "FAIRLY_USED" },
         { display: "Good", value: "GOOD" },
         { display: "Excellent", value: "EXCELLENT" }
     ];
@@ -235,35 +235,34 @@ export default function PostTabScreen({ navigation, route }) {
     }
 
     useEffect(() => {
-    if (route.params) {
-      
-  const receivedImages = route.params.imagesArray || [];
-    const paddedImages = [...receivedImages];
-    while (paddedImages.length < 3) {
-      paddedImages.push(null);
-    }
+        if (route.params) {
 
-      setActiveButton("SG Tip"); // or derive from params
-      setImages(paddedImages);
-      setTitle(route.params.title || "");
-      setDescription(route.params.description || "");
-      setSelectedCategory(route.params.categoryId || null);
-      setSelectedCategoryName(route.params.category?.name || "");
-      setChecked(route.params.condition || "");
-      // ...and so on for other fields
-    } else {
-      // Clear everything if no params
-      setActiveButton("SG Item");
-      setImages([null, null, null]);
-      setTitle("");
-      setDescription("");
-      setSelectedCategory(null);
-      setSelectedCategoryName("");
-      setChecked("");
-    }
-  }, [route.params]);
+            const receivedImages = route.params.imagesArray || [];
+            const paddedImages = [...receivedImages];
+            while (paddedImages.length < 3) {
+                paddedImages.push(null);
+            }
 
-  console.log(images)
+            setActiveButton("SG Tip"); // or derive from params
+            setImages(paddedImages);
+            setTitle(route.params.title || "");
+            setDescription(route.params.description || "");
+            setSelectedCategory(route.params.categoryId || null);
+            setSelectedCategoryName(route.params.category?.name || "");
+            setChecked(route.params.condition || "");
+            // ...and so on for other fields
+        } else {
+            // Clear everything if no params
+            setActiveButton("SG Item");
+            setImages([null, null, null]);
+            setTitle("");
+            setDescription("");
+            setSelectedCategory(null);
+            setSelectedCategoryName("");
+            setChecked("");
+        }
+    }, [route.params]);
+
 
 
 
@@ -287,7 +286,7 @@ export default function PostTabScreen({ navigation, route }) {
                 isSGPoints: sgPoints,
                 onSuccess: resetForm,
                 activeButton: activeButton,
-                fromSGTips : route.params
+                fromSGTips: route.params
             });
             return;
         }
