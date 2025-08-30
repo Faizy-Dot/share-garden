@@ -150,7 +150,7 @@ const ItemsTabScreen = () => {
             onPress={() => navigation.navigate('ProductDetail', { item })}
         >
             <Image
-                source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
+                source={item.imagesArray ? { uri: item.imagesArray[0] } : Images.homePopularListing}
                 style={styles.productImage}
             />
             <Text style={styles.productTitle} numberOfLines={1}>{item.title}</Text>

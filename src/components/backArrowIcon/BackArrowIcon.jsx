@@ -1,13 +1,30 @@
 import React from "react";
 import { TouchableOpacity } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const BackArrowIcon = (props) => {
   const navigation = useNavigation();
 
+  const route = useRoute();
+
+  const handleBack = () => {
+    const tabRootScreens = ["PostList", "TipsList", "RewardsList", "AdsList", "ItemsList"];
+
+    if (tabRootScreens.includes(route.name)) {
+      // On a tab root → go home (Items tab)
+      navigation.navigate("Items", { screen: "ItemsList" });
+    } else if (navigation.canGoBack()) {
+      // Normal back if possible
+      navigation.goBack();
+    } else {
+      // Fallback: also go home
+      navigation.navigate("Items", { screen: "ItemsList" });
+    }
+  };
+
   return (
-    <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
+    <TouchableOpacity onPress={handleBack} activeOpacity={0.7}>
       <Svg
         xmlns="http://www.w3.org/2000/svg"
         width={11}

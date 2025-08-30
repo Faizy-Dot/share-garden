@@ -207,7 +207,7 @@ export default function MySGItems({ navigation }) {
                         fontFamily={fonts.InterBold}
                         onPress={() => navigation.navigate("Post", {
                             screen: "PostList",
-                            params: { ...item }
+                            params: { ...item  , SGItems : true}
                         })} />
                     <CustomButton title={"PUBLISH"}
                         backgroundColor={colors.buttonColor}

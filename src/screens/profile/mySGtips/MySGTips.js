@@ -67,7 +67,7 @@ export default function MySGTips({ navigation }) {
     return (
       <TouchableOpacity onPress={() => navigation.navigate("Post", {
         screen: "PostList",
-        params: { ...item }
+        params: { ...item  , SGTips : true}
       })}
        key={item.id} style={styles.renderDataContainer}>
         <View style={styles.renderLeftContainer}>

@@ -43,7 +43,7 @@ export default function PostTabScreen({ navigation, route }) {
 
     const { user } = useSelector((state) => state.login)
 
-    console.log("from mysgTips==>>", route.params)
+    console.log("from Draft==>>", route.params)
 
     const resetForm = () => {
         setActiveButton("SG Item");
@@ -234,6 +234,7 @@ export default function PostTabScreen({ navigation, route }) {
         return null;
     }
 
+
     useEffect(() => {
         if (route.params) {
 
@@ -243,23 +244,34 @@ export default function PostTabScreen({ navigation, route }) {
                 paddedImages.push(null);
             }
 
-            setActiveButton("SG Tip"); // or derive from params
-            setImages(paddedImages);
-            setTitle(route.params.title || "");
-            setDescription(route.params.description || "");
-            setSelectedCategory(route.params.categoryId || null);
-            setSelectedCategoryName(route.params.category?.name || "");
-            setChecked(route.params.condition || "");
-            // ...and so on for other fields
-        } else {
-            // Clear everything if no params
-            setActiveButton("SG Item");
-            setImages([null, null, null]);
-            setTitle("");
-            setDescription("");
-            setSelectedCategory(null);
-            setSelectedCategoryName("");
-            setChecked("");
+            if (route.params.SGItems) {
+                console.log("price valueee==>>", route.params.price)
+                setActiveButton("SG Item");
+                setImages(paddedImages);
+                setTitle(route.params.title || "");
+                setDescription(route.params.description || "");
+                setSelectedCategory(route.params.categoryId || null);
+                setSelectedCategoryName(route.params.category?.name || "");
+                setChecked(route.params.condition || "");
+                setPointOrCashValue(String(route.params.price || route.params.minBid || ""))
+                if (!route.params.isSGPoints) {
+                    setSGPoints(false)
+                    setCash(true)
+                } else {
+                    setSGPoints(true)
+                    setCash(false)
+                }
+            } else if (route.params.SGTips) {
+                setActiveButton("SG Tip"); // or derive from params
+                setImages(paddedImages);
+                setTitle(route.params.title || "");
+                setDescription(route.params.description || "");
+                setSelectedCategory(route.params.categoryId || null);
+                setSelectedCategoryName(route.params.category?.name || "");
+                setChecked(route.params.condition || "");
+            }
+
+
         }
     }, [route.params]);
 
@@ -286,12 +298,12 @@ export default function PostTabScreen({ navigation, route }) {
                 isSGPoints: sgPoints,
                 onSuccess: resetForm,
                 activeButton: activeButton,
-                fromSGTips: route.params
+                forDraft: route.params
             });
             return;
         }
 
-        if (!title || !description || !selectedCategory || images.every(img => img === null) || !checked) {
+        if (!title || !description || !selectedCategory || images.every(img => img === null) || !checked || !pointOrCashValue) {
             Toast.show({
                 type: 'error',
                 text1: 'Missing Fields',
@@ -312,6 +324,7 @@ export default function PostTabScreen({ navigation, route }) {
             pointOrCashValue: pointOrCashValue,
             onSuccess: resetForm,
             activeButton: activeButton,
+            forDraft: route.params
         });
     };
 

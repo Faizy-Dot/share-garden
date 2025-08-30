@@ -48,11 +48,9 @@ export default function PostTabScreen({ navigation, route }) {
     categoryName,
     onSuccess,
     activeButton,
-    fromSGTips
+    forDraft
   } = route.params;
 
-  console.log("fromSGTips==>>>",fromSGTips)
-  
 
 
 
@@ -187,8 +185,9 @@ export default function PostTabScreen({ navigation, route }) {
       formData.append('description', description);
       formData.append('categoryId', categoryId);
       formData.append('condition', condition);
-      formData.append('isSGPoints', isSGPoints.toString());
-      formData.append('isPublished', (!isDraft).toString());
+      // formData.append('isSGPoints', isSGPoints.toString());
+      // formData.append('isPublished', (!isDraft).toString());
+      formData.append('status', 'ACTIVE')
 
       // Conditional fields based on payment type
       if (isSGPoints) {
@@ -213,8 +212,8 @@ export default function PostTabScreen({ navigation, route }) {
         description,
         categoryId,
         condition,
-        isSGPoints,
-        isPublished: !isDraft,
+        // isSGPoints,
+        // isPublished: !isDraft,
         ...(isSGPoints ? {
           minBid: pointOrCashValue,
           bidDuration: totalSeconds
@@ -224,46 +223,93 @@ export default function PostTabScreen({ navigation, route }) {
         imageCount: images.filter(img => img !== null).length
       });
 
-      const response = await axiosInstance.post(
-        '/api/products/createProduct',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+
+      if (forDraft) {
+        const response = await axiosInstance.put(
+          `/api/products/${forDraft.id}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+
+        console.log('API Response:', response.data);
+
+        if (response.status === 201) {
+          setModalVisible(true);
+          if (isDraft) {
+            setDraft(true);
+            setPublish(false);
+          } else {
+            setDraft(false);
+            setPublish(true);
+          }
+
+          const timeout = setTimeout(() => {
+            setModalVisible(false);
+            resetPreviewForm();
+            onSuccess();
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'PostList',
+                  params: { refresh: true }
+                }
+              ],
+            });
+          }, 7000);
+          timeout()
+
+          setNavigateTimeout(timeout);
         }
-      );
 
-      console.log('API Response:', response.data);
+      }else{
+         const response = await axiosInstance.post(
+          `/api/products/createProduct`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
 
-      if (response.status === 201) {
-        setModalVisible(true);
-        if (isDraft) {
-          setDraft(true);
-          setPublish(false);
-        } else {
-          setDraft(false);
-          setPublish(true);
+        console.log('API Response:', response.data);
+
+        if (response.status === 201) {
+          setModalVisible(true);
+          if (isDraft) {
+            setDraft(true);
+            setPublish(false);
+          } else {
+            setDraft(false);
+            setPublish(true);
+          }
+
+          const timeout = setTimeout(() => {
+            setModalVisible(false);
+            resetPreviewForm();
+            onSuccess();
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'PostList',
+                  params: { refresh: true }
+                }
+              ],
+            });
+          }, 7000);
+          timeout()
+
+          setNavigateTimeout(timeout);
         }
 
-        const timeout = setTimeout(() => {
-          setModalVisible(false);
-          resetPreviewForm();
-          onSuccess();
-          navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: 'PostList',
-                params: { refresh: true }
-              }
-            ],
-          });
-        }, 7000);
-        timeout()
-
-        setNavigateTimeout(timeout);
       }
+
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to create product';
       Toast.show({
@@ -280,9 +326,9 @@ export default function PostTabScreen({ navigation, route }) {
   const handlePublishSGTip = async (isDraft = false) => {
     try {
       setLoading(true);
-    let response ;
+      let response;
 
-      if (fromSGTips) {
+      if (forDraft) {
         const formData = new FormData();
 
         // Required fields for SG Tip
@@ -291,15 +337,15 @@ export default function PostTabScreen({ navigation, route }) {
         formData.append('categoryId', categoryId);
         formData.append('status', isDraft ? 'DRAFT' : 'PUBLISHED');
         formData.append('existingImages', `${images[0] || null} ,${images[1] || null} ,${images[2] || null} , `); // If you want to keep specific images
-         images.filter(img => img !== null).forEach((image, index) => {
+        images.filter(img => img !== null).forEach((image, index) => {
           formData.append('images', {
             uri: image,
             type: 'image/jpeg',
             name: `image${index}.jpg`,
           });
         });
-         response = await axiosInstance.post(
-          `/api/sgtips/update-sgtip/${fromSGTips.id}`,
+        response = await axiosInstance.post(
+          `/api/sgtips/update-sgtip/${forDraft.id}`,
           formData,
           {
             headers: {
@@ -325,7 +371,7 @@ export default function PostTabScreen({ navigation, route }) {
             name: `image${index}.jpg`,
           });
         });
-         response = await axiosInstance.post(
+        response = await axiosInstance.post(
           '/api/sgtips',
           formData,
           {
@@ -378,9 +424,9 @@ export default function PostTabScreen({ navigation, route }) {
     }
   };
 
-  const getDisplayCondition =  (apiCondition) => {
+  const getDisplayCondition = (apiCondition) => {
     switch (apiCondition) {
-      case 'FAIRLY_GOOD':
+      case 'FAIRLY_USED':
         return 'Fairly Used';
       case 'GOOD':
         return 'Good';
