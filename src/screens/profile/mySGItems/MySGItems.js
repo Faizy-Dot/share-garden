@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import styles from './style';
 import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../../components/navBar/NavBar';
@@ -9,42 +9,8 @@ import colors from '../../../config/Colors';
 import fonts from '../../../config/Fonts';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../../config/axios';
-import { BlackBitIcon, CashIcon, LikesIcon, ShareIcon, TimeIcon, ViewsIcon } from '../../../assets/svg';
+import { BlackBitIcon, CashIcon, CrossIcon, LikesIcon, ModalInfoIcon, ModalSuccessLogo, ShareIcon, TimeIcon, ViewsIcon } from '../../../assets/svg';
 
-const postedItemsData = [
-    {
-        id: 1,
-        title: "7 seater sofa",
-        description: "Comfortable 7-seater sofa set for sale!.  Sturdy wooden frame. High-density foam cushions",
-        bids: "2950",
-        highestBid: "2200",
-    },
-    {
-        id: 2,
-        title: "Dinner set",
-        description: "Brand new in box, 8-piece dinner set in blue cobalt color",
-        dollar: "100",
-    },
-];
-
-const draftsData = [
-    {
-        id: 1,
-        title: "Wooden Bed",
-        description: "Give old clothes a new life! Repair, upcycle, or repurpose them to reduce waste, save money, and unleash your creativity!",
-        bids: "550",
-    }
-]
-
-const favouritesData = [
-    {
-        id: 1,
-        title: "Headphones",
-        description: "JBL wireless headphones optimal for gaming and music on the go. Fairly used, enjoy high bass sound.",
-        bids: "900",
-        highestBid: "800",
-    }
-]
 
 const NoItemsMessage = ({ text }) => (
     <View style={{ padding: 20, alignItems: 'center' }}>
@@ -62,29 +28,31 @@ export default function MySGItems({ navigation }) {
     const [publishedItems, setPublishedItems] = useState([]);
     const [draftItems, setDraftItems] = useState([]);
     const [favouritesData, setFavouritesData] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
     const { user } = useSelector((state) => state.login);
+    const [loading, setLoading] = useState(false)
 
     console.log("drafts items==>>", draftItems)
 
-    useEffect(() => {
-        const fetchUserProducts = async () => {
-            try {
-                // Fetch published products
-                const publishedResponse = await axiosInstance.get(`/api/products/user/${user.id}/published`);
-                setPublishedItems(publishedResponse.data);
-                console.log("publishedResponse.data:=>", publishedResponse.data);
-                // Fetch draft products
-                const draftsResponse = await axiosInstance.get(`/api/products/user/${user.id}/drafts`);
-                setDraftItems(draftsResponse.data);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
-        };
+    const fetchUserProducts = async () => {
+        try {
+            const publishedResponse = await axiosInstance.get(`/api/products/user/${user.id}/published`);
+            setPublishedItems(publishedResponse.data);
 
+            const draftsResponse = await axiosInstance.get(`/api/products/user/${user.id}/drafts`);
+            setDraftItems(draftsResponse.data);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
+
+    useEffect(() => {
         if (user?.id) {
             fetchUserProducts();
         }
     }, [user]);
+
 
     useEffect(() => {
         const fetchFavorites = async () => {
@@ -98,6 +66,78 @@ export default function MySGItems({ navigation }) {
 
         fetchFavorites();
     }, []);
+
+
+    const handlePublish = async (item) => {
+
+        setLoading(true);
+        try {
+            const formData = new FormData();
+
+            // Required fields
+            formData.append('title', item.title);
+            formData.append('description', item.description);
+            formData.append('categoryId', item.categoryId);
+            formData.append('condition', item.condition);
+            formData.append('isSGPoints', item.isSGPoints.toString());
+            formData.append('isPublished', true);
+            formData.append('status', 'ACTIVE')
+
+            // Conditional fields based on payment type
+            if (item.isSGPoints) {
+                formData.append('minBid', item.minBid.toString());
+                formData.append('bidDuration', item.bidDuration.toString());
+            } else {
+                formData.append('price', item.price.toString());
+            }
+
+            // Append images
+            item.imagesArray.filter(img => img !== null).forEach((image, index) => {
+                formData.append('images', {
+                    uri: image,
+                    type: 'image/jpeg',
+                    name: `image${index}.jpg`,
+                });
+            });
+
+
+            const response = await axiosInstance.put(
+                `/api/products/${item.id}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+
+            console.log('API Response:', response);
+
+            if (response.status === 200) {
+                setLoading(false)
+                setModalVisible(true);
+
+                setTimeout(() => {
+                    fetchUserProducts();
+                    setModalVisible(false);
+                }, 7000);
+            }
+
+
+
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Failed to create product';
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: errorMessage,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
 
     const renderPostedItems = (item) => (
         <TouchableOpacity
@@ -207,15 +247,16 @@ export default function MySGItems({ navigation }) {
                         fontFamily={fonts.InterBold}
                         onPress={() => navigation.navigate("Post", {
                             screen: "PostList",
-                            params: { ...item  , SGItems : true}
+                            params: { ...item, SGItems: true }
                         })} />
-                    <CustomButton title={"PUBLISH"}
+                    <CustomButton title={loading ? "PUBLISH..." : "PUBLISH"}
                         backgroundColor={colors.buttonColor}
                         width={Metrix.HorizontalSize(100)}
                         height={Metrix.VerticalSize(36)}
                         borderRadius={Metrix.VerticalSize(4)}
                         fontSize={Metrix.FontSmall}
-                        fontFamily={fonts.InterBold} />
+                        fontFamily={fonts.InterBold}
+                        onPress={() => handlePublish(item)} />
 
                 </View>
             </TouchableOpacity>
@@ -279,6 +320,11 @@ export default function MySGItems({ navigation }) {
         )
     }
 
+    const handleModalClose = () => {
+        setModalVisible(false)
+        fetchUserProducts();
+    }
+
     return (
         <View style={styles.mySGItemsContainer}>
             <View style={styles.topContainer}>
@@ -304,6 +350,34 @@ export default function MySGItems({ navigation }) {
                     <Text style={styles.titleContainerText}>Favorites</Text>
                     {favouritesData.map(renderFavourites)}
                 </View>
+
+
+                <Modal visible={modalVisible} transparent animationType="fade">
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalBox}>
+                            <TouchableOpacity
+                                style={styles.closeButton}
+                                onPress={handleModalClose}
+                            >
+                                <CrossIcon />
+                            </TouchableOpacity>
+                            <ModalSuccessLogo />
+                            <Text style={styles.modalTitle}>
+
+                                <>Your SG item has been posted on <Text style={{ color: colors.buttonColor }}>SG marketplace</Text></>
+
+                            </Text>
+
+
+                            <View style={styles.bottomModalContainer}>
+                                <ModalInfoIcon />
+                                <Text style={styles.modalDescription}>
+                                    You can access your posted item under <Text style={{ color: colors.redColor }}>Profile {">"} My posted items.</Text>
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </ScrollView>
         </View>
     );

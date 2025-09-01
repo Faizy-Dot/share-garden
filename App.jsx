@@ -91,7 +91,10 @@ function AppNavigator() {
                 :
                 <Stack.Screen name="SgTabs" component={SgTabNavigator} />
             }
-            <Stack.Screen name="Login" component={Login} />
+            {
+              !user && 
+              <Stack.Screen name="Login" component={Login} />
+            }
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
             <Stack.Screen name="OneTimePassword" component={OneTimePassword} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />

@@ -185,8 +185,8 @@ export default function PostTabScreen({ navigation, route }) {
       formData.append('description', description);
       formData.append('categoryId', categoryId);
       formData.append('condition', condition);
-      // formData.append('isSGPoints', isSGPoints.toString());
-      // formData.append('isPublished', (!isDraft).toString());
+      formData.append('isSGPoints', isSGPoints.toString());
+      formData.append('isPublished', (!isDraft).toString());
       formData.append('status', 'ACTIVE')
 
       // Conditional fields based on payment type
@@ -212,8 +212,8 @@ export default function PostTabScreen({ navigation, route }) {
         description,
         categoryId,
         condition,
-        // isSGPoints,
-        // isPublished: !isDraft,
+        isSGPoints,
+        isPublished: !isDraft,
         ...(isSGPoints ? {
           minBid: pointOrCashValue,
           bidDuration: totalSeconds
@@ -225,6 +225,10 @@ export default function PostTabScreen({ navigation, route }) {
 
 
       if (forDraft) {
+
+
+
+
         const response = await axiosInstance.put(
           `/api/products/${forDraft.id}`,
           formData,
@@ -235,9 +239,9 @@ export default function PostTabScreen({ navigation, route }) {
           }
         );
 
-        console.log('API Response:', response.data);
+        console.log('API Response:', response);
 
-        if (response.status === 201) {
+        if (response.status === 200) {
           setModalVisible(true);
           if (isDraft) {
             setDraft(true);

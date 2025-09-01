@@ -90,7 +90,45 @@ const styles = StyleSheet.create({
         justifyContent : "flex-end",
         alignItems : "center",
         gap : Metrix.HorizontalSize(40)
-    }
+    },
+     modalContainer: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.3)", // Transparent background
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalBox: {
+        backgroundColor: colors.white,
+        borderRadius: Metrix.VerticalSize(15),
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "95%",
+        height: Metrix.VerticalSize(270),
+        padding: Metrix.VerticalSize(20),
+    },
+    modalTitle: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterBold,
+        width: Metrix.HorizontalSize(200),
+        textAlign: "center"
+    },
+    successIcon: {
+        width: Metrix.HorizontalSize(50),
+        height: Metrix.HorizontalSize(50),
+    },
+    bottomModalContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(10),
+        paddingHorizontal: Metrix.HorizontalSize(20)
+    },
+    modalDescription: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterSemiBold,
+    },
+    closeButton: {
+        alignSelf : "flex-end"
+    },
 })
 
 export default styles;
