@@ -12,26 +12,29 @@ import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../../../config/axios";
 import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import { useSelector } from "react-redux";
 
-export default function TipsTabScreen({navigation}) {
+export default function TipsTabScreen({ navigation }) {
     const [tips, setTips] = useState([]);
     const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearching, setIsSearching] = useState(false);
-    const [likingTipId, setLikingTipId] = useState(null);
+
+    const { user } = useSelector((state) => state.login);
+
 
     const calculateTimeAgo = (publishedAt) => {
         if (!publishedAt) return '0h';
-        
+
         const now = new Date();
         const published = new Date(publishedAt);
         const diffInMs = now - published;
-        
+
         // Convert to hours
         const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-        
+
         if (diffInHours < 24) {
             return `${diffInHours}h`;
         } else {
@@ -128,11 +131,21 @@ export default function TipsTabScreen({navigation}) {
         }
     }, [selectedCategory, searchQuery]);
 
-    const handleLike = async (tipId) => {
+    const handleLike = async (tip) => {
+
+        console.log(tip)
+        if (tip.authorId === user.id) {
+            Toast.show({
+                type: 'info',
+                text1: 'Notice',
+                text2: 'You cannot like your own tip'
+            });
+            return; // exit early
+        }
+
         try {
-            setLikingTipId(tipId);
-            await axiosInstance.post(`/api/sgtips/${tipId}/like`);
-            // Refresh the tips data after liking/unliking
+            await axiosInstance.post(`/api/sgtips/${tip.id}/like`);
+            // Refresh tips after liking/unliking
             await fetchTips();
             Toast.show({
                 type: 'success',
@@ -146,10 +159,9 @@ export default function TipsTabScreen({navigation}) {
                 text1: 'Error',
                 text2: 'Failed to update tip'
             });
-        } finally {
-            setLikingTipId(null);
-        }
+        } 
     };
+
 
     // Initial fetch of categories
     useEffect(() => {
@@ -203,12 +215,12 @@ export default function TipsTabScreen({navigation}) {
         console.log('Rendering tip with ID:', item.id);
         const firstImage = item.imageArray && item.imageArray.length > 0 ? item.imageArray[0] : null;
         const timeAgo = calculateTimeAgo(item.publishedAt);
-        
+
         return (
-            <TouchableOpacity onPress={()=> navigation.navigate("TipsDetail",item)} style={styles.categoryContainer}>
+            <TouchableOpacity onPress={() => navigation.navigate("TipsDetail", item)} style={styles.categoryContainer}>
                 <View style={{ flexDirection: "row", padding: 20, gap: Metrix.HorizontalSize(15), width: "100%" }}>
-                    <Image 
-                        source={firstImage ? { uri: firstImage } : Images.homePopularListing} 
+                    <Image
+                        source={firstImage ? { uri: firstImage } : Images.homePopularListing}
                         style={{ width: Metrix.HorizontalSize(119), height: Metrix.HorizontalSize(116) }}
                         resizeMode="cover"
                     />
@@ -223,10 +235,9 @@ export default function TipsTabScreen({navigation}) {
                         <ViewsIcon />
                         <Text style={styles.containertext}>{item.views || 0} Views</Text>
                     </View>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.logoContainer}
-                        onPress={() => handleLike(item.id)}
-                        disabled={likingTipId === item.id}
+                        onPress={() => handleLike(item)}
                     >
                         <LikesIcon fill={item.isLiked ? colors.redColor : 'none'} />
                         <Text style={styles.containertext}>{item._count.likes || 0} Likes</Text>
@@ -257,8 +268,8 @@ export default function TipsTabScreen({navigation}) {
             <View style={{ marginTop: Metrix.VerticalSize(22), gap: 10, flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     <View style={{ flex: 1 }}>
-                        <CustomInput 
-                            iconCondition={false} 
+                        <CustomInput
+                            iconCondition={false}
                             onChangeText={handleSearch}
                             value={searchQuery}
                             placeholder="Search tips..."
@@ -267,7 +278,7 @@ export default function TipsTabScreen({navigation}) {
                         />
                     </View>
                     {searchQuery && (
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             onPress={clearSearch}
                             style={styles.clearButton}
                         >
@@ -278,7 +289,7 @@ export default function TipsTabScreen({navigation}) {
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     <View style={{ flex: 1 }}>
-                    <DropdownComponent
+                        <DropdownComponent
                             placeholder={"Select Category"}
                             data={categories}
                             value={selectedCategory}
@@ -286,7 +297,7 @@ export default function TipsTabScreen({navigation}) {
                         />
                     </View>
                     {selectedCategory && (
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             onPress={clearCategory}
                             style={styles.clearButton}
                         >
@@ -300,12 +311,12 @@ export default function TipsTabScreen({navigation}) {
                         <Text>Loading...</Text>
                     </View>
                 ) : (
-                <FlatList
+                    <FlatList
                         data={tips}
-                    renderItem={renderCategory}
+                        renderItem={renderCategory}
                         keyExtractor={(item) => item.id.toString()}
-                    contentContainerStyle={styles.categoryList}
-                    showsVerticalScrollIndicator={false}
+                        contentContainerStyle={styles.categoryList}
+                        showsVerticalScrollIndicator={false}
                         style={{ flex: 1 }}
                         ListEmptyComponent={() => (
                             <View style={styles.emptyContainer}>

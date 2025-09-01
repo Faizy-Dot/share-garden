@@ -16,10 +16,15 @@ const styles = StyleSheet.create({
     },
     tipTitle: {
         flexDirection: "row",
-        paddingHorizontal: Metrix.HorizontalSize(15),
         gap: Metrix.HorizontalSize(10),
         marginTop: Metrix.VerticalSize(15),
         alignItems: "center"
+    },
+    tipTitleConatiner: {
+        paddingHorizontal: Metrix.HorizontalSize(15),
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent : "space-between"
     },
     categoryEarnContainer: {
         borderTopWidth: 1,
@@ -94,12 +99,12 @@ const styles = StyleSheet.create({
         backgroundColor: "#DADADA",
         borderRadius: Metrix.VerticalSize(20)
     },
-    timeText:{
-        fontSize : Metrix.normalize(11),
-        fontFamily : fonts.InterRegular,
-        color : colors.buttonColor,
-        paddingLeft : Metrix.HorizontalSize(50),
-        marginTop : Metrix.VerticalSize(3)
+    timeText: {
+        fontSize: Metrix.normalize(11),
+        fontFamily: fonts.InterRegular,
+        color: colors.buttonColor,
+        paddingLeft: Metrix.HorizontalSize(50),
+        marginTop: Metrix.VerticalSize(3)
     }
 
 })

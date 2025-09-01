@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, FlatList } from 'react-native';
+import { View, Text, Image, FlatList, Modal, Pressable, TouchableOpacity } from 'react-native';
 import axiosInstance from '../../../../config/axios';
 import styles from './styles';
 import BackArrowIcon from '../../../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../../../components/navBar/NavBar';
-import { CommentLogo, GreenBitIcon, SgProfileLogo, TipsTabIcon } from '../../../../assets/svg';
+import { CommentLogo, CrossIcon, GreenBitIcon, SgProfileLogo, TipsTabIcon } from '../../../../assets/svg';
 import colors from '../../../../config/Colors';
 import { Images, Metrix } from '../../../../config';
 import fonts from '../../../../config/Fonts';
@@ -16,6 +16,20 @@ export default function TipsDetail({ route }) {
 
     const [sgtipDetail, setSgtipDetail] = useState("")
     const [loading, setLoading] = useState(true);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageModalVisible, setImageModalVisible] = useState(false);
+
+    console.log("sgTipDetail===>>", sgtipDetail)
+
+    const openImageModal = (imageUri) => {
+        setSelectedImage(imageUri);
+        setImageModalVisible(true);
+    };
+
+    const closeImageModal = () => {
+        setImageModalVisible(false);
+        setSelectedImage(null);
+    };
 
     const fetchData = async () => {
         try {
@@ -68,7 +82,7 @@ export default function TipsDetail({ route }) {
                     <Image source={Images.homeProfile} style={styles.profileImage} />
                     <Text style={styles.commentText}>{item.comment}</Text>
                 </View>
-               <Text style={styles.timeText}>{item.time}</Text>
+                <Text style={styles.timeText}>{item.time}</Text>
             </View>
         )
     }
@@ -82,10 +96,16 @@ export default function TipsDetail({ route }) {
                 <NavBar title={"SG Tip"} />
             </View>
 
-            <View style={styles.tipTitle}>
-                <TipsTabIcon width={24} height={24} color={colors.buttonColor} />
-                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{sgtipDetail.title}</Text>
+            <View style={styles.tipTitleConatiner}>
+                <View style={styles.tipTitle}>
+                    <TipsTabIcon width={24} height={24} color={colors.buttonColor} />
+                    <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{sgtipDetail.title}</Text>
+                </View>
+                <View>
+                    <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{sgtipDetail.author.firstName}{" "}{sgtipDetail.author.lastName}</Text>
+                </View>
             </View>
+
 
             <View style={styles.categoryEarnContainer}>
                 <View style={styles.categoryContainer}>
@@ -105,10 +125,11 @@ export default function TipsDetail({ route }) {
                 <Text>{sgtipDetail.description}</Text>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: Metrix.VerticalSize(15) }}>
                     <View style={styles.SGTipimageContainer}>
-                        {
-                            route.params.imageArray[0] &&
-                            <Image source={{ uri: route.params.imageArray[0] }} style={styles.SGTipupdateImage} />
-                        }
+                        {route.params.imageArray[0] && (
+                            <TouchableOpacity onPress={() => openImageModal(route.params.imageArray[0])}>
+                                <Image source={{ uri: route.params.imageArray[0] }} style={styles.SGTipupdateImage} />
+                            </TouchableOpacity>
+                        )}
                     </View>
                     <View style={styles.SGTipimageContainer}>
                         {
@@ -137,6 +158,21 @@ export default function TipsDetail({ route }) {
                         contentContainerStyle={{ gap: Metrix.VerticalSize(15) }} />
                 </View>
             </View>
+
+            <Modal visible={imageModalVisible} transparent animationType="fade">
+                <View style={{ flex: 1,backgroundColor: "rgba(0,0,0,0.5)", justifyContent: 'center', alignItems: 'center' }}>
+                    <TouchableOpacity style={{ position: 'absolute', top: Metrix.VerticalSize(50), right: Metrix.HorizontalSize(20) ,zIndex : 1}} onPress={closeImageModal}>
+                        <CrossIcon strokeColor='white' />
+                    </TouchableOpacity>
+                    {selectedImage && (
+                        <Image
+                            source={{ uri: selectedImage }}
+                            style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
+                        />
+                    )}
+                </View>
+            </Modal>
+
 
         </View>
     );
