@@ -11,13 +11,17 @@ const defaultCategories = [
     // ... keep all existing default categories
 ];
 
-export default function CategoryFlatList() {
-    const [selectedId, setSelectedId] = useState(null);
+export default function CategoryFlatList({ onCategorySelect, selectedCategory }) {
+    const [selectedId, setSelectedId] = useState(selectedCategory);
     const [categories, setCategories] = useState(defaultCategories);
 
     useEffect(() => {
         fetchCategories();
     }, []);
+
+    useEffect(() => {
+        setSelectedId(selectedCategory);
+    }, [selectedCategory]);
 
     const fetchCategories = async () => {
         try {
@@ -63,7 +67,12 @@ export default function CategoryFlatList() {
         const isSelect = selectedId == item.id;
         return (
             <TouchableOpacity 
-                onPress={() => setSelectedId(item.id)} 
+                onPress={() => {
+                    setSelectedId(item.id);
+                    if (onCategorySelect) {
+                        onCategorySelect(item);
+                    }
+                }} 
                 activeOpacity={0.8} 
                 style={{ width: Metrix.HorizontalSize(73), height: Metrix.VerticalSize(130) }}
             >

@@ -51,6 +51,9 @@ export default function MerchantAds() {
                 params.push(`categoryId=${categoryId}`);
             }
 
+            // Add status filter for active ads only
+            params.push(`status=ACTIVE`);
+
             // Add pagination parameters
             params.push(`page=${page}`);
             params.push(`limit=${pagination.limit}`);

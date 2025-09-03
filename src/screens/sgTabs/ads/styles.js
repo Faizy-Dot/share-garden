@@ -137,5 +137,28 @@ export const styles = StyleSheet.create({
         fontSize: Metrix.FontSmall,
         fontFamily: fonts.InterBold,
         color: colors.white,
+    },
+    searchInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: Metrix.HorizontalSize(10),
+        marginTop: Metrix.VerticalSize(10),
+        gap: Metrix.HorizontalSize(10)
+    },
+    searchInput: {
+        height: 50,
+        backgroundColor: '#F3F3F3',
+        borderWidth: 1,
+        borderColor: '#E6E6E6',
+        borderRadius: 5,
+        paddingHorizontal: 15,
+        fontSize: 16,
+        color: '#000'
+    },
+    clearButton: {
+        position: 'absolute',
+        right: Metrix.HorizontalSize(20),
+        top: Metrix.VerticalSize(30),
+        zIndex: 1,
     }
 })

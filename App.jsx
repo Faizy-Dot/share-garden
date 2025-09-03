@@ -15,16 +15,25 @@ import ResetPassword from './src/screens/auth/Login/frogotPassword/ResetPassword
 import MerchantTabNavigtor from './src/screens/merchantScreens/merchantTabs/MerchantTabs';
 // Stripe Provider - will be uncommented after installing the package
 import { StripeProvider } from '@stripe/stripe-react-native';
+import pushNotificationService from './src/services/pushNotificationService';
 
 const Stack = createNativeStackNavigator();
 
 function AppNavigator() {
   const { user } = useSelector((state) => state.login); // Fetch user from Redux state
+  
   useEffect(() => {
     setTimeout(() => {
       SplashScreen.hide();
     }, 2000);
   }, []);
+
+  // Initialize push notifications when user is logged in
+  useEffect(() => {
+    if (user?.id) {
+      pushNotificationService.initialize();
+    }
+  }, [user?.id]);
 
   const getInitialRoute = () => {
     if (!user) return 'OnBoarding';

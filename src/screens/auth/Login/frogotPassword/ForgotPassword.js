@@ -14,6 +14,17 @@ export default function ForgotPassword({ navigation }) {
     const [loading, setLoading] = useState(false);
 
     const submit = async () => {
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Email',
+                text2: 'Please enter a valid email address.',
+            });
+            return;
+        }
+
         setLoading(true);
         try {
             const response = await ApiCaller.Post('/api/auth/forgot-password', { email });
@@ -26,10 +37,13 @@ export default function ForgotPassword({ navigation }) {
                     text1: response.data.message,
                 });
                 navigation.navigate('OneTimePassword', { email: response.data.email });
-            } else{
+            } else {
+                // Handle different error status codes
+                const errorMessage = response.data?.message || 'An error occurred';
                 Toast.show({
                     type: 'error',
-                    text1: response.data.message,
+                    text1: 'Error',
+                    text2: errorMessage,
                 });
             }
         } catch (err) {

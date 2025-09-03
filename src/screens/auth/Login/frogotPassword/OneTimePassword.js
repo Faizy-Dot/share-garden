@@ -14,6 +14,8 @@ export default function OneTimePassword({ navigation, route }) {
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   // Handle OTP input and auto-focus
   const handleInputChange = (text, index) => {
@@ -67,7 +69,51 @@ export default function OneTimePassword({ navigation, route }) {
       setLoading(false);
     }
   };
-     
+
+  // Resend OTP functionality
+  const handleResendOTP = async () => {
+    if (resendCooldown > 0) return;
+    
+    setResendLoading(true);
+    try {
+      const response = await ApiCaller.Post('/api/auth/forgot-password', { email });
+      
+      if (response.status === 200) {
+        Toast.show({
+          type: 'success',
+          text1: 'OTP sent successfully',
+          text2: 'Please check your email for the new OTP.',
+        });
+        
+        // Start cooldown timer (60 seconds)
+        setResendCooldown(60);
+        const timer = setInterval(() => {
+          setResendCooldown((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: response.data?.message || 'Failed to resend OTP',
+        });
+      }
+    } catch (err) {
+      console.error("Resend OTP Error:", err);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Something went wrong. Please try again.',
+      });
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   return (
     <View style={styles.OneTimePassword}>
@@ -97,6 +143,23 @@ export default function OneTimePassword({ navigation, route }) {
 
           {/* Verify Button */}
           <CustomButton title={loading ? "Verifying..." : "Verify"} width={"100%"} onPress={verify} disabled={loading} />
+          
+          {/* Resend OTP Button */}
+          <View style={{ marginTop: Metrix.VerticalSize(20), alignItems: 'center' }}>
+            <Text style={styles.resendText}>
+              Didn't receive the code?{' '}
+              {resendCooldown > 0 ? (
+                <Text style={styles.cooldownText}>Resend in {resendCooldown}s</Text>
+              ) : (
+                <Text 
+                  style={[styles.resendLink, resendLoading && styles.disabledLink]} 
+                  onPress={handleResendOTP}
+                >
+                  {resendLoading ? 'Sending...' : 'Resend OTP'}
+                </Text>
+              )}
+            </Text>
+          </View>
         </View>
       </View>
     </View>

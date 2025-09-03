@@ -1,13 +1,12 @@
-import { FlatList, Image, Text, View, ActivityIndicator, Alert, TouchableOpacity, Dimensions } from "react-native";
+import { FlatList, Image, Text, View, ActivityIndicator, Alert, TouchableOpacity, Dimensions, TextInput } from "react-native";
 import { styles } from "./styles";
 import BackArrowIcon from "../../../components/backArrowIcon/BackArrowIcon";
 import NavBar from "../../../components/navBar/NavBar";
-import CustomInput from "../../../components/customInput/CustomInput";
 import CategoryFlatList from "../../../components/categoryFlatList/CategoryFlatList";
 import { Images, Metrix } from "../../../config";
 // Remove KeyboardAwareScrollView import since we're using FlatList
-import { AdsLocationIcon, AdsStickerIcon } from "../../../assets/svg";
-import { useCallback, useEffect, useState } from "react";
+import { AdsLocationIcon, AdsStickerIcon, CrossIcon } from "../../../assets/svg";
+import { useCallback, useEffect, useState, useRef } from "react";
 import ApiCaller from "../../../config/ApiCaller";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -23,7 +22,7 @@ export default function AdsTabScreen() {
 
     const [loading, setLoading] = useState(false)
     const [ads, setAds] = useState([])
-    const [searchQuery, setSearchQuery] = useState('')
+    const [searchResults, setSearchResults] = useState(null)
     const [selectedCategory, setSelectedCategory] = useState(null)
     const [pagination, setPagination] = useState({
         currentPage: 1,
@@ -34,26 +33,28 @@ export default function AdsTabScreen() {
         limit: 12
     })
     const [refreshing, setRefreshing] = useState(false)
+    const [searchText, setSearchText] = useState('')
+    const searchInputRef = useRef(null)
+    const searchTimeoutRef = useRef(null)
 
-    const fetchAds = async (search = '', categoryId = null, page = 1, isLoadMore = false) => {
+    const fetchAds = async (categoryId = null, page = 1, isLoadMore = false) => {
         if (!isLoadMore) {
             setLoading(true);
         }
         
         try {
-            console.log('Fetching ads...', { search, categoryId, page });
+            console.log('Fetching ads...', { categoryId, page });
             
             // Build query parameters
             let url = '/api/ads';
             const params = [];
             
-            if (search && search.trim()) {
-                params.push(`search=${encodeURIComponent(search.trim())}`);
-            }
-            
             if (categoryId) {
                 params.push(`categoryId=${categoryId}`);
             }
+            
+            // Add status filter for active ads only
+            params.push(`status=ACTIVE`);
             
             // Add pagination parameters
             params.push(`page=${page}`);
@@ -95,17 +96,83 @@ export default function AdsTabScreen() {
         }
     };
 
+    const performSearch = async (query) => {
+        try {
+            console.log('Searching ads...', { query });
+            
+            // Build search query parameters
+            let url = '/api/ads';
+            const params = [];
+            
+            if (query && query.trim()) {
+                params.push(`search=${encodeURIComponent(query.trim())}`);
+            }
+            
+            if (selectedCategory) {
+                params.push(`categoryId=${selectedCategory}`);
+            }
+            
+            // Add status filter for active ads only
+            params.push(`status=ACTIVE`);
+            
+            // Add pagination parameters
+            params.push(`page=1`);
+            params.push(`limit=${pagination.limit}`);
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            console.log('Search API URL:', url);
+            const response = await ApiCaller.Get(url);
+            console.log('Search response:', response);
+            
+            if (response.data) {
+                const { ads: searchAds } = response.data;
+                setSearchResults(searchAds);
+                console.log('Search results set:', searchAds.length, 'ads');
+            } else {
+                setSearchResults([]);
+            }
+        } catch (error) {
+            console.error('Error searching ads:', error);
+            setSearchResults([]);
+        }
+    };
+
+    const debouncedSearch = (query) => {
+        // Clear existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        
+        // Set new timeout for debounced search
+        searchTimeoutRef.current = setTimeout(() => {
+            if (query && query.trim()) {
+                performSearch(query);
+            } else {
+                setSearchResults(null);
+            }
+        }, 500); // 500ms delay
+    };
+
+
+
 
     useFocusEffect(
         useCallback(() => {
-            fetchAds(searchQuery, selectedCategory, 1, false);
-        }, [searchQuery, selectedCategory])
+            fetchAds(selectedCategory, 1, false);
+        }, [selectedCategory])
     );
 
-    // Handle search input
-    const handleSearch = (text) => {
-        setSearchQuery(text);
-    };
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, []);
 
     // Handle category selection
     const handleCategorySelect = (category) => {
@@ -114,21 +181,45 @@ export default function AdsTabScreen() {
 
     // Clear all filters
     const clearFilters = () => {
-        setSearchQuery('');
+        // Clear search timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        
+        setSearchText('');
+        if (searchInputRef.current?.clear) {
+            searchInputRef.current.clear();
+        }
+        setSearchResults(null);
         setSelectedCategory(null);
+        fetchAds(null, 1, false);
     };
 
     // Load more ads
     const loadMoreAds = () => {
         if (pagination.hasNextPage && !loading) {
-            fetchAds(searchQuery, selectedCategory, pagination.currentPage + 1, true);
+            if (searchResults) {
+                // If showing search results, don't load more
+                return;
+            }
+            fetchAds(selectedCategory, pagination.currentPage + 1, true);
         }
     };
 
     // Refresh ads
     const onRefresh = () => {
         setRefreshing(true);
-        fetchAds(searchQuery, selectedCategory, 1, false);
+        if (searchResults) {
+            // If showing search results, refresh search
+            if (searchInputRef.current) {
+                performSearch(searchInputRef.current);
+            } else {
+                setSearchResults(null);
+                fetchAds(selectedCategory, 1, false);
+            }
+        } else {
+            fetchAds(selectedCategory, 1, false);
+        }
     };
 
     console.log("Ads==>>", ads)
@@ -189,14 +280,42 @@ export default function AdsTabScreen() {
                 <NavBar title={"Merchant Ads"} />
             </View>
 
-            <View>
-                <CustomInput 
-                    iconCondition={true} 
-                    justifyContent={"space-between"}
-                    value={searchQuery}
-                    onChangeText={handleSearch}
-                    placeholder="Search ads..."
-                />
+            <View style={styles.searchInputContainer}>
+                <View style={{flex : 1 , justifyContent : "center"}}>
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder={"Search ads..."}
+                        placeholderTextColor="#999"
+                        returnKeyType="done"
+                        ref={searchInputRef}
+                        onChangeText={(text) => {
+                            searchInputRef.current = text;
+                            setDisplaySearchText(text);
+                            debouncedSearch(text);
+                        }}
+                        autoCorrect={false}
+                        blurOnSubmit={false}
+                    />
+                    <TouchableOpacity
+                        onPress={() => {
+                            // Clear search timeout
+                            if (searchTimeoutRef.current) {
+                                clearTimeout(searchTimeoutRef.current);
+                            }
+                            
+                            searchInputRef.current = '';
+                            setDisplaySearchText('');
+                            if (searchInputRef.current?.clear) {
+                                searchInputRef.current.clear();
+                            }
+                            setSearchResults(null);
+                            fetchAds(selectedCategory, 1, false);
+                        }}
+                        style={styles.clearButton}
+                    >
+                        <CrossIcon width={16} height={16} strokeColor="#999" />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <View style={{ marginTop: Metrix.VerticalSize(10) }}>
@@ -207,11 +326,11 @@ export default function AdsTabScreen() {
             </View>
 
             {/* Filter Status */}
-            {(searchQuery || selectedCategory) && (
+            {(searchResults || selectedCategory) && (
                 <View style={styles.filterStatusContainer}>
                     <Text style={styles.filterStatusText}>
-                        {searchQuery && `Search: "${searchQuery}"`}
-                        {searchQuery && selectedCategory && ' • '}
+                        {searchResults && `Search: "${displaySearchText}"`}
+                        {searchResults && selectedCategory && ' • '}
                         {selectedCategory && `Category: ${selectedCategory}`}
                     </Text>
                     <TouchableOpacity onPress={clearFilters} style={styles.clearFiltersButton}>
@@ -224,14 +343,68 @@ export default function AdsTabScreen() {
 
     return (
         <View style={styles.adsContainer}>
+            {/* Fixed Header with Search */}
+            <View style={styles.topContainer}>
+                <View>
+                    <BackArrowIcon />
+                </View>
+
+                <View>
+                    <NavBar title={"Merchant Ads"} />
+                </View>
+
+                <View style={styles.searchInputContainer}>
+                    <View style={{flex : 1 , justifyContent : "center"}}>
+                        <TextInput
+                            style={styles.searchInput}
+                            placeholder="Search ads..."
+                            placeholderTextColor="#999"
+                            value={searchText}
+                            onChangeText={(text) => {
+                                setSearchText(text);
+                                debouncedSearch(text);
+                            }}
+                        />
+                        <TouchableOpacity
+                            onPress={() => {
+                                // Clear search timeout
+                                if (searchTimeoutRef.current) {
+                                    clearTimeout(searchTimeoutRef.current);
+                                }
+                                
+                                setSearchText('');
+                                if (searchInputRef.current?.clear) {
+                                    searchInputRef.current.clear();
+                                }
+                                setSearchResults(null);
+                                fetchAds(selectedCategory, 1, false);
+                            }}
+                            style={styles.clearButton}
+                        >
+                            <CrossIcon width={16} height={16} strokeColor="#999" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                <View style={{ marginTop: Metrix.VerticalSize(10) }}>
+                    <CategoryFlatList 
+                        onCategorySelect={handleCategorySelect}
+                        selectedCategory={selectedCategory}
+                    />
+                </View>
+
+
+            </View>
+
+            {/* Content */}
             {loading && ads.length === 0 ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#003034" />
                     <Text style={styles.loadingText}>Loading ads...</Text>
                 </View>
-            ) : ads.length > 0 ? (
+            ) : (searchResults || ads).length > 0 ? (
                 <FlatList 
-                    data={ads}
+                    data={searchResults || ads}
                     keyExtractor={(item) => item.id}
                     renderItem={renderAdsData}
                     numColumns={3}
@@ -239,21 +412,21 @@ export default function AdsTabScreen() {
                     contentContainerStyle={styles.adsDataStyle}
                     onEndReached={loadMoreAds}
                     onEndReachedThreshold={0.1}
-                    ListHeaderComponent={renderHeader}
                     ListFooterComponent={renderFooter}
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                     columnWrapperStyle={styles.rowContainer}
+                    keyboardShouldPersistTaps="handled"
                 />
             ) : (
                 <View style={styles.noAdsContainer}>
                     <Text style={styles.noAdsText}>
-                        {searchQuery || selectedCategory 
+                        {searchResults || selectedCategory 
                             ? 'No ads found matching your search criteria.' 
                             : 'No ads available at the moment.'
                         }
                     </Text>
-                    {(searchQuery || selectedCategory) && (
+                    {(searchResults || selectedCategory) && (
                         <TouchableOpacity onPress={clearFilters} style={styles.clearFiltersButton}>
                             <Text style={styles.clearFiltersText}>Clear Filters</Text>
                         </TouchableOpacity>

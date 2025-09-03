@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         width: "100%",
         paddingLeft: Metrix.HorizontalSize(25),
-        fontSize: Metrix.FontMedium,
+        fontSize: Metrix.FontExtraSmall,
         fontFamily: fonts.InterRegular,
         borderRadius: Metrix.LightRadius,
         height: Metrix.VerticalSize(45),
@@ -118,6 +118,25 @@ const styles = StyleSheet.create({
         fontSize: Metrix.FontExtraSmall,
         marginLeft: 4,
         marginTop: Metrix.VerticalSize(2)
+    },
+    resendText: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.black,
+        textAlign: 'center',
+    },
+    resendLink: {
+        color: colors.buttonColor,
+        fontFamily: fonts.InterBold,
+        textDecorationLine: 'underline',
+    },
+    cooldownText: {
+        color: colors.grayColor || '#999',
+        fontFamily: fonts.InterRegular,
+    },
+    disabledLink: {
+        color: colors.grayColor || '#999',
+        opacity: 0.6,
     }
 })
 
