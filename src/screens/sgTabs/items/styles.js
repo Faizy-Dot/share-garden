@@ -233,7 +233,11 @@ const styles = StyleSheet.create({
     
     clearButton: {
         position: 'absolute',
-        right: Metrix.HorizontalSize(5), // Adjust based on FilterIcon position
+        right: Metrix.HorizontalSize(15),
+        top: '50%',
+        transform: [{ translateY: -8 }], // Half of the icon height (16px) to center it
+        zIndex: 1,
+        padding: Metrix.HorizontalSize(5), // Add padding for better touch target
     },
    
     clearIconText: {

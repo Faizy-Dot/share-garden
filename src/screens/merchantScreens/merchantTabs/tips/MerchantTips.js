@@ -12,6 +12,7 @@ import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../../../../config/axios";
 import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
 
 export default function MerchantTips({navigation}) {
     const [tips, setTips] = useState([]);
@@ -21,6 +22,7 @@ export default function MerchantTips({navigation}) {
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [likingTipId, setLikingTipId] = useState(null);
+    const { user } = useSelector((state) => state.login);
 
     const calculateTimeAgo = (publishedAt) => {
         if (!publishedAt) return '0h';
@@ -120,30 +122,51 @@ export default function MerchantTips({navigation}) {
         }, [fetchTips])
     );
 
-    const handleLike = async (tipId) => {
+    const handleLike = async (tip) => {
+        // Prevent self-interaction
+        if (tip.authorId === user.id) {
+            Toast.show({
+                type: 'info',
+                text1: 'Notice',
+                text2: 'You cannot like your own tip'
+            });
+            return;
+        }
+
+        // Prevent multiple interactions (check if already liked)
+        if (tip.isLiked) {
+            Toast.show({
+                type: 'info',
+                text1: 'Already Liked',
+                text2: 'You have already liked this tip'
+            });
+            return;
+        }
+
         try {
-            setLikingTipId(tipId);
-            const response = await axiosInstance.post(`/api/sgtips/${tipId}/like`);
+            setLikingTipId(tip.id);
+            const response = await axiosInstance.post(`/api/sgtips/${tip.id}/like`);
             
             // Update the tip's like status in the local state
             setTips(prevTips => 
-                prevTips.map(tip => 
-                    tip.id === tipId 
+                prevTips.map(t => 
+                    t.id === tip.id 
                         ? { 
-                            ...tip, 
-                            isLiked: !tip.isLiked,
+                            ...t, 
+                            isLiked: true,
                             _count: {
-                                ...tip._count,
-                                likes: tip.isLiked ? (tip._count.likes || 1) - 1 : (tip._count.likes || 0) + 1
+                                ...t._count,
+                                likes: (t._count.likes || 0) + 1
                             }
                         } 
-                        : tip
+                        : t
                 )
             );
 
             Toast.show({
                 type: 'success',
-                text1: tip.isLiked ? 'Tip unliked' : 'Tip liked',
+                text1: 'Tip liked successfully',
+                text2: 'Thank you for liking this tip!'
             });
         } catch (error) {
             console.error('Error liking tip:', error);
@@ -195,6 +218,15 @@ export default function MerchantTips({navigation}) {
                     <View style={{ width: Metrix.HorizontalSize(200), gap: 10, height: Metrix.VerticalSize(116) }}>
                         <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold, color: colors.buttonColor }}>{item.title}</Text>
                         <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular }}>{item.description}</Text>
+                        {/* Tip Owner Name */}
+                        <Text style={{ 
+                            fontSize: Metrix.FontExtraSmall, 
+                            fontFamily: fonts.InterSemiBold, 
+                            color: colors.gray,
+                            marginTop: 5
+                        }}>
+                            By: {item.author?.firstName} {item.author?.lastName}
+                        </Text>
                     </View>
                 </View>
 
@@ -204,9 +236,12 @@ export default function MerchantTips({navigation}) {
                         <Text style={styles.containertext}>{item.views || 0} Views</Text>
                     </View>
                     <TouchableOpacity 
-                        style={styles.logoContainer}
-                        onPress={() => handleLike(item.id)}
-                        disabled={likingTipId === item.id}
+                        style={[
+                            styles.logoContainer,
+                            (item.authorId === user.id || item.isLiked) && { opacity: 0.6 }
+                        ]}
+                        onPress={() => handleLike(item)}
+                        disabled={likingTipId === item.id || item.authorId === user.id || item.isLiked}
                     >
                         <LikesIcon fill={item.isLiked ? colors.redColor : 'none'} />
                         <Text style={styles.containertext}>{item._count.likes || 0} Likes</Text>

@@ -157,8 +157,25 @@ export const styles = StyleSheet.create({
     },
     clearButton: {
         position: 'absolute',
-        right: Metrix.HorizontalSize(20),
-        top: Metrix.VerticalSize(30),
+        right: Metrix.HorizontalSize(15),
+        top: '50%',
+        transform: [{ translateY: -12 }], // Half of the icon height (16px) to center it
         zIndex: 1,
+        padding: Metrix.HorizontalSize(5), // Add padding for better touch target
+    },
+    clearFilterContainer: {
+        marginTop: Metrix.VerticalSize(10),
+        alignItems: 'center',
+    },
+    clearFilterButton: {
+        backgroundColor: colors.buttonColor,
+        paddingHorizontal: Metrix.HorizontalSize(20),
+        paddingVertical: Metrix.VerticalSize(8),
+        borderRadius: Metrix.HorizontalSize(20),
+    },
+    clearFilterText: {
+        color: colors.white,
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterSemiBold,
     }
 })

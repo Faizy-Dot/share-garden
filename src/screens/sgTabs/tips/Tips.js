@@ -132,32 +132,43 @@ export default function TipsTabScreen({ navigation }) {
     }, [selectedCategory, searchQuery]);
 
     const handleLike = async (tip) => {
-
         console.log(tip)
+        
+        // Prevent self-interaction
         if (tip.authorId === user.id) {
             Toast.show({
                 type: 'info',
                 text1: 'Notice',
                 text2: 'You cannot like your own tip'
             });
-            return; // exit early
+            return;
+        }
+
+        // Prevent multiple interactions (check if already liked)
+        if (tip.isLiked) {
+            Toast.show({
+                type: 'info',
+                text1: 'Already Liked',
+                text2: 'You have already liked this tip'
+            });
+            return;
         }
 
         try {
             await axiosInstance.post(`/api/sgtips/${tip.id}/like`);
-            // Refresh tips after liking/unliking
+            // Refresh tips after liking
             await fetchTips();
             Toast.show({
                 type: 'success',
-                text1: 'Success',
-                text2: 'Tip updated successfully'
+                text1: 'Tip liked successfully',
+                text2: 'Thank you for liking this tip!'
             });
         } catch (error) {
             console.error('Error liking tip:', error);
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Failed to update tip'
+                text2: 'Failed to like tip'
             });
         } 
     };
@@ -227,6 +238,15 @@ export default function TipsTabScreen({ navigation }) {
                     <View style={{ width: Metrix.HorizontalSize(200), gap: 10, height: Metrix.VerticalSize(116) }}>
                         <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold, color: colors.buttonColor }}>{item.title}</Text>
                         <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular }}>{item.description}</Text>
+                        {/* Tip Owner Name */}
+                        <Text style={{ 
+                            fontSize: Metrix.FontExtraSmall, 
+                            fontFamily: fonts.InterSemiBold, 
+                            color: colors.gray,
+                            marginTop: 5
+                        }}>
+                            By: {item.author?.firstName} {item.author?.lastName}
+                        </Text>
                     </View>
                 </View>
 
@@ -236,8 +256,12 @@ export default function TipsTabScreen({ navigation }) {
                         <Text style={styles.containertext}>{item.views || 0} Views</Text>
                     </View>
                     <TouchableOpacity
-                        style={styles.logoContainer}
+                        style={[
+                            styles.logoContainer,
+                            (item.authorId === user.id || item.isLiked) && { opacity: 0.6 }
+                        ]}
                         onPress={() => handleLike(item)}
+                        disabled={item.authorId === user.id || item.isLiked}
                     >
                         <LikesIcon fill={item.isLiked ? colors.redColor : 'none'} />
                         <Text style={styles.containertext}>{item._count.likes || 0} Likes</Text>

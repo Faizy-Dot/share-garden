@@ -47,31 +47,41 @@ const SGTipActions = ({
             return;
         }
 
+        // Prevent multiple interactions (check if already liked)
+        if (isLiked) {
+            Toast.show({
+                type: 'info',
+                text1: 'Already Liked',
+                text2: 'You have already liked this SGTip'
+            });
+            return;
+        }
+
         if (isLiking) return;
 
         setIsLiking(true);
         try {
             const response = await sgtipActivityService.likeSGTip(sgTipId);
             
-            // Update local state
-            setIsLiked(!isLiked);
+            // Update local state - only allow liking (not unliking)
+            setIsLiked(true);
             setStats(prev => ({
                 ...prev,
-                likes: prev.likes + (isLiked ? -1 : 1)
+                likes: prev.likes + 1
             }));
 
             // Notify parent component
             if (onStatsUpdate) {
                 onStatsUpdate({
                     ...stats,
-                    likes: stats.likes + (isLiked ? -1 : 1)
+                    likes: stats.likes + 1
                 });
             }
 
             Toast.show({
                 type: 'success',
-                text1: isLiked ? 'Unliked' : 'Liked',
-                text2: isLiked ? 'SGTip unliked' : 'SGTip liked successfully'
+                text1: 'Liked',
+                text2: 'SGTip liked successfully'
             });
 
         } catch (error) {
@@ -186,7 +196,7 @@ const SGTipActions = ({
                     backgroundColor: isLiked ? colors.redColor + '20' : 'transparent',
                 }}
                 onPress={handleLike}
-                disabled={isLiking || isAuthor}
+                disabled={isLiking || isAuthor || isLiked}
             >
                 {isLiking ? (
                     <ActivityIndicator size="small" color={colors.buttonColor} />

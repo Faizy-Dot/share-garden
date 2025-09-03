@@ -195,6 +195,14 @@ export default function AdsTabScreen() {
         fetchAds(null, 1, false);
     };
 
+    // Clear only category filter
+    const clearCategoryFilter = () => {
+        setSelectedCategory(null);
+        fetchAds(null, 1, false);
+    };
+
+
+
     // Load more ads
     const loadMoreAds = () => {
         if (pagination.hasNextPage && !loading) {
@@ -270,76 +278,7 @@ export default function AdsTabScreen() {
         );
     };
 
-    const renderHeader = () => (
-        <View style={styles.topContainer}>
-            <View>
-                <BackArrowIcon />
-            </View>
 
-            <View>
-                <NavBar title={"Merchant Ads"} />
-            </View>
-
-            <View style={styles.searchInputContainer}>
-                <View style={{flex : 1 , justifyContent : "center"}}>
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder={"Search ads..."}
-                        placeholderTextColor="#999"
-                        returnKeyType="done"
-                        ref={searchInputRef}
-                        onChangeText={(text) => {
-                            searchInputRef.current = text;
-                            setDisplaySearchText(text);
-                            debouncedSearch(text);
-                        }}
-                        autoCorrect={false}
-                        blurOnSubmit={false}
-                    />
-                    <TouchableOpacity
-                        onPress={() => {
-                            // Clear search timeout
-                            if (searchTimeoutRef.current) {
-                                clearTimeout(searchTimeoutRef.current);
-                            }
-                            
-                            searchInputRef.current = '';
-                            setDisplaySearchText('');
-                            if (searchInputRef.current?.clear) {
-                                searchInputRef.current.clear();
-                            }
-                            setSearchResults(null);
-                            fetchAds(selectedCategory, 1, false);
-                        }}
-                        style={styles.clearButton}
-                    >
-                        <CrossIcon width={16} height={16} strokeColor="#999" />
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-            <View style={{ marginTop: Metrix.VerticalSize(10) }}>
-                <CategoryFlatList 
-                    onCategorySelect={handleCategorySelect}
-                    selectedCategory={selectedCategory}
-                />
-            </View>
-
-            {/* Filter Status */}
-            {(searchResults || selectedCategory) && (
-                <View style={styles.filterStatusContainer}>
-                    <Text style={styles.filterStatusText}>
-                        {searchResults && `Search: "${displaySearchText}"`}
-                        {searchResults && selectedCategory && ' • '}
-                        {selectedCategory && `Category: ${selectedCategory}`}
-                    </Text>
-                    <TouchableOpacity onPress={clearFilters} style={styles.clearFiltersButton}>
-                        <Text style={styles.clearFiltersText}>Clear</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        </View>
-    );
 
     return (
         <View style={styles.adsContainer}>
@@ -393,6 +332,15 @@ export default function AdsTabScreen() {
                     />
                 </View>
 
+                {/* Clear Filter Button - Show only when there are active filters */}
+                {(searchText || selectedCategory) && (
+                    <View style={styles.clearFilterContainer}>
+                        <TouchableOpacity onPress={clearFilters} style={styles.clearFilterButton}>
+                            <Text style={styles.clearFilterText}>Clear All Filters</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+
 
             </View>
 
@@ -426,11 +374,7 @@ export default function AdsTabScreen() {
                             : 'No ads available at the moment.'
                         }
                     </Text>
-                    {(searchResults || selectedCategory) && (
-                        <TouchableOpacity onPress={clearFilters} style={styles.clearFiltersButton}>
-                            <Text style={styles.clearFiltersText}>Clear Filters</Text>
-                        </TouchableOpacity>
-                    )}
+
                 </View>
             )}
         </View>
