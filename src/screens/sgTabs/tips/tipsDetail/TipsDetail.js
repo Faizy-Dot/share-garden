@@ -18,6 +18,7 @@ import sgtipActivityService from '../../../../services/sgtipActivityService';
 import commentService from '../../../../services/commentService';
 import Toast from 'react-native-toast-message';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function TipsDetail({ route }) {
     // console.log(route.params.imageArray)
@@ -28,7 +29,11 @@ export default function TipsDetail({ route }) {
     const [imageModalVisible, setImageModalVisible] = useState(false);
     const [recentActivity, setRecentActivity] = useState([]);
     const [stats, setStats] = useState({ likes: 0, shares: 0 });
-    
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editingContent, setEditingContent] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+
+
     // Comments state
     const [comments, setComments] = useState([]);
     const [loadingComments, setLoadingComments] = useState(false);
@@ -40,11 +45,12 @@ export default function TipsDetail({ route }) {
         hasNextPage: false,
         hasPrevPage: false
     });
-    
+
+    console.log("commentss==>>", comments)
+
     const { user } = useSelector((state) => state.login);
     const realTimeActivityRef = useRef(null);
 
-    console.log("sgTipDetail===>>", sgtipDetail)
 
     const openImageModal = (imageUri) => {
         setSelectedImage(imageUri);
@@ -60,7 +66,7 @@ export default function TipsDetail({ route }) {
         try {
             const response = await axiosInstance.get(`/api/sgtips/${route.params.id}`);
             setSgtipDetail(response.data);
-            
+
             // Set initial stats
             if (response.data.stats) {
                 setStats({
@@ -104,40 +110,106 @@ export default function TipsDetail({ route }) {
     }
 
     const handleSubmitComment = async () => {
-        if (!newComment.trim() || isSubmittingComment) return;
+        if (!newComment.trim()) return;
 
-        setIsSubmittingComment(true);
         try {
-            const response = await commentService.addComment(route.params.id, newComment);
-            console.log('Comment response:', response);
+            // Call API
+            const response = await commentService.addComment(sgtipDetail.id, newComment);
+            // Make sure response has an `id`, `content`, `createdAt` etc.
+            // If not, create a local object
+            const newCommentObj = {
+                id: response.comment.id || Date.now().toString(), // fallback id
+                content: newComment,
+                createdAt: response.createdAt || new Date().toISOString(),
+                user: user,
+                userId : user.id // add logged-in user details so profile image + name show
+            };
 
-            // Add the new comment to the list (backend returns complete comment with user info)
-            setComments(prev => [response, ...prev]);
-            setNewComment('');
-            
-            // Update comment count in stats
+            // Insert into comments list immediately
+            setComments(prev => [newCommentObj, ...prev]);
+
+            // Update stats count
             setStats(prev => ({
                 ...prev,
                 comments: (prev.comments || 0) + 1
             }));
-            
+
+            // Clear input
+            setNewComment('');
+
             Toast.show({
                 type: 'success',
-                text1: 'Comment Added',
-                text2: 'Your comment has been posted successfully'
+                text1: 'Comment posted successfully',
             });
-
         } catch (error) {
-            console.error('Failed to submit comment:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error posting comment',
+            });
+        }
+    };
+
+
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            await commentService.deleteComment(commentId);
+            setComments(prev => prev.filter(c => c.id !== commentId));
+
+            // Update stats count
+            setStats(prev => ({
+                ...prev,
+                comments: (prev.comments || 1) - 1
+            }));
+
+            Toast.show({
+                type: 'success',
+                text1: 'Deleted',
+                text2: 'Comment deleted successfully'
+            });
+        } catch (error) {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Failed to post comment. Please try again.'
+                text2: 'Failed to delete comment'
             });
-        } finally {
-            setIsSubmittingComment(false);
         }
-    }
+    };
+
+
+
+    const handleEditComment = async () => {
+        if (!editingContent.trim()) return;
+
+        try {
+            const updated = await commentService.editComment(editingCommentId, editingContent);
+
+            setComments(prev =>
+                prev.map(c =>
+                    c.id === editingCommentId
+                        ? { ...c, content: editingContent } // update local immediately
+                        : c
+                )
+            );
+
+            setIsEditing(false);
+            setEditingContent('');
+            setEditingCommentId(null);
+
+            Toast.show({
+                type: 'success',
+                text1: 'Comment updated'
+            });
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Failed to update comment'
+            });
+        }
+    };
+
+
+
 
     // Setup socket connection and real-time listeners
     useEffect(() => {
@@ -145,7 +217,7 @@ export default function TipsDetail({ route }) {
 
         // Connect to socket service
         sgtipSocketService.connect(user.id);
-        
+
         // Join SGTip room for live updates
         sgtipSocketService.joinSGTipRoom(route.params.id);
 
@@ -160,7 +232,7 @@ export default function TipsDetail({ route }) {
                         text2: `${data.likedBy.firstName} liked your SGTip: "${data.sgTipTitle}"`
                     });
                 }
-                
+
                 // Update activity feed
                 if (realTimeActivityRef.current) {
                     realTimeActivityRef.current.addActivity({
@@ -183,7 +255,7 @@ export default function TipsDetail({ route }) {
                         text2: `${data.sharedBy.firstName} shared your SGTip: "${data.sgTipTitle}"`
                     });
                 }
-                
+
                 // Update activity feed
                 if (realTimeActivityRef.current) {
                     realTimeActivityRef.current.addActivity({
@@ -259,7 +331,7 @@ export default function TipsDetail({ route }) {
             const now = moment();
             const commentTime = moment(timestamp);
             const diffInMinutes = now.diff(commentTime, 'minutes');
-            
+
             if (diffInMinutes < 1) return 'Just now';
             if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
             if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
@@ -269,40 +341,42 @@ export default function TipsDetail({ route }) {
         return (
             <View style={styles.commentListRenderConatiner}>
                 <View style={styles.renderImageText}>
-                    <Image 
-                        source={item.user?.profileImage ? { uri: item.user.profileImage } : Images.homeProfile} 
-                        style={styles.profileImage} 
-                    />
+                    {
+                       item.user?.profileImage ? 
+                       <Image
+                           source={ { uri: item.user.profileImage } }
+                           style={styles.profileImage}
+                       />
+                       :
+                        <Icon name="user-circle" size={Metrix.HorizontalSize(42)} color="white" />
+                    }
                     <View style={{ flex: 1 }}>
                         <Text style={styles.commentText}>{item.content}</Text>
-                        {item.isEdited && (
-                            <Text style={[styles.timeText, { fontSize: Metrix.FontExtraSmall, color: colors.gray }]}>
-                                (edited)
-                            </Text>
-                        )}
                     </View>
                 </View>
-                <Text style={styles.timeText}>{formatTime(item.createdAt)}</Text>
-                
-                {/* Render replies if any */}
-                {item.replies && item.replies.length > 0 && (
-                    <View style={{ marginLeft: Metrix.HorizontalSize(50), marginTop: Metrix.VerticalSize(10) }}>
-                        {item.replies.map((reply, index) => (
-                            <View key={reply.id} style={[styles.commentListRenderConatiner, { marginBottom: Metrix.VerticalSize(8) }]}>
-                                <View style={styles.renderImageText}>
-                                    <Image 
-                                        source={reply.user?.profileImage ? { uri: reply.user.profileImage } : Images.homeProfile} 
-                                        style={[styles.profileImage, { width: Metrix.HorizontalSize(32), height: Metrix.HorizontalSize(32) }]} 
-                                    />
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={[styles.commentText, { fontSize: Metrix.FontExtraSmall }]}>{reply.content}</Text>
-                                    </View>
-                                </View>
-                                <Text style={[styles.timeText, { fontSize: Metrix.FontExtraSmall }]}>{formatTime(reply.createdAt)}</Text>
-                            </View>
-                        ))}
+                <View style={styles.commentFooterContainer}>
+                    <Text style={styles.timeText}>{formatTime(item.createdAt)}</Text>
+                    <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(10) }}>
+                        {
+                            user.id === item.userId &&
+                            <TouchableOpacity activeOpacity={0.8}
+                                onPress={() => {
+                                    setEditingCommentId(item.id);
+                                    setEditingContent(item.content);
+                                    setIsEditing(true);
+                                }}>
+                                <Text style={[styles.editDeleteText, { color: colors.buttonColor }]}>Edit</Text>
+                            </TouchableOpacity>
+                        }
+                        {
+                            user.id === item.userId || sgtipDetail.authorId === user.id ?
+                                <TouchableOpacity activeOpacity={0.8} onPress={() => handleDeleteComment(item.id)}>
+                                    <Text style={[styles.editDeleteText, { color: colors.redColor }]}>Delete</Text>
+                                </TouchableOpacity>
+                                : null
+                        }
                     </View>
-                )}
+                </View>
             </View>
         );
     };
@@ -310,8 +384,8 @@ export default function TipsDetail({ route }) {
 
 
     return (
-        <KeyboardAvoidingView 
-            style={styles.mainContainer} 
+        <KeyboardAvoidingView
+            style={styles.mainContainer}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
@@ -323,173 +397,182 @@ export default function TipsDetail({ route }) {
                 isAuthor={user?.id === sgtipDetail.author?.id}
                 onActivityPress={handleActivityPress}
             />
-            
-            <ScrollView 
-                style={{ flex: 1 }}
-                contentContainerStyle={{ flexGrow: 1 }}
+            <View style={styles.topContainer}>
+                <BackArrowIcon />
+                <NavBar title={"SG Tip"} />
+            </View>
+
+            <FlatList
+                data={comments}
+                renderItem={renderComment}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={{ paddingBottom: Metrix.VerticalSize(20), gap: Metrix.VerticalSize(15) }}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
-            >
-                <View style={styles.topContainer}>
-                    <BackArrowIcon />
-                    <NavBar title={"SG Tip"} />
-                </View>
 
-            <View style={styles.tipTitleConatiner}>
-                <View style={styles.tipTitle}>
-                    <TipsTabIcon width={24} height={24} color={colors.buttonColor} />
-                    <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{sgtipDetail.title}</Text>
-                </View>
-                <View>
-                    <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{sgtipDetail.author.firstName}{" "}{sgtipDetail.author.lastName}</Text>
-                </View>
-            </View>
+                // 👇 Top part of your screen (tip details, actions, add comment box)
+                ListHeaderComponent={
+
+                    <>
+                        <View style={styles.tipTitleConatiner}>
+                            <View style={styles.tipTitle}>
+                                <TipsTabIcon width={24} height={24} color={colors.buttonColor} />
+                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{sgtipDetail.title}</Text>
+                            </View>
+                            <View>
+                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{sgtipDetail.author.firstName}{" "}{sgtipDetail.author.lastName}</Text>
+                            </View>
+                        </View>
 
 
-            <View style={styles.categoryEarnContainer}>
-                <View style={styles.categoryContainer}>
-                    <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold }}>Category:</Text>
-                    <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterRegular }}>{sgtipDetail.category.name}</Text>
-                </View>
-                <View style={styles.earnConatiner}>
-                    <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold }}>Points Earned</Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5) }}>
-                        <GreenBitIcon />
-                        <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>{sgtipDetail.stats.totalPointsEarned}</Text>
-                    </View>
-                </View>
-            </View>
+                        <View style={styles.categoryEarnContainer}>
+                            <View style={styles.categoryContainer}>
+                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold }}>Category:</Text>
+                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterRegular }}>{sgtipDetail.category.name}</Text>
+                            </View>
+                            <View style={styles.earnConatiner}>
+                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold }}>Points Earned</Text>
+                                <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(5) }}>
+                                    <GreenBitIcon />
+                                    <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterBold }}>{sgtipDetail.stats.totalPointsEarned}</Text>
+                                </View>
+                            </View>
+                        </View>
 
-            <View style={styles.descriptionImgContainer}>
-                <Text>{sgtipDetail.description}</Text>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: Metrix.VerticalSize(15) }}>
-                    <View style={styles.SGTipimageContainer}>
-                        {route.params.imageArray[0] && (
-                            <TouchableOpacity onPress={() => openImageModal(route.params.imageArray[0])}>
-                                <Image source={{ uri: route.params.imageArray[0] }} style={styles.SGTipupdateImage} />
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                    <View style={styles.SGTipimageContainer}>
-                        {
-                            route.params.imageArray[1] &&
-                            <Image source={{ uri: route.params.imageArray[1] }} style={styles.SGTipupdateImage} />
-                        }
-                    </View>
-                    <View style={styles.SGTipimageContainer}>
-                        {
-                            route.params.imageArray[2] &&
-                            <Image source={{ uri: route.params.imageArray[2] }} style={styles.SGTipupdateImage} />
-                        }
-                    </View>
-                </View>
-            </View>
+                        <View style={styles.descriptionImgContainer}>
+                            <Text>{sgtipDetail.description}</Text>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: Metrix.VerticalSize(15) }}>
+                                <View style={styles.SGTipimageContainer}>
+                                    {route.params.imageArray[0] && (
+                                        <TouchableOpacity onPress={() => openImageModal(route.params.imageArray[0])}>
+                                            <Image source={{ uri: route.params.imageArray[0] }} style={styles.SGTipupdateImage} />
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                                <View style={styles.SGTipimageContainer}>
+                                    {
+                                        route.params.imageArray[1] &&
+                                        <Image source={{ uri: route.params.imageArray[1] }} style={styles.SGTipupdateImage} />
+                                    }
+                                </View>
+                                <View style={styles.SGTipimageContainer}>
+                                    {
+                                        route.params.imageArray[2] &&
+                                        <Image source={{ uri: route.params.imageArray[2] }} style={styles.SGTipupdateImage} />
+                                    }
+                                </View>
+                            </View>
+                        </View>
 
-            {/* Like and Share Actions */}
-            <SGTipActions
-                sgTipId={route.params.id}
-                userId={user?.id}
-                authorId={sgtipDetail.author?.id}
-                initialStats={stats}
-                onStatsUpdate={handleStatsUpdate}
-                sgTipData={{
-                    title: sgtipDetail.title,
-                    description: sgtipDetail.description,
-                    author: sgtipDetail.author,
-                    isLiked: sgtipDetail.isLiked || false, // Use existing like status from API response
-                    hasShared: sgtipDetail.isShared || false // Use existing share status from API response (note: field name is isShared, not hasShared)
-                }}
-            />
-
-            <View style={styles.commentContainer}>
-                <View style={styles.commentTopContainer}>
-                    <CommentLogo />
-                    <Text style={styles.commentHeading}>Comments ({sgtipDetail.stats?.comments || 0})</Text>
-                </View>
-
-                {/* Add Comment Section */}
-                <View style={{ marginTop: Metrix.VerticalSize(15), marginBottom: Metrix.VerticalSize(10) }}>
-                    <TextInput
-                        style={{
-                            borderWidth: 1,
-                            borderColor: colors.borderColor,
-                            borderRadius: Metrix.VerticalSize(8),
-                            padding: Metrix.HorizontalSize(12),
-                            fontSize: Metrix.FontSmall,
-                            fontFamily: fonts.InterRegular,
-                            minHeight: Metrix.VerticalSize(80),
-                            maxHeight: Metrix.VerticalSize(120),
-                            textAlignVertical: 'top',
-                            backgroundColor: colors.white
-                        }}
-                        placeholder="Write a comment..."
-                        placeholderTextColor={colors.gray}
-                        value={newComment}
-                        onChangeText={setNewComment}
-                        multiline
-                        maxLength={500}
-                        returnKeyType="default"
-                        blurOnSubmit={false}
-                    />
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: Metrix.VerticalSize(8) }}>
-                        <Text style={{ fontSize: Metrix.FontExtraSmall, color: colors.gray }}>
-                            {newComment.length}/500 characters
-                        </Text>
-                        <TouchableOpacity
-                            style={{
-                                backgroundColor: newComment.trim() ? colors.buttonColor : colors.borderColor,
-                                paddingHorizontal: Metrix.HorizontalSize(20),
-                                paddingVertical: Metrix.VerticalSize(8),
-                                borderRadius: Metrix.VerticalSize(20),
-                                opacity: isSubmittingComment ? 0.6 : 1
+                        {/* Like and Share Actions */}
+                        <SGTipActions
+                            sgTipId={route.params.id}
+                            userId={user?.id}
+                            authorId={sgtipDetail.author?.id}
+                            initialStats={stats}
+                            onStatsUpdate={handleStatsUpdate}
+                            sgTipData={{
+                                title: sgtipDetail.title,
+                                description: sgtipDetail.description,
+                                author: sgtipDetail.author,
+                                isLiked: sgtipDetail.isLiked || false, // Use existing like status from API response
+                                hasShared: sgtipDetail.isShared || false // Use existing share status from API response (note: field name is isShared, not hasShared)
                             }}
-                            onPress={handleSubmitComment}
-                            disabled={!newComment.trim() || isSubmittingComment}
-                        >
-                            {isSubmittingComment ? (
-                                <ActivityIndicator size="small" color={colors.white} />
-                            ) : (
-                                <Text style={{
-                                    color: colors.white,
-                                    fontSize: Metrix.FontSmall,
-                                    fontFamily: fonts.InterSemiBold
-                                }}>
-                                    Post
-                                </Text>
-                            )}
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                        />
 
-                {/* Comments List */}
-                <View style={styles.commentsSection}>
-                    {loadingComments ? (
+                        <View style={styles.commentContainer}>
+                            <View style={styles.commentTopContainer}>
+                                <CommentLogo />
+                                <Text style={styles.commentHeading}>Comments ({sgtipDetail.stats?.comments || 0})</Text>
+                            </View>
+
+                            {/* Add Comment Section */}
+                            <View style={{ marginTop: Metrix.VerticalSize(15), marginBottom: Metrix.VerticalSize(10) }}>
+                                <TextInput
+                                    style={{
+                                        borderWidth: 1,
+                                        borderColor: colors.borderColor,
+                                        borderRadius: Metrix.VerticalSize(8),
+                                        padding: Metrix.HorizontalSize(12),
+                                        fontSize: Metrix.FontSmall,
+                                        fontFamily: fonts.InterRegular,
+                                        minHeight: Metrix.VerticalSize(80),
+                                        maxHeight: Metrix.VerticalSize(120),
+                                        textAlignVertical: 'top',
+                                        backgroundColor: colors.white
+                                    }}
+                                    placeholder="Write a comment..."
+                                    placeholderTextColor={colors.gray}
+                                    value={newComment}
+                                    onChangeText={setNewComment}
+                                    multiline
+                                    maxLength={500}
+                                    returnKeyType="default"
+                                    blurOnSubmit={false}
+                                />
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: Metrix.VerticalSize(8) }}>
+                                    <Text style={{ fontSize: Metrix.FontExtraSmall, color: colors.gray }}>
+                                        {newComment.length}/500 characters
+                                    </Text>
+                                    <TouchableOpacity
+                                        style={{
+                                            backgroundColor: newComment.trim() ? colors.buttonColor : colors.borderColor,
+                                            paddingHorizontal: Metrix.HorizontalSize(20),
+                                            paddingVertical: Metrix.VerticalSize(8),
+                                            borderRadius: Metrix.VerticalSize(20),
+                                            opacity: isSubmittingComment ? 0.6 : 1
+                                        }}
+                                        onPress={handleSubmitComment}
+                                        disabled={!newComment.trim() || isSubmittingComment}
+                                    >
+                                        {isSubmittingComment ? (
+                                            <ActivityIndicator size="small" color={colors.white} />
+                                        ) : (
+                                            <Text style={{
+                                                color: colors.white,
+                                                fontSize: Metrix.FontSmall,
+                                                fontFamily: fonts.InterSemiBold
+                                            }}>
+                                                Post
+                                            </Text>
+                                        )}
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </>
+
+                }
+
+                // 👇 Shows loader or empty state after the list
+                ListFooterComponent={
+                    loadingComments ? (
                         <View style={{ alignItems: 'center', paddingVertical: Metrix.VerticalSize(20) }}>
                             <ActivityIndicator size="small" color={colors.buttonColor} />
-                            <Text style={{ marginTop: Metrix.VerticalSize(10), color: colors.gray }}>Loading comments...</Text>
+                            <Text style={{ marginTop: Metrix.VerticalSize(10), color: colors.gray }}>
+                                Loading comments...
+                            </Text>
                         </View>
-                    ) : (
-                        <FlatList 
-                            data={comments}
-                            renderItem={renderComment}
-                            keyExtractor={(item) => item.id}
-                            contentContainerStyle={{ gap: Metrix.VerticalSize(15) }}
-                            showsVerticalScrollIndicator={false}
-                            ListEmptyComponent={
-                                <View style={{ alignItems: 'center', paddingVertical: Metrix.VerticalSize(20) }}>
-                                    <Text style={{ color: colors.gray, fontSize: Metrix.FontSmall }}>No comments yet. Be the first to comment!</Text>
-                                </View>
-                            }
-                        />
-                    )}
-                </View>
-            </View>
+                    ) : null
+                }
 
-            </ScrollView>
+                // 👇 Empty comments list state
+                ListEmptyComponent={
+                    !loadingComments && (
+                        <View style={{ alignItems: 'center', paddingVertical: Metrix.VerticalSize(20) }}>
+                            <Text style={{ color: colors.gray, fontSize: Metrix.FontSmall }}>
+                                No comments yet. Be the first to comment!
+                            </Text>
+                        </View>
+                    )
+                }
+            />
+
+
 
             <Modal visible={imageModalVisible} transparent animationType="fade">
-                <View style={{ flex: 1,backgroundColor: "rgba(0,0,0,0.5)", justifyContent: 'center', alignItems: 'center' }}>
-                    <TouchableOpacity style={{ position: 'absolute', top: Metrix.VerticalSize(50), right: Metrix.HorizontalSize(20) ,zIndex : 1}} onPress={closeImageModal}>
+                <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: 'center', alignItems: 'center' }}>
+                    <TouchableOpacity style={{ position: 'absolute', top: Metrix.VerticalSize(50), right: Metrix.HorizontalSize(20), zIndex: 1 }} onPress={closeImageModal}>
                         <CrossIcon strokeColor='white' />
                     </TouchableOpacity>
                     {selectedImage && (
@@ -500,6 +583,47 @@ export default function TipsDetail({ route }) {
                     )}
                 </View>
             </Modal>
+
+            <Modal visible={isEditing} transparent animationType="slide">
+                <View style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(0,0,0,0.5)"
+                }}>
+                    <View style={{
+                        backgroundColor: colors.white,
+                        width: "90%",
+                        padding: 20,
+                        borderRadius: 10
+                    }}>
+                        <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterRegular, marginBottom: Metrix.VerticalSize(10) }}>Edit Comment</Text>
+                        <TextInput
+                            value={editingContent}
+                            onChangeText={setEditingContent}
+                            style={{
+                                borderWidth: 1,
+                                borderColor: colors.borderColor,
+                                borderRadius: 6,
+                                padding: Metrix.HorizontalSize(10),
+                                minHeight: Metrix.VerticalSize(80),
+                                textAlignVertical: "top"
+                            }}
+                            multiline
+                        />
+
+                        <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 10 }}>
+                            <TouchableOpacity onPress={() => setIsEditing(false)} style={{ marginRight: 15 }}>
+                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterRegular }}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleEditComment}>
+                                <Text style={{ color: colors.buttonColor, fontSize: Metrix.FontSmall, fontFamily: fonts.InterRegular }}>Save</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
 
         </KeyboardAvoidingView>
     );

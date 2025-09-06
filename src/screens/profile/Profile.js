@@ -11,6 +11,7 @@ import { logout } from '../../redux/Actions/authActions/loginAction';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { BellIcon, GreenBitIcon, LogoutIcon, NotificationIcon, RightArrowIcon, SgBidIcon, SgItemsIcon, SgProfileLogo, SgPtsIcon, SgReviewsIcon, SgSettings, SgTipsIcon } from '../../assets/svg';
+import { CommonActions } from '@react-navigation/native';
 
 
 
@@ -80,13 +81,24 @@ export default function Profile({ navigation }) {
     const { loading, error, user } = useSelector((state) => state.login);
     const dispatch = useDispatch();
 
-    const handleLogout = () => {
-        dispatch(logout());
-        Toast.show({
-            type: 'success',
-            text1: "Logout Successfully",
-        });
-        navigation.navigate('Login');
+    const handleLogout = async () => {
+        try {
+            await dispatch(logout()); // wait until user is cleared from Redux
+            Toast.show({
+                type: 'success',
+                text1: "Logout Successfully",
+            });
+        } catch (error) {
+            console.log(error);
+        } finally {
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: 'Login' }], // Go to Login stack after logout
+                })
+            );
+
+        }
     };
 
     const handleItemPress = (item) => {

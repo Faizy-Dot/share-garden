@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: Metrix.HorizontalSize(15),
         flexDirection: "row",
         alignItems: "center",
-        justifyContent : "space-between"
+        justifyContent: "space-between"
     },
     categoryEarnContainer: {
         borderTopWidth: 1,
@@ -83,14 +83,15 @@ const styles = StyleSheet.create({
     profileImage: {
         width: Metrix.HorizontalSize(42),
         height: Metrix.HorizontalSize(42),
+        borderRadius: Metrix.HorizontalSize(21),
+        alignSelf: "flex-start"
     },
     commentText: {
         fontSize: Metrix.FontSmall,
         fontFamily: fonts.InterRegular,
     },
     commentListRenderConatiner: {
-        // gap: Metrix.HorizontalSize(10),
-
+        paddingHorizontal: Metrix.HorizontalSize(20)
     },
     renderImageText: {
         gap: Metrix.HorizontalSize(10),
@@ -103,8 +104,18 @@ const styles = StyleSheet.create({
         fontSize: Metrix.normalize(11),
         fontFamily: fonts.InterRegular,
         color: colors.buttonColor,
-        paddingLeft: Metrix.HorizontalSize(50),
-        marginTop: Metrix.VerticalSize(3)
+    },
+    commentFooterContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: 'space-between',
+        marginTop: Metrix.VerticalSize(3),
+        paddingHorizontal: Metrix.HorizontalSize(10)
+    },
+    editDeleteText:{
+        textDecorationLine : "underline",
+        fontSize : Metrix.FontSmall,
+        fontFamily : fonts.InterSemiBold,
     }
 
 })
