@@ -122,7 +122,7 @@ export default function TipsDetail({ route }) {
                 content: newComment,
                 createdAt: response.createdAt || new Date().toISOString(),
                 user: user,
-                userId : user.id // add logged-in user details so profile image + name show
+                userId: user.id // add logged-in user details so profile image + name show
             };
 
             // Insert into comments list immediately
@@ -342,13 +342,13 @@ export default function TipsDetail({ route }) {
             <View style={styles.commentListRenderConatiner}>
                 <View style={styles.renderImageText}>
                     {
-                       item.user?.profileImage ? 
-                       <Image
-                           source={ { uri: item.user.profileImage } }
-                           style={styles.profileImage}
-                       />
-                       :
-                        <Icon name="user-circle" size={Metrix.HorizontalSize(42)} color="white" />
+                        item.user?.profileImage ?
+                            <Image
+                                source={{ uri: item.user.profileImage }}
+                                style={styles.profileImage}
+                            />
+                            :
+                            <Icon name="user-circle" size={Metrix.HorizontalSize(42)} color="white" />
                     }
                     <View style={{ flex: 1 }}>
                         <Text style={styles.commentText}>{item.content}</Text>
@@ -359,22 +359,26 @@ export default function TipsDetail({ route }) {
                     <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(10) }}>
                         {
                             user.id === item.userId &&
-                            <TouchableOpacity activeOpacity={0.8}
-                                onPress={() => {
-                                    setEditingCommentId(item.id);
-                                    setEditingContent(item.content);
-                                    setIsEditing(true);
-                                }}>
-                                <Text style={[styles.editDeleteText, { color: colors.buttonColor }]}>Edit</Text>
-                            </TouchableOpacity>
-                        }
-                        {
-                            user.id === item.userId || sgtipDetail.authorId === user.id ?
+                            <>
+                                <TouchableOpacity activeOpacity={0.8}
+                                    onPress={() => {
+                                        setEditingCommentId(item.id);
+                                        setEditingContent(item.content);
+                                        setIsEditing(true);
+                                    }}>
+                                    <Text style={[styles.editDeleteText, { color: colors.buttonColor }]}>Edit</Text>
+                                </TouchableOpacity>
+
                                 <TouchableOpacity activeOpacity={0.8} onPress={() => handleDeleteComment(item.id)}>
                                     <Text style={[styles.editDeleteText, { color: colors.redColor }]}>Delete</Text>
                                 </TouchableOpacity>
-                                : null
+                            </>
                         }
+
+
+
+
+
                     </View>
                 </View>
             </View>
