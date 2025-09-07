@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: "#DADADA",
-        borderRadius: Metrix.VerticalSize(20)
+        borderRadius: Metrix.VerticalSize(25)
     },
     timeText: {
         fontSize: Metrix.normalize(11),

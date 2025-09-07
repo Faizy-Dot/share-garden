@@ -21,7 +21,7 @@ const Stack = createNativeStackNavigator();
 
 function AppNavigator() {
   const { user } = useSelector((state) => state.login); // Fetch user from Redux state
-  
+
   useEffect(() => {
     setTimeout(() => {
       SplashScreen.hide();
@@ -55,8 +55,15 @@ function AppNavigator() {
                     ProductDetail: 'product/:id',
                   },
                 },
+                Tips: {
+                  screens: {
+                    TipsDetail: "sgtip/:id",  // maps /sgtip/12345 -> route.params.id = 12345
+                  },
+
+                }
               },
             },
+
             // Add other deep link routes as needed
           },
         },
@@ -101,7 +108,7 @@ function AppNavigator() {
                 <Stack.Screen name="SgTabs" component={SgTabNavigator} />
             }
             {
-              !user && 
+              !user &&
               <Stack.Screen name="Login" component={Login} />
             }
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
@@ -130,7 +137,7 @@ function AppNavigator() {
 export default function App() {
   return (
     <Provider store={store}>
-      <StripeProvider publishableKey="pk_test_51RkTv5BSnkvyM8bzS2oWw7fJjCGx63akot9KZANcw7iZDs84R1ifvEmhw3uoi7q8dTrGmkM4BEAUPHIWVjj48qCa00NAqg6aFC"> 
+      <StripeProvider publishableKey="pk_test_51RkTv5BSnkvyM8bzS2oWw7fJjCGx63akot9KZANcw7iZDs84R1ifvEmhw3uoi7q8dTrGmkM4BEAUPHIWVjj48qCa00NAqg6aFC">
         <AppNavigator />
         <Toast />
       </StripeProvider>

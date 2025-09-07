@@ -21,7 +21,6 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function TipsDetail({ route }) {
-    // console.log(route.params.imageArray)
 
     const [sgtipDetail, setSgtipDetail] = useState("")
     const [loading, setLoading] = useState(true);
@@ -46,7 +45,6 @@ export default function TipsDetail({ route }) {
         hasPrevPage: false
     });
 
-    console.log("commentss==>>", comments)
 
     const { user } = useSelector((state) => state.login);
     const realTimeActivityRef = useRef(null);
@@ -447,22 +445,26 @@ export default function TipsDetail({ route }) {
                             <Text>{sgtipDetail.description}</Text>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: Metrix.VerticalSize(15) }}>
                                 <View style={styles.SGTipimageContainer}>
-                                    {route.params.imageArray[0] && (
-                                        <TouchableOpacity onPress={() => openImageModal(route.params.imageArray[0])}>
-                                            <Image source={{ uri: route.params.imageArray[0] }} style={styles.SGTipupdateImage} />
+                                    {sgtipDetail.imagesArray[0] && (
+                                        <TouchableOpacity onPress={() => openImageModal(sgtipDetail.imagesArray[0])}>
+                                            <Image source={{ uri: sgtipDetail.imagesArray[0] }} style={styles.SGTipupdateImage} />
                                         </TouchableOpacity>
                                     )}
                                 </View>
                                 <View style={styles.SGTipimageContainer}>
                                     {
-                                        route.params.imageArray[1] &&
-                                        <Image source={{ uri: route.params.imageArray[1] }} style={styles.SGTipupdateImage} />
+                                        sgtipDetail.imagesArray[1] &&
+                                        <TouchableOpacity onPress={() => openImageModal(sgtipDetail.imagesArray[1])}>
+                                            <Image source={{ uri: sgtipDetail.imagesArray[1] }} style={styles.SGTipupdateImage} />
+                                        </TouchableOpacity>
                                     }
                                 </View>
                                 <View style={styles.SGTipimageContainer}>
                                     {
-                                        route.params.imageArray[2] &&
-                                        <Image source={{ uri: route.params.imageArray[2] }} style={styles.SGTipupdateImage} />
+                                        sgtipDetail.imagesArray[2] &&
+                                        <TouchableOpacity onPress={() => openImageModal(sgtipDetail.imagesArray[2])}>
+                                            <Image source={{ uri: sgtipDetail.imagesArray[2] }} style={styles.SGTipupdateImage} />
+                                        </TouchableOpacity>
                                     }
                                 </View>
                             </View>
@@ -632,3 +634,5 @@ export default function TipsDetail({ route }) {
         </KeyboardAvoidingView>
     );
 }
+
+

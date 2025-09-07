@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -42,6 +42,25 @@
             <data android:scheme="https" android:host="sharegarden.com" />
             <data android:scheme="https" android:host="www.sharegarden.com" />
         </intent-filter>
+
+        <!-- Deep linking for web URLs -->
+ <intent-filter android:autoVerify="true">
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+
+    <!-- Match SGTip links -->
+    <data
+        android:scheme="https"
+        android:host="sharegarden.com"
+        android:pathPrefix="/sgtip" />
+
+    <data
+        android:scheme="https"
+        android:host="www.sharegarden.com"
+        android:pathPrefix="/sgtip" />
+     </intent-filter>
+
       </activity>
     </application>
 </manifest>
