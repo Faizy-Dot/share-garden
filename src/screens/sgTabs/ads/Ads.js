@@ -1,4 +1,4 @@
-import { FlatList, Image, Text, View, ActivityIndicator, Alert, TouchableOpacity, Dimensions, TextInput } from "react-native";
+import { FlatList, Image, Text, View, ActivityIndicator, Alert, TouchableOpacity, TextInput } from "react-native";
 import { styles } from "./styles";
 import BackArrowIcon from "../../../components/backArrowIcon/BackArrowIcon";
 import NavBar from "../../../components/navBar/NavBar";
@@ -17,9 +17,7 @@ const fallbackImage = Images.homePopularListing;
 
 
 export default function AdsTabScreen() {
-    const screenWidth = Dimensions.get('window').width;
-    const itemWidth = (screenWidth - Metrix.HorizontalSize(45)) / 3; // 3 items per row with margins
-
+   
     const [loading, setLoading] = useState(false)
     const [ads, setAds] = useState([])
     const [searchResults, setSearchResults] = useState(null)
@@ -245,7 +243,7 @@ export default function AdsTabScreen() {
         const categoryName = item.category ? item.category.name : 'Uncategorized';
         
         return (
-            <View style={[styles.adsDataContainer, { width: itemWidth }]}>
+            <View style={styles.adsDataContainer}>
                 <Image source={imageSource} style={styles.image} />
                 <View style={styles.textContainer}>
                     <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
@@ -355,7 +353,7 @@ export default function AdsTabScreen() {
                     data={searchResults || ads}
                     keyExtractor={(item) => item.id}
                     renderItem={renderAdsData}
-                    numColumns={3}
+                    numColumns={2}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.adsDataStyle}
                     onEndReached={loadMoreAds}

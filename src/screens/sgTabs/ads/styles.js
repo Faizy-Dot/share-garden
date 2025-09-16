@@ -1,7 +1,10 @@
-import { StyleSheet } from "react-native"
+import { Dimensions, StyleSheet } from "react-native"
 import colors from "../../../config/Colors"
 import { Metrix } from "../../../config"
 import fonts from "../../../config/Fonts"
+
+const { width } = Dimensions.get('window');
+const productWidth = (width - (Metrix.HorizontalSize(40))) / 2;
 
 
 export const styles = StyleSheet.create({
@@ -18,10 +21,12 @@ export const styles = StyleSheet.create({
     // bottomContainer removed since we're using ListHeaderComponent
     adsDataStyle: {
         paddingBottom: Metrix.VerticalSize(20),
+        
     },
     rowContainer: {
         justifyContent: 'space-between',
         marginBottom: Metrix.VerticalSize(10),
+        gap : Metrix.HorizontalSize(7)
     },
     image: {
         height: Metrix.VerticalSize(120),
@@ -30,17 +35,18 @@ export const styles = StyleSheet.create({
         borderRadius: 8,
     },
     textContainer: {
-        
+
     },
     title: {
         fontSize: Metrix.FontSmall,
-        fontFamily: fonts.InterSemiBold
+        fontFamily: fonts.InterSemiBold,
+        height: Metrix.VerticalSize(45)
     },
     description: {
         fontSize: Metrix.normalize(8),
-        fontFamily : fonts.InterRegular,
-        color : "#168679",
-        height : 22
+        fontFamily: fonts.InterRegular,
+        color: "#168679",
+        height: Metrix.VerticalSize(25)
     },
     adsDataContainer: {
         flex: 1,
@@ -49,24 +55,20 @@ export const styles = StyleSheet.create({
         backgroundColor: colors.white,
         borderRadius: 8,
         padding: Metrix.HorizontalSize(5),
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
+        borderWidth: 1,
+        borderColor: colors.borderColor,
+        width: productWidth,
+
     },
     locationContainer: {
         flexDirection: "column",
         gap: Metrix.VerticalSize(2),
         marginTop: Metrix.VerticalSize(4),
     },
-    locationText:{
+    locationText: {
         fontSize: Metrix.normalize(8),
-        fontFamily : fonts.InterRegular,
-        color : "#646262"
+        fontFamily: fonts.InterRegular,
+        color: "#646262"
     },
     categoryText: {
         fontSize: Metrix.normalize(8),
@@ -146,20 +148,21 @@ export const styles = StyleSheet.create({
         gap: Metrix.HorizontalSize(10)
     },
     searchInput: {
-        height: 50,
+        height: Metrix.VerticalSize(50),
         backgroundColor: '#F3F3F3',
         borderWidth: 1,
         borderColor: '#E6E6E6',
-        borderRadius: 5,
-        paddingHorizontal: 15,
-        fontSize: 16,
-        color: '#000'
+        borderRadius: 3,
+        paddingHorizontal: Metrix.HorizontalSize(15),
+        fontSize: Metrix.FontRegular,
+        fontFamily : fonts.InterRegular,
+        color:  colors.black
     },
     clearButton: {
         position: 'absolute',
         right: Metrix.HorizontalSize(15),
-        top: '50%',
-        transform: [{ translateY: -12 }], // Half of the icon height (16px) to center it
+        // top: '50%',
+        // transform: [{ translateY: -12 }], // Half of the icon height (16px) to center it
         zIndex: 1,
         padding: Metrix.HorizontalSize(5), // Add padding for better touch target
     },

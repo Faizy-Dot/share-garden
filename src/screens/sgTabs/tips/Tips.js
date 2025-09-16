@@ -237,7 +237,7 @@ export default function TipsTabScreen({ navigation }) {
                     />
                     <View style={{ width: Metrix.HorizontalSize(200), gap: 10, height: Metrix.VerticalSize(116) }}>
                         <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterSemiBold, color: colors.buttonColor }}>{item.title}</Text>
-                        <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular }}>{item.description}</Text>
+                        <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular ,height : Metrix.VerticalSize(45) }}>{item.description}</Text>
                         {/* Tip Owner Name */}
                         <Text style={{ 
                             fontSize: Metrix.FontExtraSmall, 

@@ -4,7 +4,7 @@ import { Colors, Fonts, Metrix } from "../../../config";
 import fonts from "../../../config/Fonts";
 
 const { width } = Dimensions.get('window');
-const productWidth = (width - (Metrix.HorizontalSize(40))) / 3; // 40 = padding (15+15) + gaps between items (5+5)
+const productWidth = (width - (Metrix.HorizontalSize(40))) / 2; // 40 = padding (15+15) + gaps between items (5+5)
 
 const styles = StyleSheet.create({
     container: {
@@ -157,20 +157,15 @@ const styles = StyleSheet.create({
     productRow: {
         justifyContent: 'space-between',
         marginBottom: Metrix.VerticalSize(10),
+        // gap : 20
     },
     productContainer: {
         width: productWidth,
         backgroundColor: colors.white,
         borderRadius: Metrix.VerticalSize(8),
         padding: Metrix.VerticalSize(5),
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
+        borderWidth : 1,
+        borderColor : colors.borderColor
     },
     productImage: {
         width: '100%',
@@ -218,7 +213,7 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         flex: 1,
-        height: Metrix.VerticalSize(46),
+        height: Metrix.VerticalSize(50),
         backgroundColor: '#F3F3F3',
         borderWidth: 1,
         borderColor: '#E6E6E6',
@@ -234,8 +229,8 @@ const styles = StyleSheet.create({
     clearButton: {
         position: 'absolute',
         right: Metrix.HorizontalSize(15),
-        top: '50%',
-        transform: [{ translateY: -8 }], // Half of the icon height (16px) to center it
+        // top: '50%',
+        // transform: [{ translateY: -8 }], // Half of the icon height (16px) to center it
         zIndex: 1,
         padding: Metrix.HorizontalSize(5), // Add padding for better touch target
     },

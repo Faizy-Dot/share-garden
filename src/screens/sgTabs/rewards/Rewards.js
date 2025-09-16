@@ -139,7 +139,7 @@ export default function RewardsTabScreen({ navigation }) {
     const renderResults = ({ item }) => {
         return (
             <View style={styles.resultsContainer}>
-                <View>
+                <View style={{flex : 1 , paddingRight : Metrix.HorizontalSize(10)}}>
                     <Text style={styles.titleText}>{item.description || item.category || 'Transaction'}</Text>
                     <Text style={styles.itemsIdText}>
                         {item.type === 'EARNED' ? 'Earned' : 'Spent'} • {new Date(item.createdAt || item.date).toLocaleDateString()}

@@ -195,7 +195,7 @@ const ItemsTabScreen = () => {
                 data={searchResults || products}
                 renderItem={renderProduct}
                 keyExtractor={(item) => item.id}
-                numColumns={3}
+                numColumns={2}
                 columnWrapperStyle={styles.productRow}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.productList}

@@ -76,17 +76,16 @@ const styles = StyleSheet.create({
     resultsContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingHorizontal: 40,
+        alignContent : "center",
+        paddingHorizontal: 30,
         borderBottomWidth: 1,
         paddingVertical: Metrix.VerticalSize(10),
         borderStyle: "dotted",
-
+        width : "100%"
     },
     bitContainer: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
-        width: Metrix.HorizontalSize(68)
     },
     starImg:{
         width : Metrix.HorizontalSize(25),
