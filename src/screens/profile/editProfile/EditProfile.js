@@ -302,11 +302,11 @@ export default function EditProfile({ navigation }) {
         <View style={styles.container}>
             <View style={styles.content}>
                 <View style={{ gap: Metrix.VerticalSize(11) }}>
-                    <View style={{ marginTop: Metrix.VerticalSize(13), paddingHorizontal: Metrix.HorizontalSize(15), }}>
-                        <BackArrowIcon />
-                    </View>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", paddingHorizontal: Metrix.HorizontalSize(18), alignItems: "center" }}>
-                        <Text style={styles.editProfileText}>Edit Profile</Text>
+                    <View style={{ marginTop: Metrix.VerticalSize(13), paddingHorizontal: Metrix.HorizontalSize(15), flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: Metrix.HorizontalSize(15) }}>
+                            <BackArrowIcon />
+                            <Text style={styles.editProfileText}>Edit Profile</Text>
+                        </View>
                         <CustomButton width={Metrix.HorizontalSize(81)}
                             height={Metrix.VerticalSize(36)}
                             title={loading ? "Save..." : "Save"}
@@ -319,20 +319,20 @@ export default function EditProfile({ navigation }) {
                         gap: Metrix.HorizontalSize(20), paddingHorizontal: Metrix.HorizontalSize(20),
                         alignItems: "center"
                     }}>
-                        <TouchableOpacity 
-                            style={styles.imagePickerContainer} 
+                        <TouchableOpacity
+                            style={styles.imagePickerContainer}
                             onPress={handleImagePick}
                             disabled={imageLoading}
                         >
                             {profileImage || user.profileImage ? (
                                 <View style={styles.profileContainer}>
-                                    <Image 
-                                        source={{ uri: profileImage || user.profileImage }} 
+                                    <Image
+                                        source={{ uri: profileImage || user.profileImage }}
                                         style={styles.profileImage}
                                         resizeMode="cover"
                                     />
                                     <View style={styles.camerIconConatiner}>
-                                        <CameraIcon/>
+                                        <CameraIcon />
                                     </View>
                                 </View>
                             ) : (
@@ -422,7 +422,7 @@ export default function EditProfile({ navigation }) {
                         </View>
                         <View style={{ gap: Metrix.VerticalSize(7) }}>
                             <Text style={styles.userName}>Address</Text>
-                            <TextInput 
+                            <TextInput
                                 style={styles.inputs}
                                 value={address1}
                                 onChangeText={setAddress1}
@@ -534,27 +534,27 @@ export default function EditProfile({ navigation }) {
                     </View>
 
                     <View style={styles.connectionContainer}>
-                        <Text style={styles.contactInformationText}>Optional Information</Text>
+                        <Text style={styles.contactInformationText}>Social Connections</Text>
                         <View style={styles.connectionBoxes}>
-                            <View>
+                            {/* <View>
                                 <CustomButton width={"100%"} height={Metrix.VerticalSize(40)} backgroundColor={colors.white} borderColor={colors.black} borderWidth={1} borderRadius={Metrix.VerticalSize(3)} icon={<FontAwesome name="facebook" color="#1B70D4" style={styles.socialButtonIcon} />}
                                     title={"Disconnect"}
                                     color={colors.black} fontSize={Metrix.FontSmall} fontFamily={fonts.InterBold} />
                                 <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular, marginTop: Metrix.VerticalSize(5), flex: 1 }}>Sign in with Facebook and discover your trusted connections to buyers</Text>
-                            </View>
+                            </View> */}
                             <View>
                                 <CustomButton width={"100%"} height={Metrix.VerticalSize(40)} backgroundColor={colors.white} borderColor={colors.black} borderWidth={1} borderRadius={Metrix.VerticalSize(3)} icon={<FontAwesome name="google" color="#F8443E" style={styles.socialButtonIcon} />}
-                                    title={"Connect"}
+                                    title={"disconnect"}
                                     color={colors.black} fontSize={Metrix.FontSmall} fontFamily={fonts.InterBold} />
                                 <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular, marginTop: Metrix.VerticalSize(5) }}>Sign in with Gmail and discover your trusted connections to buyers</Text>
                             </View>
-                            <View>
+                            {/* <View>
                                 <CustomButton width={"100%"} height={Metrix.VerticalSize(40)} backgroundColor={colors.white} borderColor={colors.black} borderWidth={1} borderRadius={Metrix.VerticalSize(3)} icon={<FontAwesome name="apple" color={colors.black} style={styles.socialButtonIcon} />}
                                     title={"Connect"}
                                     color={colors.black} fontSize={Metrix.FontSmall} fontFamily={fonts.InterBold} />
                                 <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular, marginTop: Metrix.VerticalSize(5) }}>Sign in with Apple and discover your trusted connections
                                     to buyers</Text>
-                            </View>
+                            </View> */}
                         </View>
 
                     </View>

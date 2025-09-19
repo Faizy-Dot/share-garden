@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     },
     description: {
         width: "100%",
-        height: Metrix.VerticalSize(106),
+        height: Metrix.VerticalSize(160),
         borderWidth: 1,
         paddingHorizontal: Metrix.HorizontalSize(20),
         borderRadius: Metrix.LightRadius,

@@ -98,10 +98,11 @@ const styles = StyleSheet.create({
     height : Metrix.VerticalSize(108),
     borderWidth : 1,
     borderColor : colors.borderColor,
-    justifyContent : "space-around",
+    justifyContent : "space-between",
     alignItems : "center",
     borderRadius : Metrix.VerticalSize(3),
-    flexDirection : "row"
+    flexDirection : "row",
+    paddingHorizontal : Metrix.HorizontalSize(20)
   },
   dotContainer: {
     flexDirection: 'row',

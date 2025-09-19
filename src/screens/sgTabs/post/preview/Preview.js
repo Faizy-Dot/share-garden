@@ -3,7 +3,7 @@ import { Image, Modal, Switch, Text, TextInput, TouchableOpacity, View, ScrollVi
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import BackArrowIcon from "../../../../components/backArrowIcon/BackArrowIcon";
 import colors from "../../../../config/Colors";
@@ -15,6 +15,7 @@ import CustomButton from "../../../../components/Button/Button";
 import axiosInstance from '../../../../config/axios';
 import { BlackBitIcon, CashIcon, CrossIcon, ModalInfoIcon, ModalSuccessLogo, SgTipsIcon, TimeIcon, TipsTabIcon } from "../../../../assets/svg";
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import { updateUserProfile } from "../../../../redux/Actions/authActions/loginAction";
 
 
 export default function PostTabScreen({ navigation, route }) {
@@ -35,6 +36,7 @@ export default function PostTabScreen({ navigation, route }) {
   const [navigateTimeout, setNavigateTimeout] = useState(null);
 
   const { user } = useSelector((state) => state.login)
+  const dispatch = useDispatch();
 
   const {
     title,
@@ -51,7 +53,7 @@ export default function PostTabScreen({ navigation, route }) {
     forDraft
   } = route.params;
 
-
+  console.log("fordraft==>>", forDraft)
 
 
   const handleInput = (text, setter, field) => {
@@ -205,7 +207,7 @@ export default function PostTabScreen({ navigation, route }) {
           name: `image${index}.jpg`,
         });
       });
-
+      formData.append('existingImages', "");
       // Debug logs
       console.log('Form Data Contents:', {
         title,
@@ -224,10 +226,10 @@ export default function PostTabScreen({ navigation, route }) {
       });
 
 
-      if (forDraft) {
+      if (forDraft.id) {
 
 
-
+        console.log("checkkkk")
 
         const response = await axiosInstance.put(
           `/api/products/${forDraft.id}`,
@@ -270,8 +272,8 @@ export default function PostTabScreen({ navigation, route }) {
           setNavigateTimeout(timeout);
         }
 
-      }else{
-         const response = await axiosInstance.post(
+      } else {
+        const response = await axiosInstance.post(
           `/api/products/createProduct`,
           formData,
           {
@@ -390,6 +392,7 @@ export default function PostTabScreen({ navigation, route }) {
 
 
       if (response.status === 201 || response.status === 200) {
+        dispatch(updateUserProfile({ sgPoints: (user?.sgPoints || 0) + 100 }));
         setModalVisible(true);
         if (isDraft) {
           setDraft(true);

@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
     amount: {
         flexDirection: "row",
         alignItems: "center",
-        alignSelf: "flex-start",
         gap: Metrix.HorizontalSize(5),
     },
     title: {
@@ -44,7 +43,7 @@ const styles = StyleSheet.create({
     description: {
         fontSize: Metrix.FontExtraSmall,
         fontFamily: fonts.InterRegular,
-        width: Metrix.HorizontalSize(200),
+        height :Metrix.VerticalSize(60)
     },
     highestBidText: {
         fontSize: Metrix.FontRegular,
@@ -67,31 +66,31 @@ const styles = StyleSheet.create({
     draftsContainer: {
         borderWidth: 1,
         borderColor: colors.borderColor,
-        padding : Metrix.VerticalSize(10),
-        gap : Metrix.VerticalSize(10),
+        padding: Metrix.VerticalSize(10),
+        gap: Metrix.VerticalSize(10),
         borderRadius: Metrix.VerticalSize(3),
     },
     favouritesContainer: {
         flexDirection: "row",
         borderWidth: 1,
         borderColor: colors.borderColor,
-        gap : Metrix.HorizontalSize(10),
-        padding : Metrix.VerticalSize(10),
+        gap: Metrix.HorizontalSize(10),
+        padding: Metrix.VerticalSize(10),
         borderRadius: Metrix.VerticalSize(3),
     },
-    draftButtonContainer:{
-        flexDirection : "row",
-        gap :Metrix.HorizontalSize(5),
-        justifyContent : "flex-end",
+    draftButtonContainer: {
+        flexDirection: "row",
+        gap: Metrix.HorizontalSize(5),
+        justifyContent: "flex-end",
     },
-    favouritesButtonContainer:{
-        flexDirection : "row",
-        gap :Metrix.HorizontalSize(5),
-        justifyContent : "flex-end",
-        alignItems : "center",
-        gap : Metrix.HorizontalSize(40)
+    favouritesButtonContainer: {
+        flexDirection: "row",
+        gap: Metrix.HorizontalSize(5),
+        justifyContent: "flex-end",
+        alignItems: "center",
+        gap: Metrix.HorizontalSize(40)
     },
-     modalContainer: {
+    modalContainer: {
         flex: 1,
         backgroundColor: "rgba(0,0,0,0.3)", // Transparent background
         justifyContent: "center",
@@ -127,7 +126,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.InterSemiBold,
     },
     closeButton: {
-        alignSelf : "flex-end"
+        alignSelf: "flex-end"
     },
 })
 

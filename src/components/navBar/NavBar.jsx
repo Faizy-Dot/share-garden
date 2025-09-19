@@ -18,6 +18,8 @@ export default function NavBar({
 }) {
     const { user } = useSelector((state) => state.login);
 
+    // console.log("from navbar=>>" , user)
+
 
     const navigation = useNavigation()
     return (

@@ -500,18 +500,18 @@ const ProductDetail = ({ route, navigation }) => {
               <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
                 Highest Bid: <Text style={{ color: colors.black }}>{displayData.highestBid || 0}</Text>
               </Text>
-              <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
+              {/* <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
                 Status: <Text style={{ color: colors.black }}>{displayData.status || 'Active'}</Text>
-              </Text>
+              </Text> */}
             </>
           ) : (
             <>
               <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
                 Total Views: <Text style={{ color: colors.black }}>{displayData.views || 0}</Text>
               </Text>
-              <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
+              {/* <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
                 Status: <Text style={{ color: colors.black }}>{displayData.status || 'Available'}</Text>
-              </Text>
+              </Text> */}
             </>
           )}
         </View>
@@ -571,11 +571,7 @@ const ProductDetail = ({ route, navigation }) => {
           >
             <NotificationIcon />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => Linking.openURL(`tel:${displayData.seller?.phoneNumber}`)}
-          >
-            <CallIcon />
-          </TouchableOpacity>
+         
         </View>
       </View>
 

@@ -151,8 +151,8 @@ export default function MySGItems({ navigation }) {
                     source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
                     style={styles.postedImg}
                 />
-                <View style={{ gap: Metrix.VerticalSize(15) }}>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <View style={{ gap: Metrix.VerticalSize(15), flex: 1 }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
                         <Text style={styles.title}>{item.title}</Text>
                         {item.isSGPoints ? (
                             <View style={styles.amount}>
@@ -166,7 +166,18 @@ export default function MySGItems({ navigation }) {
                             </View>
                         )}
                     </View>
-                    <Text style={styles.description}>{item.description}</Text>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
+                        <Text style={styles.description}>{item.description}</Text>
+                        <CustomButton title={"EDIT"}
+                            width={Metrix.HorizontalSize(70)}
+                            height={Metrix.VerticalSize(30)}
+                            borderRadius={4}
+                            fontSize={Metrix.FontRegular}
+                            onPress={() => navigation.navigate("Post", {
+                                screen: "PostList",
+                                params: { ...item, SGItems: true }
+                            })} />
+                    </View>
                 </View>
             </View>
             {item.isSGPoints && (
@@ -219,7 +230,7 @@ export default function MySGItems({ navigation }) {
                         source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
                         style={styles.postedImg}
                     />
-                    <View style={{ gap: Metrix.VerticalSize(15) }}>
+                    <View style={{ gap: Metrix.VerticalSize(15), flex: 1 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             <Text style={styles.title}>{item.title}</Text>
                             {item.isSGPoints ? (
@@ -238,7 +249,7 @@ export default function MySGItems({ navigation }) {
                     </View>
                 </View>
                 <View style={styles.draftButtonContainer}>
-                    <CustomButton title={"PREVIEW"}
+                    <CustomButton title={"EDIT"}
                         backgroundColor={"#C4C4C4"}
                         width={Metrix.HorizontalSize(100)}
                         height={Metrix.VerticalSize(36)}
@@ -277,7 +288,7 @@ export default function MySGItems({ navigation }) {
                         source={{ uri: product.images.split(',')[0] }}
                         style={styles.postedImg}
                     />
-                    <View style={{ gap: Metrix.VerticalSize(15) }}>
+                    <View style={{ gap: Metrix.VerticalSize(15), flex: 1 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             <Text style={styles.title}>{product.title}</Text>
                             {product.isSGPoints ? (

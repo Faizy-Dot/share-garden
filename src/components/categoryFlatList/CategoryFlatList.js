@@ -11,33 +11,34 @@ import {
   MusicIcon, OthersIcon, PetsIcon, PropertyIcon, ServicesIcon, 
   SportsIcon, StationaryIcon, ToolsIcon, ToysIcon, VehiclesIcon 
 } from '../../assets/svg/categoryIconSVG';
+import colors from '../../config/Colors';
 
 // ✅ Default categories (all SVGs now)
-const defaultCategories = [
-  { id: "1", name: "Mobile", icon: MobileIcon },
-  { id: "2", name: "Furniture", icon: FurnitureIcon },
-  { id: "3", name: "Electronics", icon: ElectronicIcon },
-  { id: "4", name: "Fashion", icon: FashionIcon },
-  { id: "5", name: "Books", icon: BooksIcon },
-  { id: "6", name: "Tools", icon: ToolsIcon },
-  { id: "7", name: "Luxury", icon: LuxuryIcon },
-  { id: "8", name: "Services", icon: ServicesIcon },
-  { id: "9", name: "Vehicles", icon: VehiclesIcon },
-  { id: "10", name: "Property", icon: PropertyIcon },
-  { id: "11", name: "Baby", icon: BabyIcon },
-  { id: "12", name: "Toys", icon: ToysIcon },
-  { id: "13", name: "Pets", icon: PetsIcon },
-  { id: "14", name: "Food", icon: FoodDrinksIcon },
-  { id: "15", name: "Sports", icon: SportsIcon },
-  { id: "16", name: "Stationary", icon: StationaryIcon },
-  { id: "17", name: "Music", icon: MusicIcon },
-  { id: "18", name: "Art", icon: ArtIcon },
-  { id: "19", name: "Others", icon: OthersIcon },
-];
+// const defaultCategories = [
+//   { id: "1", name: "Mobile", icon: MobileIcon },
+//   { id: "2", name: "Furniture", icon: FurnitureIcon },
+//   { id: "3", name: "Electronics", icon: ElectronicIcon },
+//   { id: "4", name: "Fashion", icon: FashionIcon },
+//   { id: "5", name: "Books", icon: BooksIcon },
+//   { id: "6", name: "Tools", icon: ToolsIcon },
+//   { id: "7", name: "Luxury", icon: LuxuryIcon },
+//   { id: "8", name: "Services", icon: ServicesIcon },
+//   { id: "9", name: "Vehicles", icon: VehiclesIcon },
+//   { id: "10", name: "Property", icon: PropertyIcon },
+//   { id: "11", name: "Baby", icon: BabyIcon },
+//   { id: "12", name: "Toys", icon: ToysIcon },
+//   { id: "13", name: "Pets", icon: PetsIcon },
+//   { id: "14", name: "Food", icon: FoodDrinksIcon },
+//   { id: "15", name: "Sports", icon: SportsIcon },
+//   { id: "16", name: "Stationary", icon: StationaryIcon },
+//   { id: "17", name: "Music", icon: MusicIcon },
+//   { id: "18", name: "Art", icon: ArtIcon },
+//   { id: "19", name: "Others", icon: OthersIcon },
+// ];
 
 export default function CategoryFlatList({ onCategorySelect, selectedCategory }) {
   const [selectedId, setSelectedId] = useState(selectedCategory);
-  const [categories, setCategories] = useState(defaultCategories);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     fetchCategories();
@@ -102,10 +103,10 @@ export default function CategoryFlatList({ onCategorySelect, selectedCategory })
         activeOpacity={0.8}
         style={{ width: Metrix.HorizontalSize(73), height: Metrix.VerticalSize(130) }}
       >
-        <View style={[styles.category, isSelect && { backgroundColor: "#5B5B5B" }]}>
-          <IconComponent  color={isSelect ? "#fff" : "#000"}  />
+        <View style={styles.category}>
+          <IconComponent   />
         </View>
-        <Text style={styles.categoryText}>{item.name}</Text>
+        <Text style={[styles.categoryText, isSelect && {color: colors.buttonColor }]}>{item.name}</Text>
       </TouchableOpacity>
     );
   };

@@ -146,12 +146,11 @@ const styles = StyleSheet.create({
 
     imagePickerContainer: {
         alignSelf: 'center',
-        marginVertical: 20,
     },
     imagePlaceholder: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: Metrix.HorizontalSize(100),
+        height: Metrix.HorizontalSize(100),
+        borderRadius: Metrix.HorizontalSize(50),
         backgroundColor: '#f0f0f0',
         justifyContent: 'center',
         alignItems: 'center',

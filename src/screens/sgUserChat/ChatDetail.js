@@ -50,6 +50,21 @@ const ChatDetail = ({ route, navigation }) => {
     return userId;
   };
 
+  console.log("product info from chat==>>", productInfo)
+
+  // const fetchProductDetail = async () => {
+  //   try {
+  //     const response = await axiosInstance.get(`/api/products/316bec87-99a6-4242-b022-9c1a993b908a`)
+  //     console.log("singl product==>>", response)
+  //   } catch (err) {
+  //     console.log(err)
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   fetchProductDetail()
+  // }, [])
+
   // Get the correct product info
   const getProductInfo = () => {
     if (!productInfo) {
@@ -374,18 +389,18 @@ const ChatDetail = ({ route, navigation }) => {
             <Icon name="chevron-right" size={30} color={colors.buttonColor} />
           )}
         </TouchableOpacity>
-      
+
       </View>
-        {showEmojiPicker && (
-          <EmojiSelector
-            onEmojiSelected={emoji => setMessage(prev => prev + emoji)}
-            showSearchBar={false}
-            showTabs={true}
-            category={Categories.all}
-            columns={8}
-            style={{ height: 250 }}
-          />
-        )}
+      {showEmojiPicker && (
+        <EmojiSelector
+          onEmojiSelected={emoji => setMessage(prev => prev + emoji)}
+          showSearchBar={false}
+          showTabs={true}
+          category={Categories.all}
+          columns={8}
+          style={{ height: 250 }}
+        />
+      )}
     </View>
   );
 };
