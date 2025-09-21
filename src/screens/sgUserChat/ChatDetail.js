@@ -9,7 +9,7 @@ import colors from '../../config/Colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendMessage } from '../../store/actions/chatActions';
 import moment from 'moment';
-import { CashIcon, ChevronRightIcon, EmojiIcon, NotificationIcon } from '../../assets/svg';
+import { BidTitleIcon, BlackBitIcon, CashIcon, ChevronRightIcon, EmojiIcon, NotificationIcon } from '../../assets/svg';
 import axiosInstance from '../../config/axios';
 import io from 'socket.io-client';
 import { BASE_URL } from '../../config/constants';
@@ -318,16 +318,25 @@ const ChatDetail = ({ route, navigation }) => {
           <NavBar title={"Chats"} />
         </View>
 
-        <View style={styles.infoContainer}>
-          <View style={styles.productInfoContainer}>
-            <Image source={Images.homePopularListing} style={styles.productImage} />
-            <Text style={styles.infoText}>7 Seater Sofa Set</Text>
+        {
+          productInfo &&
+
+          <View style={styles.infoContainer}>
+            <View style={styles.productInfoContainer}>
+              <Image source={{ uri: productInfo?.imagesArray[0] }} style={styles.productImage} />
+              <Text style={styles.infoText}>{productInfo?.title}</Text>
+            </View>
+            <View style={[styles.productInfoContainer, { gap: 5 }]}>
+              {
+                productInfo?.price ?
+                  <CashIcon />
+                  :
+                  <BlackBitIcon />
+              }
+              <Text style={[styles.infoText, { color: colors.buttonColor }]}>{productInfo?.price || productInfo.minBid}</Text>
+            </View>
           </View>
-          <View style={[styles.productInfoContainer, { gap: 5 }]}>
-            <CashIcon />
-            <Text style={[styles.infoText, { color: colors.buttonColor }]}>2200</Text>
-          </View>
-        </View>
+        }
 
       </View>
 

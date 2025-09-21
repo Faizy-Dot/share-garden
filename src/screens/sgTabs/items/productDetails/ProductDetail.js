@@ -44,7 +44,7 @@ const ProductDetail = ({ route, navigation }) => {
   const images = [Images.homePopularListing, Images.homeProfile, Images.homePopularListing,]
 
   const { width } = Dimensions.get('window');
-
+  console.log("product detail==>>", productDetail)
   const myPosts = [
     { id: 1, post: "Single bed in Toronto" },
     { id: 2, post: "Audi A6 in Toronto" },
@@ -76,15 +76,15 @@ const ProductDetail = ({ route, navigation }) => {
   };
 
   const calculateTimeRemaining = (durationInSeconds) => {
-  const clampedDuration = Math.max(0, durationInSeconds); // Prevent negatives
+    const clampedDuration = Math.max(0, durationInSeconds); // Prevent negatives
 
-  const days = Math.floor(clampedDuration / (24 * 60 * 60));
-  const hours = Math.floor((clampedDuration % (24 * 60 * 60)) / (60 * 60));
-  const minutes = Math.floor((clampedDuration % (60 * 60)) / 60);
-  const seconds = clampedDuration % 60;
+    const days = Math.floor(clampedDuration / (24 * 60 * 60));
+    const hours = Math.floor((clampedDuration % (24 * 60 * 60)) / (60 * 60));
+    const minutes = Math.floor((clampedDuration % (60 * 60)) / 60);
+    const seconds = clampedDuration % 60;
 
-  return { days, hours, minutes, seconds };
-};
+    return { days, hours, minutes, seconds };
+  };
 
   const fetchProductDetail = async () => {
     if (!productId) {
@@ -561,17 +561,18 @@ const ProductDetail = ({ route, navigation }) => {
                 name: displayData.seller?.name || 'Seller',
                 image: displayData.seller?.profileImage
               },
-              productInfo: {
-                id: displayData.id,
-                title: displayData.title,
-                price: displayData.price,
-                image: displayData.images?.[0]
-              }
+              productInfo: productDetail
+              //  {
+              //   id: displayData.id,
+              //   title: displayData.title,
+              //   price: displayData.price,
+              //   image: displayData.images?.[0]
+              // }
             })}
           >
             <NotificationIcon />
           </TouchableOpacity>
-         
+
         </View>
       </View>
 
@@ -717,12 +718,13 @@ const ProductDetail = ({ route, navigation }) => {
                     name: displayData.seller?.name || 'Seller',
                     image: displayData.seller?.profileImage
                   },
-                  productInfo: {
-                    id: displayData.id,
-                    title: displayData.title,
-                    price: displayData.price,
-                    image: displayData.images?.[0]
-                  }
+                  productInfo: productDetail
+                  // {
+                  //   id: displayData.id,
+                  //   title: displayData.title,
+                  //   price: displayData.price,
+                  //   image: displayData.images?.[0]
+                  // }
                 });
               }}
               icon={<NotificationIcon stroke="#fff" style={{ marginLeft: 10 }} />}
