@@ -69,14 +69,17 @@ export default function AdsTabScreen() {
             if (response.data) {
                 const { ads: newAds, pagination: newPagination } = response.data;
                 
+                // Ensure newAds is an array
+                const safeNewAds = Array.isArray(newAds) ? newAds : [];
+                
                 if (isLoadMore) {
-                    setAds(prevAds => [...prevAds, ...newAds]);
+                    setAds(prevAds => [...prevAds, ...safeNewAds]);
                 } else {
-                    setAds(newAds);
+                    setAds(safeNewAds);
                 }
                 
-                setPagination(newPagination);
-                console.log('Ads set:', newAds.length, 'ads, Page:', newPagination.currentPage);
+                setPagination(newPagination || {});
+                console.log('Ads set:', safeNewAds.length, 'ads, Page:', newPagination?.currentPage);
             } else {
                 if (!isLoadMore) {
                     setAds([]);
@@ -127,8 +130,10 @@ export default function AdsTabScreen() {
             
             if (response.data) {
                 const { ads: searchAds } = response.data;
-                setSearchResults(searchAds);
-                console.log('Search results set:', searchAds.length, 'ads');
+                // Ensure searchAds is an array
+                const safeSearchAds = Array.isArray(searchAds) ? searchAds : [];
+                setSearchResults(safeSearchAds);
+                console.log('Search results set:', safeSearchAds.length, 'ads');
             } else {
                 setSearchResults([]);
             }
@@ -231,6 +236,11 @@ export default function AdsTabScreen() {
     console.log("Ads==>>", ads)
 
     const renderAdsData = ({ item }) => {
+        // Safety check for undefined item
+        if (!item) {
+            return null;
+        }
+        
         // Use API image or fallback
         const imageSource = item.images ? { uri: item.images } : fallbackImage;
         
@@ -343,14 +353,14 @@ export default function AdsTabScreen() {
             </View>
 
             {/* Content */}
-            {loading && ads.length === 0 ? (
+            {loading && (!ads || ads.length === 0) ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#003034" />
                     <Text style={styles.loadingText}>Loading ads...</Text>
                 </View>
-            ) : (searchResults || ads).length > 0 ? (
+            ) : (searchResults || ads || []).length > 0 ? (
                 <FlatList 
-                    data={searchResults || ads}
+                    data={searchResults || ads || []}
                     keyExtractor={(item) => item.id}
                     renderItem={renderAdsData}
                     numColumns={2}

@@ -352,7 +352,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
             <View style={styles.iconContainer}>
               <View style={styles.iconRow}>
                 <ViewsIcon width={16} height={10} />
-                <Text style={styles.iconText}>{productInfo?.views || item.views || 0}</Text>
+                <Text style={styles.iconText}>{productInfo?.viewCount || item.viewCount || 0}</Text>
               </View>
               <View style={styles.iconRow}>
                 <LikesIcon width={14} height={12} />

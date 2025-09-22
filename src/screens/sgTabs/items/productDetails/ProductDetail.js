@@ -45,22 +45,11 @@ const ProductDetail = ({ route, navigation }) => {
 
   const { width } = Dimensions.get('window');
   console.log("product detail==>>", productDetail)
-  const myPosts = [
-    { id: 1, post: "Single bed in Toronto" },
-    { id: 2, post: "Audi A6 in Toronto" },
-    { id: 3, post: "Sofa Set in Toronto" }
-  ];
 
   const { user } = useSelector((state) => state.login);
 
   const viewIncremented = useRef(false);
 
-  const renderMyPosts = ({ item }) => (
-    <TouchableOpacity activeOpacity={0.8} style={styles.postBox}>
-      <TimeIcon width={12} height={12} stroke={colors.black} />
-      <Text style={{ fontSize: Metrix.customFontSize(10), fontFamily: fonts.InterLight }}>{item.post}</Text>
-    </TouchableOpacity>
-  );
 
   const getDisplayCondition = (condition) => {
     switch (condition) {
@@ -480,12 +469,14 @@ const ProductDetail = ({ route, navigation }) => {
               />
             ) : (
               <CustomButton
-                title="I WANT TO PURCHASE THIS"
+                title={isUserSeller() ? "YOU ARE THE SELLER" : "I WANT TO PURCHASE THIS"}
                 height={Metrix.VerticalSize(46)}
                 width={"100%"}
                 borderRadius={Metrix.VerticalSize(3)}
                 fontSize={Metrix.FontSmall}
                 onPress={handlePurchaseRequest}
+                disabled={isUserSeller()}
+                backgroundColor={isUserSeller() ? colors.grey : colors.buttonColor}
               />
             )}
           </View>
@@ -507,7 +498,7 @@ const ProductDetail = ({ route, navigation }) => {
           ) : (
             <>
               <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
-                Total Views: <Text style={{ color: colors.black }}>{displayData.views || 0}</Text>
+                Total Views: <Text style={{ color: colors.black }}>{displayData.viewCount || 0}</Text>
               </Text>
               {/* <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
                 Status: <Text style={{ color: colors.black }}>{displayData.status || 'Available'}</Text>
@@ -576,18 +567,6 @@ const ProductDetail = ({ route, navigation }) => {
         </View>
       </View>
 
-      <View style={styles.bottomContainer}>
-        <Text style={{ fontSize: Metrix.FontRegular, fontFamily: fonts.InterRegular, color: colors.buttonColor }}>Most Recent  Search</Text>
-
-        <FlatList
-          data={myPosts}
-          renderItem={renderMyPosts}
-          keyExtractor={(item) => item.id.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.myPost}
-        />
-      </View>
 
       <Modal
         visible={isModalVisible} transparent animationType="fade"

@@ -94,6 +94,50 @@ const styles = StyleSheet.create({
         fontFamily: fonts.InterRegular,
         lineHeight : Metrix.VerticalSize(18),
         marginTop : Metrix.VerticalSize(15)
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: Metrix.VerticalSize(50)
+    },
+    loadingText: {
+        fontSize: Metrix.FontMedium,
+        fontFamily: fonts.InterRegular,
+        color: colors.gray,
+        marginTop: Metrix.VerticalSize(10)
+    },
+    totalReviewsText: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.gray,
+        marginTop: Metrix.VerticalSize(5)
+    },
+    ratingCount: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.gray,
+        marginLeft: Metrix.HorizontalSize(5)
+    },
+    noReviewsContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: Metrix.VerticalSize(50),
+        paddingHorizontal: Metrix.HorizontalSize(20)
+    },
+    noReviewsText: {
+        fontSize: Metrix.FontLarge,
+        fontFamily: fonts.InterSemiBold,
+        color: colors.gray,
+        marginBottom: Metrix.VerticalSize(10)
+    },
+    noReviewsSubText: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.gray,
+        textAlign: 'center',
+        lineHeight: Metrix.VerticalSize(20)
     }
 })
 

@@ -166,17 +166,19 @@ export default function MySGItems({ navigation }) {
                             </View>
                         )}
                     </View>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
+                    <View style={{ flexDirection: "column", gap: Metrix.VerticalSize(8) }}>
                         <Text style={styles.description}>{item.description}</Text>
-                        <CustomButton title={"EDIT"}
-                            width={Metrix.HorizontalSize(70)}
-                            height={Metrix.VerticalSize(30)}
-                            borderRadius={4}
-                            fontSize={Metrix.FontRegular}
-                            onPress={() => navigation.navigate("Post", {
-                                screen: "PostList",
-                                params: { ...item, SGItems: true }
-                            })} />
+                        <View style={{ alignSelf: 'flex-end' }}>
+                            <CustomButton title={"EDIT"}
+                                width={Metrix.HorizontalSize(70)}
+                                height={Metrix.VerticalSize(30)}
+                                borderRadius={4}
+                                fontSize={Metrix.FontRegular}
+                                onPress={() => navigation.navigate("Post", {
+                                    screen: "PostList",
+                                    params: { ...item, SGItems: true }
+                                })} />
+                        </View>
                     </View>
                 </View>
             </View>
@@ -203,7 +205,7 @@ export default function MySGItems({ navigation }) {
                 </View>
                 <View style={styles.bottomIcon}>
                     <ViewsIcon />
-                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.views || 0} views</Text>
+                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.viewCount || 0} views</Text>
                 </View>
                 <View style={styles.bottomIcon}>
                     <LikesIcon />

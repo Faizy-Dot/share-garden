@@ -69,14 +69,17 @@ export default function MerchantAds() {
             if (response.data) {
                 const { ads: newAds, pagination: newPagination } = response.data;
 
+                // Ensure newAds is an array
+                const safeNewAds = Array.isArray(newAds) ? newAds : [];
+
                 if (isLoadMore) {
-                    setAds(prevAds => [...prevAds, ...newAds]);
+                    setAds(prevAds => [...prevAds, ...safeNewAds]);
                 } else {
-                    setAds(newAds);
+                    setAds(safeNewAds);
                 }
 
-                setPagination(newPagination);
-                console.log('Ads set:', newAds.length, 'ads, Page:', newPagination.currentPage);
+                setPagination(newPagination || {});
+                console.log('Ads set:', safeNewAds.length, 'ads, Page:', newPagination?.currentPage);
             } else {
                 if (!isLoadMore) {
                     setAds([]);
@@ -132,20 +135,27 @@ export default function MerchantAds() {
     console.log("MerchantAds==>>", ads)
 
     const formatAdsData = (data, columns) => {
-        const numberOfFullRows = Math.floor(data.length / columns);
-        let numberOfElementsLastRow = data.length - numberOfFullRows * columns;
+        // Ensure data is an array
+        const safeData = Array.isArray(data) ? data : [];
+        const numberOfFullRows = Math.floor(safeData.length / columns);
+        let numberOfElementsLastRow = safeData.length - numberOfFullRows * columns;
 
         while (numberOfElementsLastRow !== 0 && numberOfElementsLastRow !== columns) {
-            data.push({ id: `blank-${numberOfElementsLastRow}`, empty: true });
+            safeData.push({ id: `blank-${numberOfElementsLastRow}`, empty: true });
             numberOfElementsLastRow++;
         }
 
-        return data;
+        return safeData;
     };
 
-    const formattedAds = formatAdsData([...ads], 3);
+    const formattedAds = formatAdsData([...(ads || [])], 3);
 
     const renderAdsData = ({ item }) => {
+        // Safety check for undefined item
+        if (!item) {
+            return null;
+        }
+        
         // Use API image or fallback
         const imageSource = item.images ? { uri: item.images } : fallbackImage;
       
@@ -236,14 +246,14 @@ export default function MerchantAds() {
 
     return (
         <View style={styles.adsContainer}>
-            {loading && ads.length === 0 ? (
+            {loading && (!ads || ads.length === 0) ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#003034" />
                     <Text style={styles.loadingText}>Loading ads...</Text>
                 </View>
-            ) : ads.length > 0 ? (
+            ) : (ads || []).length > 0 ? (
                 <FlatList
-                    data={ads}
+                    data={ads || []}
                     keyExtractor={(item) => item.id}
                     renderItem={renderAdsData}
                     numColumns={3}
