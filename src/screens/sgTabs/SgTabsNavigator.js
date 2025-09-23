@@ -22,6 +22,7 @@ import BidsReview from "../profile/myBids/bidsReview/BidsReview";
 import PreviewPostedSgItems from "../profile/mySGItems/previewPostedSGItems/PreviewPostedSgItems";
 import SubmitReview from "../profile/submitReview/SubmitReview";
 import TipsDetail from "./tips/tipsDetail/TipsDetail";
+import AdDetail from "./ads/AdDetail";
 
 
 
@@ -122,6 +123,7 @@ function PostStackScreen() {
     return (
       <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
         <ItemsStack.Screen name="AdsList" component={AdsTabScreen} />
+        <ItemsStack.Screen name="AdDetail" component={AdDetail} />
         <ItemsStack.Screen name="Profile" component={Profile} />
         <ItemsStack.Screen name="EditProfile" component={EditProfile} />
         <ItemsStack.Screen name="SgUserNotification" component={SgUserNotification} />

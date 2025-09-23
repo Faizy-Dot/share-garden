@@ -16,7 +16,7 @@ import { useFocusEffect } from "@react-navigation/native";
 const fallbackImage = Images.homePopularListing;
 
 
-export default function AdsTabScreen() {
+export default function AdsTabScreen({ navigation }) {
    
     const [loading, setLoading] = useState(false)
     const [ads, setAds] = useState([])
@@ -253,7 +253,11 @@ export default function AdsTabScreen() {
         const categoryName = item.category ? item.category.name : 'Uncategorized';
         
         return (
-            <View style={styles.adsDataContainer}>
+            <TouchableOpacity 
+                style={styles.adsDataContainer}
+                onPress={() => navigation.navigate('AdDetail', { adId: item.id })}
+                activeOpacity={0.8}
+            >
                 <Image source={imageSource} style={styles.image} />
                 <View style={styles.textContainer}>
                     <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
@@ -266,7 +270,7 @@ export default function AdsTabScreen() {
                         <Text style={styles.categoryText} numberOfLines={1}>{categoryName}</Text>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 
