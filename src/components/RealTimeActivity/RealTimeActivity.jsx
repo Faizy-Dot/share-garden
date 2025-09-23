@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { View, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { Metrix } from '../../config';
 import colors from '../../config/Colors';
 import fonts from '../../config/Fonts';
 import { Images } from '../../config';
 
-const RealTimeActivity = ({ 
+const RealTimeActivity = forwardRef(({ 
     sgTipId, 
     userId, 
     isAuthor = false,
     onActivityPress 
-}) => {
+}, ref) => {
     const [recentActivity, setRecentActivity] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
     const [fadeAnim] = useState(new Animated.Value(0));
@@ -40,6 +40,10 @@ const RealTimeActivity = ({
     const addActivity = (activity) => {
         setRecentActivity(prev => [activity, ...prev.slice(0, 2)]); // Keep only last 3
     };
+
+    useImperativeHandle(ref, () => ({
+        addActivity,
+    }));
 
     const getActivityText = (activity) => {
         if (activity.type === 'like') {
@@ -142,6 +146,6 @@ const RealTimeActivity = ({
             ))}
         </Animated.View>
     );
-};
+});
 
 export default RealTimeActivity;
