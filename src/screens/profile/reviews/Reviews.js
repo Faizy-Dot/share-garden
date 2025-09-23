@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, FlatList, Image, ActivityIndicator } from 'react-native';
 import { useSelector } from 'react-redux';
 import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
 import styles from './style';
@@ -10,6 +10,7 @@ import CustomButton from '../../../components/Button/Button';
 import { StarIcon } from '../../../assets/svg';
 import ApiCaller from '../../../config/ApiCaller';
 import moment from 'moment';
+import Toast from 'react-native-toast-message';
 
 export default function Reviews() {
   const { user } = useSelector(state => state.login);
@@ -26,11 +27,15 @@ export default function Reviews() {
     try {
       setLoading(true);
       if (!user?.id) {
-        Alert.alert('Error', 'User not found. Please login again.');
+        Toast.show({ type: 'error', text1: 'Error', text2: 'User not found. Please login again.' });
         return;
       }
 
-      const response = await ApiCaller.Get(`/api/reviews/user/${user.id}`);
+      const response = await ApiCaller.Get(
+        `/api/reviews/user/${user.id}`,
+        '',
+        user?.token ? { Authorization: `Bearer ${user.token}` } : {}
+      );
       
       if (response.status === 200) {
         const { reviews: userReviews, averageRating: avgRating, totalReviews: total } = response.data;
@@ -52,12 +57,12 @@ export default function Reviews() {
         
         console.log('Reviews fetched:', safeReviews.length, 'reviews');
       } else {
-        console.error('Error fetching reviews:', response.data?.message);
-        Alert.alert('Error', 'Failed to load reviews. Please try again.');
+        console.error('Error fetching reviews:', response?.status, response?.data);
+        Toast.show({ type: 'error', text1: 'Error', text2: response?.data?.message || 'Failed to load reviews. Please try again.' });
       }
     } catch (error) {
       console.error('Error fetching reviews:', error);
-      Alert.alert('Error', 'Failed to load reviews. Please try again.');
+      Toast.show({ type: 'error', text1: 'Error', text2: error?.data?.message || 'Failed to load reviews. Please try again.' });
     } finally {
       setLoading(false);
     }
