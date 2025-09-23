@@ -12,7 +12,7 @@ import { Images, Metrix } from "../../../../config";
 import styles from "./style";
 import fonts from "../../../../config/Fonts";
 import CustomButton from "../../../../components/Button/Button";
-import axiosInstance from '../../../../config/axios';
+import ApiCaller from '../../../../config/ApiCaller';
 import { BlackBitIcon, CashIcon, CrossIcon, ModalInfoIcon, ModalSuccessLogo, SgTipsIcon, TimeIcon, TipsTabIcon } from "../../../../assets/svg";
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { updateUserProfile } from "../../../../redux/Actions/authActions/loginAction";
@@ -226,7 +226,7 @@ export default function PostTabScreen({ navigation, route }) {
       });
 
 
-      if (forDraft.id) {
+      if (forDraft?.id) {
 
 
         console.log("checkkkk")
@@ -267,19 +267,17 @@ export default function PostTabScreen({ navigation, route }) {
               ],
             });
           }, 7000);
-          timeout()
 
           setNavigateTimeout(timeout);
         }
 
       } else {
-        const response = await axiosInstance.post(
+        const response = await ApiCaller.Post(
           `/api/products/createProduct`,
           formData,
           {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${user?.token}`,
           }
         );
 
@@ -309,7 +307,6 @@ export default function PostTabScreen({ navigation, route }) {
               ],
             });
           }, 7000);
-          timeout()
 
           setNavigateTimeout(timeout);
         }
@@ -317,12 +314,9 @@ export default function PostTabScreen({ navigation, route }) {
       }
 
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to create product';
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: errorMessage,
-      });
+      console.log('Create product error:', error?.status, error?.data);
+      const errorMessage = error?.data?.message || 'Failed to create product';
+      Toast.show({ type: 'error', text1: 'Error', text2: errorMessage });
     } finally {
       setLoading(false);
     }

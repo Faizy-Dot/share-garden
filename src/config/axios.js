@@ -4,9 +4,6 @@ import store from '../redux/store';
 const axiosInstance = axios.create({
     baseURL: 'https://api.sharegarden.ca',
     timeout: 10000,
-    headers: {
-        'Content-Type': 'application/json',
-    }
 });
 
 // Request interceptor
@@ -17,6 +14,12 @@ axiosInstance.interceptors.request.use(
         
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+        }
+        // If sending FormData, let axios set the correct multipart boundary
+        if (config.data && typeof config.data === 'object' && typeof config.data.append === 'function') {
+            if (config.headers && config.headers['Content-Type']) {
+                delete config.headers['Content-Type'];
+            }
         }
         return config;
     },
