@@ -164,11 +164,23 @@ const ProductDetail = ({ route, navigation }) => {
   const handleFavoritePress = async () => {
     try {
       const response = await axiosInstance.post(`/api/products/favorites/${productId}`);
-      setIsFavorite(!isFavorite); // Toggle favorite status
-      // Optionally show some feedback to user
+      if (response.status === 200) {
+        setIsFavorite(!isFavorite); // Toggle favorite status
+        // Show success feedback
+        Toast.show({
+          type: 'success',
+          text1: isFavorite ? 'Removed from favorites' : 'Added to favorites',
+          text2: response.data.message
+        });
+      }
     } catch (error) {
-      console.log('Error toggling favorite:', error);
-      // Optionally show error message to user
+      console.error('Error toggling favorite:', error);
+      // Show error message to user
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error.response?.data?.message || 'Failed to update favorite status'
+      });
     }
   };
 

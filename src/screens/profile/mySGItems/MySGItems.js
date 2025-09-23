@@ -213,7 +213,7 @@ export default function MySGItems({ navigation }) {
                 </View>
                 <View style={styles.bottomIcon}>
                     <ShareIcon />
-                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.shares || 0}</Text>
+                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.shareCount || 0}</Text>
                 </View>
             </View>
         </TouchableOpacity>

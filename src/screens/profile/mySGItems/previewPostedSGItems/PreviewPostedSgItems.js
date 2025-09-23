@@ -360,7 +360,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
               </View>
               <View style={styles.iconRow}>
                 <ShareIcon width={14} height={17} />
-                <Text style={styles.iconText}>{productInfo?.shares || item.shares || 0}</Text>
+                <Text style={styles.iconText}>{productInfo?.shareCount || item.shareCount || 0}</Text>
               </View>
             </View>
 
