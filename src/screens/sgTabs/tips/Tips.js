@@ -4,7 +4,7 @@ import BackArrowIcon from "../../../components/backArrowIcon/BackArrowIcon";
 import NavBar from "../../../components/navBar/NavBar";
 import { Images, Metrix } from "../../../config";
 import CustomInput from "../../../components/customInput/CustomInput";
-import DropdownComponent from "../../../components/dropDown/DropDownInput";
+import CategoryFlatList from "../../../components/categoryFlatList/CategoryFlatList";
 import fonts from "../../../config/Fonts";
 import colors from "../../../config/Colors";
 import { LikesIcon, ShareIcon, TimeIcon, ViewsIcon } from "../../../assets/svg";
@@ -67,8 +67,8 @@ export default function TipsTabScreen({ navigation }) {
             let url = '/api/sgtips/published';
             const params = new URLSearchParams();
 
-            if (selectedCategory?.value) {
-                params.append('categoryId', selectedCategory.value);
+            if (selectedCategory?.id) {
+                params.append('categoryId', selectedCategory.id);
             }
             if (searchQuery.trim()) {
                 params.append('search', searchQuery.trim());
@@ -311,19 +311,15 @@ export default function TipsTabScreen({ navigation }) {
                     )}
                 </View>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                    <View style={{ flex: 1 }}>
-                        <DropdownComponent
-                            placeholder={"Select Category"}
-                            data={categories}
-                            value={selectedCategory}
-                            onChange={handleCategoryChange}
-                        />
-                    </View>
+                <View style={{ marginTop: Metrix.VerticalSize(10) }}>
+                    <CategoryFlatList
+                        onCategorySelect={handleCategoryChange}
+                        selectedCategory={selectedCategory?.id}
+                    />
                     {selectedCategory && (
                         <TouchableOpacity
                             onPress={clearCategory}
-                            style={styles.clearButton}
+                            style={[styles.clearButton, { alignSelf: 'flex-end', marginTop: Metrix.VerticalSize(10) }]}
                         >
                             <Text style={{ color: colors.buttonColor }}>Clear</Text>
                         </TouchableOpacity>
