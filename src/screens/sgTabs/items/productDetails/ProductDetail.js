@@ -218,7 +218,7 @@ const ProductDetail = ({ route, navigation }) => {
   // Add function to handle product sharing
   const handleSharePress = async () => {
     try {
-      // Use hosted web URL that redirects to app (replace with your actual hosted URL)
+      // Use hosted web URL that redirects to app
       const webLink = `https://sharegardendeeplink-s3xe.vercel.app/product.html?id=${productId}`;
 
       const shareMessage = `Check out this amazing product on ShareGarden!\n\n${displayData.title}\n\n${displayData.description}\n\nPrice: ${displayData.isSGPoints ? `${displayData.minBid} SG Points` : `$${displayData.price}`}\n\nCondition: ${getDisplayCondition(displayData.condition)}\n\nSeller: ${displayData.seller?.firstName || ''} ${displayData.seller?.lastName || ''}\n\nView in ShareGarden app:\n${webLink}`;
@@ -226,6 +226,7 @@ const ProductDetail = ({ route, navigation }) => {
       const result = await Share.share({
         message: shareMessage,
         title: displayData.title,
+        url: webLink, // Add URL for better sharing on iOS
       });
 
       if (result.action === Share.sharedAction) {

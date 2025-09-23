@@ -103,29 +103,52 @@ const ProductDetail = ({ route, navigation }) => {
 
 ### 5. Share Functionality
 
-The share function in `ProductDetail.js` creates appropriate deep links:
+The share functions across the app create appropriate deep links using the hosted web URLs:
 
+**Product Sharing:**
 ```javascript
-const handleSharePress = async () => {
-  const deepLinkUrl = `sharegarden://product/${productId}`;
-  const webUrl = `https://sharegarden.com/product/${productId}`;
-  
-  const result = await Share.share({
-    message: shareMessage,
-    title: displayData.title,
-    url: Platform.OS === 'ios' ? deepLinkUrl : webUrl,
-  });
-};
+const webLink = `https://sharegardendeeplink-s3xe.vercel.app/product.html?id=${productId}`;
+const result = await Share.share({
+  message: shareMessage,
+  title: displayData.title,
+  url: webLink,
+});
+```
+
+**SGTip Sharing:**
+```javascript
+const webLink = `https://sharegardendeeplink-s3xe.vercel.app/sgtip.html?id=${sgtipId}`;
+const result = await Share.share({
+  message: shareMessage,
+  title: sgtipData.title,
+  url: webLink,
+});
+```
+
+**Ad Sharing:**
+```javascript
+const webLink = `https://sharegardendeeplink-s3xe.vercel.app/index.html?type=ad&id=${adId}`;
+const result = await Share.share({
+  message: shareMessage,
+  title: ad.title,
+  url: webLink,
+});
 ```
 
 ## Web Fallback
 
-A web page (`web/product.html`) is provided as a fallback for users who don't have the app installed. This page:
+Web pages are hosted at `https://sharegardendeeplink-s3xe.vercel.app/` as fallbacks for users who don't have the app installed:
 
-1. Attempts to open the app automatically
-2. Provides a manual button to open the app
-3. Offers download links for users without the app
-4. Handles both iOS and Android app store redirects
+- `index.html` - Main deeplink page (handles all content types)
+- `product.html` - Product-specific deeplink page  
+- `sgtip.html` - SGTip-specific deeplink page
+
+These pages:
+1. Attempt to open the app automatically
+2. Provide manual buttons to open the app
+3. Offer download links for users without the app
+4. Handle both iOS and Android app store redirects
+5. Display content previews when possible
 
 ## Testing Deep Links
 

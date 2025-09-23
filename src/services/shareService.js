@@ -15,7 +15,7 @@ class ShareService {
 
   // ✅ Generate share URL (deep link)
   getShareUrl(sgTipId) {
-    return `https://sharegarden.com/sgtip/${sgTipId}`;
+    return `https://sharegardendeeplink-s3xe.vercel.app/sgtip.html?id=${sgTipId}`;
   }
 
   // ✅ Share with native share dialog

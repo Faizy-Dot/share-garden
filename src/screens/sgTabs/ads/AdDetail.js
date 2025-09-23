@@ -54,9 +54,13 @@ export default function AdDetail({ route, navigation }) {
 
   const handleShare = async () => {
     try {
+      const webLink = `https://sharegardendeeplink-s3xe.vercel.app/index.html?type=ad&id=${adId}`;
+      const shareMessage = `Check out this amazing ad on ShareGarden!\n\n${ad?.title}\n\n${ad?.description || ''}\n\nView in ShareGarden app:\n${webLink}`;
+      
       const result = await Share.share({
-        message: `Check out this amazing ad: ${ad?.title}`,
+        message: shareMessage,
         title: ad?.title,
+        url: webLink,
       });
     } catch (error) {
       console.error('Error sharing:', error);
