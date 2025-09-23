@@ -13,6 +13,7 @@ import { images } from '../../../../assets';
 import { useSelector } from 'react-redux';
 import RealTimeActivity from '../../../../components/RealTimeActivity/RealTimeActivity';
 import SGTipActions from '../../../../components/SGTipActions/SGTipActions';
+import SGTipActivityModal from '../../../../components/SGTipActivityModal/SGTipActivityModal';
 import sgtipSocketService from '../../../../services/sgtipSocketService';
 import sgtipActivityService from '../../../../services/sgtipActivityService';
 import commentService from '../../../../services/commentService';
@@ -31,6 +32,10 @@ export default function TipsDetail({ route }) {
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editingContent, setEditingContent] = useState('');
     const [isEditing, setIsEditing] = useState(false);
+    
+    // Activity modal states
+    const [showLikesModal, setShowLikesModal] = useState(false);
+    const [showSharesModal, setShowSharesModal] = useState(false);
 
 
     // Comments state
@@ -307,6 +312,14 @@ export default function TipsDetail({ route }) {
         console.log('Activity pressed:', activity);
     };
 
+    const handleShowLikes = () => {
+        setShowLikesModal(true);
+    };
+
+    const handleShowShares = () => {
+        setShowSharesModal(true);
+    };
+
 
     if (loading) {
         return (
@@ -477,6 +490,8 @@ export default function TipsDetail({ route }) {
                             authorId={sgtipDetail.author?.id}
                             initialStats={stats}
                             onStatsUpdate={handleStatsUpdate}
+                            onShowLikes={handleShowLikes}
+                            onShowShares={handleShowShares}
                             sgTipData={{
                                 title: sgtipDetail.title,
                                 description: sgtipDetail.description,
@@ -630,6 +645,23 @@ export default function TipsDetail({ route }) {
                 </View>
             </Modal>
 
+            {/* Likes Modal */}
+            <SGTipActivityModal
+                visible={showLikesModal}
+                onClose={() => setShowLikesModal(false)}
+                sgTipId={route.params.id}
+                activityType="like"
+                title="Who Liked This SGTip"
+            />
+
+            {/* Shares Modal */}
+            <SGTipActivityModal
+                visible={showSharesModal}
+                onClose={() => setShowSharesModal(false)}
+                sgTipId={route.params.id}
+                activityType="share"
+                title="Who Shared This SGTip"
+            />
 
         </KeyboardAvoidingView>
     );

@@ -14,7 +14,9 @@ const SGTipActions = ({
     authorId, 
     initialStats = { likes: 0, shares: 0 },
     onStatsUpdate,
-    sgTipData = {} // Add SGTip data for sharing
+    sgTipData = {}, // Add SGTip data for sharing
+    onShowLikes, // Callback to show likes modal
+    onShowShares // Callback to show shares modal
 }) => {
     const [isLiked, setIsLiked] = useState(false);
     const [isLiking, setIsLiking] = useState(false);
@@ -195,8 +197,8 @@ const SGTipActions = ({
                     borderRadius: Metrix.VerticalSize(20),
                     backgroundColor: isLiked ? colors.redColor + '20' : 'transparent',
                 }}
-                onPress={handleLike}
-                disabled={isLiking || isAuthor || isLiked}
+                onPress={isAuthor ? () => onShowLikes && onShowLikes() : handleLike}
+                disabled={isLiking || (!isAuthor && isLiked)}
             >
                 {isLiking ? (
                     <ActivityIndicator size="small" color={colors.buttonColor} />
@@ -226,7 +228,7 @@ const SGTipActions = ({
                     borderRadius: Metrix.VerticalSize(20),
                     backgroundColor: hasShared ? colors.buttonColor + '20' : 'transparent',
                 }}
-                onPress={handleShare}
+                onPress={isAuthor ? () => onShowShares && onShowShares() : handleShare}
                 disabled={isSharing}
             >
                 {isSharing ? (
