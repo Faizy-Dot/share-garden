@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux';
 import { BlackBitIcon, CallIcon, CashIcon, CrossIcon, HandShakeIcon, LikesIcon, NotificationIcon, ShareIcon, SpeakerIcon, TimeIcon } from '../../../../assets/svg';
 import { Modal } from 'react-native';
 import Toast from 'react-native-toast-message';
+import ProductActivityModal from '../../../../components/ProductActivityModal/ProductActivityModal';
 
 
 const ProductDetail = ({ route, navigation }) => {
@@ -40,6 +41,13 @@ const ProductDetail = ({ route, navigation }) => {
   const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
   const [bidLoading, setBidLoading] = useState(false);
   const [bidError, setBidError] = useState(null);
+
+  // Add states for activity modals
+  const [showLikesModal, setShowLikesModal] = useState(false);
+  const [showSharesModal, setShowSharesModal] = useState(false);
+  const [showFavoritesModal, setShowFavoritesModal] = useState(false);
+  const [productStats, setProductStats] = useState({ views: 0, likes: 0, shares: 0, favorites: 0 });
+  const [isLiked, setIsLiked] = useState(false);
 
   const images = [Images.homePopularListing, Images.homeProfile, Images.homePopularListing,]
 
@@ -85,8 +93,23 @@ const ProductDetail = ({ route, navigation }) => {
     try {
       const response = await axiosInstance.get(`/api/products/${productId}`);
       setProductDetail(response.data);
-      // Set initial favorite status if your API returns this information
+      
+      // Set initial favorite and like status if your API returns this information
       setIsFavorite(response.data.isFavorited || false);
+      setIsLiked(response.data.isLiked || false);
+      
+      // Update stats from API response
+      if (response.data.stats) {
+        setProductStats(response.data.stats);
+      } else {
+        // Fallback to individual fields if stats object doesn't exist
+        setProductStats({
+          views: response.data.viewCount || 0,
+          likes: response.data.likeCount || 0,
+          shares: response.data.shareCount || 0,
+          favorites: response.data.favoriteCount || 0
+        });
+      }
 
       console.log("Product Detail response", response.data);
 
@@ -166,6 +189,14 @@ const ProductDetail = ({ route, navigation }) => {
       const response = await axiosInstance.post(`/api/products/favorites/${productId}`);
       if (response.status === 200) {
         setIsFavorite(!isFavorite); // Toggle favorite status
+        
+        // Update local stats
+        const newStats = {
+          ...productStats,
+          favorites: isFavorite ? productStats.favorites - 1 : productStats.favorites + 1
+        };
+        setProductStats(newStats);
+        
         // Show success feedback
         Toast.show({
           type: 'success',
@@ -188,7 +219,7 @@ const ProductDetail = ({ route, navigation }) => {
   const handleSharePress = async () => {
     try {
       // Use hosted web URL that redirects to app (replace with your actual hosted URL)
-      const webLink = `https://your-sharegarden-site.netlify.app?id=${productId}`;
+      const webLink = `https://sharegardendeeplink-s3xe.vercel.app/product.html?id=${productId}`;
 
       const shareMessage = `Check out this amazing product on ShareGarden!\n\n${displayData.title}\n\n${displayData.description}\n\nPrice: ${displayData.isSGPoints ? `${displayData.minBid} SG Points` : `$${displayData.price}`}\n\nCondition: ${getDisplayCondition(displayData.condition)}\n\nSeller: ${displayData.seller?.firstName || ''} ${displayData.seller?.lastName || ''}\n\nView in ShareGarden app:\n${webLink}`;
 
@@ -201,6 +232,12 @@ const ProductDetail = ({ route, navigation }) => {
         // Optionally increment share count on your backend
         try {
           await axiosInstance.post(`/api/products/${productId}/shares`);
+          // Update local stats
+          const newStats = {
+            ...productStats,
+            shares: productStats.shares + 1
+          };
+          setProductStats(newStats);
         } catch (error) {
           if (error?.response?.status === 404) {
             // Endpoint does not exist, ignore
@@ -213,6 +250,54 @@ const ProductDetail = ({ route, navigation }) => {
     } catch (error) {
       console.log('Error sharing product:', error);
       Alert.alert('Error', 'Failed to share product. Please try again.');
+    }
+  };
+
+  // Add handler functions for activity modals
+  const handleShowLikes = () => {
+    setShowLikesModal(true);
+  };
+
+  const handleShowShares = () => {
+    setShowSharesModal(true);
+  };
+
+  const handleShowFavorites = () => {
+    setShowFavoritesModal(true);
+  };
+
+  const handleStatsUpdate = (newStats) => {
+    setProductStats(newStats);
+  };
+
+  // Add like handler
+  const handleLikePress = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const response = await axiosInstance.post(`/api/products/${productId}/like`);
+      
+      if (response.data.isLiked !== undefined) {
+        setIsLiked(response.data.isLiked);
+        const newStats = {
+          ...productStats,
+          likes: response.data.isLiked ? productStats.likes + 1 : productStats.likes - 1
+        };
+        setProductStats(newStats);
+        
+        Toast.show({
+          type: 'success',
+          text1: response.data.isLiked ? 'Product liked!' : 'Product unliked!',
+          text2: response.data.message
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update like status'
+      });
     }
   };
 
@@ -400,6 +485,9 @@ const ProductDetail = ({ route, navigation }) => {
             <View style={styles.FeaturedContainer}>
               <Text style={styles.featuredText}>Featured</Text>
               <View style={styles.IconContainer}>
+                <TouchableOpacity onPress={handleLikePress}>
+                  <LikesIcon stroke={colors.white} fill={isLiked ? colors.white : 'none'} />
+                </TouchableOpacity>
                 <TouchableOpacity onPress={handleFavoritePress}>
                   <LikesIcon stroke={colors.white} fill={isFavorite ? colors.white : 'none'} />
                 </TouchableOpacity>
@@ -509,12 +597,43 @@ const ProductDetail = ({ route, navigation }) => {
             </>
           ) : (
             <>
-              <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
-                Total Views: <Text style={{ color: colors.black }}>{displayData.viewCount || 0}</Text>
-              </Text>
-              {/* <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
-                Status: <Text style={{ color: colors.black }}>{displayData.status || 'Available'}</Text>
-              </Text> */}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                <TouchableOpacity 
+                  onPress={isUserSeller() ? handleShowLikes : null}
+                  style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Metrix.VerticalSize(5) }}
+                >
+                  <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
+                    Total Views: <Text style={{ color: colors.black }}>{productStats.views || displayData.viewCount || 0}</Text>
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  onPress={isUserSeller() ? handleShowLikes : null}
+                  style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Metrix.VerticalSize(5) }}
+                >
+                  <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
+                    Likes: <Text style={{ color: colors.black }}>{productStats.likes || 0}</Text>
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  onPress={isUserSeller() ? handleShowShares : null}
+                  style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Metrix.VerticalSize(5) }}
+                >
+                  <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
+                    Shares: <Text style={{ color: colors.black }}>{productStats.shares || 0}</Text>
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  onPress={isUserSeller() ? handleShowFavorites : null}
+                  style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Metrix.VerticalSize(5) }}
+                >
+                  <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
+                    Saves: <Text style={{ color: colors.black }}>{productStats.favorites || 0}</Text>
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </>
           )}
         </View>
@@ -724,6 +843,32 @@ const ProductDetail = ({ route, navigation }) => {
           </View>
         </View>
       </Modal>
+
+
+      {/* Activity Modals */}
+      <ProductActivityModal
+        visible={showLikesModal}
+        onClose={() => setShowLikesModal(false)}
+        productId={productId}
+        activityType="like"
+        title="Who Liked This Product"
+      />
+
+      <ProductActivityModal
+        visible={showSharesModal}
+        onClose={() => setShowSharesModal(false)}
+        productId={productId}
+        activityType="share"
+        title="Who Shared This Product"
+      />
+
+      <ProductActivityModal
+        visible={showFavoritesModal}
+        onClose={() => setShowFavoritesModal(false)}
+        productId={productId}
+        activityType="favorite"
+        title="Who Saved This Product"
+      />
     </KeyboardAwareScrollView>
   );
 };
