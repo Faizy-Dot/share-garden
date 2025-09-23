@@ -8,10 +8,25 @@ import fonts from "../../../../config/Fonts"
 import { useSelector } from "react-redux"
 import { BlackEyeIcon, GreenBitIcon, PurchaseIcon, ShareIcon } from "../../../../assets/svg"
 import CustomButton from "../../../../components/Button/Button"
+import axiosInstance from "../../../../config/axios"
+import Toast from "react-native-toast-message"
 
 const PreviewMerchantAd = ({ route , navigation }) => {
 
-  const { image } = route.params
+  const { 
+    image,
+    title,
+    description,
+    categoryName,
+    addCoupon,
+    discountType,
+    percentageValue,
+    fixedValue,
+    couponCode,
+    redeemByOnline,
+    redeemByInStore,
+    expiryDate,
+  } = route.params
 
   const { user } = useSelector((state) => state.login)
 
@@ -24,24 +39,27 @@ const PreviewMerchantAd = ({ route , navigation }) => {
         contentContainerStyle={styles.scrollContainer}
       >
         <View style={styles.headerContainer}>
-          <Text style={styles.titleText}>Family Day Event Promo, 30% off Store wide!</Text>
-          <Text style={styles.categoryText}>Clothing</Text>
-          <Image source={{ uri: image }} style={styles.image} />
-          <Text style={styles.descriptionText}>description</Text>
+          <Text style={styles.titleText}>{title || 'Ad Title'}</Text>
+          <Text style={styles.categoryText}>{categoryName || 'Category'}</Text>
+          {image ? (
+            <Image source={{ uri: image }} style={styles.image} />
+          ) : null}
+          <Text style={styles.descriptionText}>{description || ''}</Text>
         </View>
 
+        {addCoupon ? (
         <View style={styles.couponCard}>
           <View style={styles.couponHeader}>
             <View style={styles.userInfoContainer}>
               <Text style={styles.userInitial}>{user?.firstName.charAt(0).toUpperCase()}</Text>
               <View>
-                <Text style={styles.couponTitle}>Family Day Promo</Text>
-                <Text style={styles.validUntil}>Valid Until: July 06, 2025</Text>
-                <Text style={styles.redeemText}>Redeem coupon: Online, Instore</Text>
+                <Text style={styles.couponTitle}>{title || 'Coupon'}</Text>
+                <Text style={styles.validUntil}>Valid Until: {expiryDate ? new Date(expiryDate).toDateString() : 'N/A'}</Text>
+                <Text style={styles.redeemText}>Redeem coupon: {(redeemByOnline ? 'Online' : '')}{(redeemByOnline && redeemByInStore) ? ', ' : ''}{(redeemByInStore ? 'Instore' : '')}</Text>
               </View>
             </View>
             <View style={styles.discountContainer}>
-              <Text style={styles.discountText}>20% OFF</Text>
+              <Text style={styles.discountText}>{discountType === 'PERCENTAGE' ? `${percentageValue || 0}% OFF` : (fixedValue ? `$${fixedValue} OFF` : '0 OFF')}</Text>
             </View>
           </View>
 
@@ -65,6 +83,7 @@ const PreviewMerchantAd = ({ route , navigation }) => {
             </View>
           </View>
         </View>
+        ) : null}
 
         <View style={styles.grabCouponSection}>
           <Text style={styles.grabTitle}>Grab this coupon</Text>
@@ -95,7 +114,20 @@ const PreviewMerchantAd = ({ route , navigation }) => {
             fontSize={Metrix.FontSmall}
             borderWidth={1}
             onPress={() =>
-              navigation.navigate("MerchantPostADScreen")
+              navigation.navigate("MerchantPostADScreen", {
+                image,
+                title,
+                description,
+                categoryName,
+                addCoupon,
+                discountType,
+                percentageValue,
+                fixedValue,
+                couponCode,
+                redeemByOnline,
+                redeemByInStore,
+                expiryDate,
+              })
             }
           />
           <CustomButton
@@ -104,6 +136,44 @@ const PreviewMerchantAd = ({ route , navigation }) => {
             height={Metrix.VerticalSize(42)}
             fontSize={Metrix.FontSmall}
             borderRadius={4}
+            onPress={async () => {
+              try {
+                const formData = new FormData();
+                if (title) formData.append('title', title);
+                if (description) formData.append('description', description);
+                if (categoryName) {
+                  // categoryId is not passed; Preview screen doesn't have id. Inform user to go back if missing.
+                }
+                if (image) {
+                  formData.append('images', { uri: image, type: 'image/jpeg', name: 'ad.jpg' });
+                }
+                if (addCoupon) {
+                  formData.append('addCoupon', 'true');
+                  if (discountType) formData.append('discountType', discountType);
+                  const redeemBy = redeemByOnline ? 'ONLINE' : (redeemByInStore ? 'ON_STORE' : 'ONLINE');
+                  formData.append('redeemBy', redeemBy);
+                  if (couponCode) formData.append('couponCode', couponCode);
+                  if (expiryDate) formData.append('expiryDate', expiryDate);
+                  formData.append('couponTitle', title || 'Coupon');
+                  if (discountType === 'PERCENTAGE' && percentageValue) formData.append('percentageValue', String(percentageValue));
+                  if (discountType === 'FIXED' && fixedValue) formData.append('fixedAmountValue', String(fixedValue));
+                  formData.append('disclaimer', description || '');
+                } else {
+                  formData.append('addCoupon', 'false');
+                }
+
+                const res = await axiosInstance.post('/api/ads', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                if (res.status === 201) {
+                  try { await axiosInstance.patch(`/api/ads/${res.data.id}/publish`); } catch {}
+                  Toast.show({ type: 'success', text1: 'Ad Published', text2: 'Your ad has been posted.' });
+                  navigation.goBack();
+                } else {
+                  Toast.show({ type: 'error', text1: 'Error', text2: res.data?.message || 'Failed to publish ad' });
+                }
+              } catch (e) {
+                Toast.show({ type: 'error', text1: 'Error', text2: e.response?.data?.message || 'Failed to publish ad' });
+              }
+            }}
           />
         </View>
       </KeyboardAwareScrollView>

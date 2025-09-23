@@ -210,6 +210,28 @@ export default function MerchantPostAD() {
       name: 'photo.jpg',
     });
 
+    // Attach coupon fields if user opted to add coupon
+    if (addCoupon) {
+      formData.append('addCoupon', 'true');
+      if (discountType) formData.append('discountType', discountType);
+      // Only one redeemBy supported by API: ONLINE or ON_STORE
+      const redeemBy = checkOnline ? 'ONLINE' : (checkInStore ? 'ON_STORE' : 'ONLINE');
+      formData.append('redeemBy', redeemBy);
+      if (couponCode) formData.append('couponCode', couponCode);
+      if (expiryDate) formData.append('expiryDate', new Date(expiryDate).toISOString());
+      if (title) formData.append('couponTitle', title); // use ad title as coupon title if no separate field
+      if (discountType === 'PERCENTAGE' && percentageValue) {
+        formData.append('percentageValue', String(percentageValue));
+      }
+      if (discountType === 'FIXED' && fixedValue) {
+        formData.append('fixedAmountValue', String(fixedValue));
+      }
+      // Optional: disclaimer if present (reuse description if no separate field exists)
+      formData.append('disclaimer', description || '');
+    } else {
+      formData.append('addCoupon', 'false');
+    }
+
     try {
       const response = await axiosInstance.post(
         '/api/ads',
@@ -224,7 +246,7 @@ export default function MerchantPostAD() {
       console.log("response first api ==>>", response.data);
 
       if(response.status === 201){
-        const responsePublish = await axiosInstance.patch(`api/ads/${response.data.id}/publish`);
+        const responsePublish = await axiosInstance.patch(`/api/ads/${response.data.id}/publish`);
         console.log("response from second api==>>", responsePublish.data);
       }
 
@@ -477,9 +499,20 @@ export default function MerchantPostAD() {
             borderColor={"#D0D0D0"}
             fontSize={Metrix.FontSmall}
             borderWidth={1}
-            onPress={() =>
+          onPress={() =>
               navigation.navigate("MerchantPreviewADScreen", {
-                image: image,
+                image,
+                title,
+                description,
+                categoryName: selectedCategoryName,
+                addCoupon,
+                discountType,
+                percentageValue,
+                fixedValue,
+                couponCode,
+                redeemByOnline: checkOnline,
+                redeemByInStore: checkInStore,
+                expiryDate: expiryDate ? new Date(expiryDate).toISOString() : null,
               })
             }
           />
