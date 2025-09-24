@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, Animated } from 'react-native';
 import { LikesIcon, ShareIcon } from '../../assets/svg';
 import colors from '../../config/Colors';
 import fonts from '../../config/Fonts';
@@ -15,8 +15,8 @@ const SGTipActions = ({
     initialStats = { likes: 0, shares: 0 },
     onStatsUpdate,
     sgTipData = {}, // Add SGTip data for sharing
-    onShowLikes, // Callback to show likes modal
-    onShowShares // Callback to show shares modal
+    pulseLikeKey, // triggers like icon pulse when changes
+    pulseShareKey, // triggers share icon pulse when changes
 }) => {
     const [isLiked, setIsLiked] = useState(false);
     const [isLiking, setIsLiking] = useState(false);
@@ -25,6 +25,26 @@ const SGTipActions = ({
     const [hasShared, setHasShared] = useState(false); // Track if user has already shared
 
     const isAuthor = userId === authorId;
+
+    // Animated values for graffiti/pulse
+    const likeScale = useRef(new Animated.Value(1)).current;
+    const shareScale = useRef(new Animated.Value(1)).current;
+
+    const runPulse = (animatedValue) => {
+        Animated.sequence([
+            Animated.timing(animatedValue, { toValue: 1.25, duration: 120, useNativeDriver: true }),
+            Animated.timing(animatedValue, { toValue: 0.95, duration: 120, useNativeDriver: true }),
+            Animated.timing(animatedValue, { toValue: 1, duration: 120, useNativeDriver: true }),
+        ]).start();
+    };
+
+    useEffect(() => {
+        if (pulseLikeKey) runPulse(likeScale);
+    }, [pulseLikeKey]);
+
+    useEffect(() => {
+        if (pulseShareKey) runPulse(shareScale);
+    }, [pulseShareKey]);
 
     useEffect(() => {
         // Use the existing data from the SGTip detail instead of making a separate API call
@@ -118,6 +138,20 @@ const SGTipActions = ({
 
             // Only call API if share was successful and user hasn't shared before
             if (result.action === 'shared' && !hasShared) {
+                // If author shares own SGTip, do NOT award points or open bottom sheets
+                if (isAuthor) {
+                    setHasShared(true);
+                    setStats(prev => ({ ...prev, shares: prev.shares + 1 }));
+                    if (onStatsUpdate) {
+                        onStatsUpdate({ ...stats, shares: stats.shares + 1 });
+                    }
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Shared Successfully!',
+                        text2: 'You shared your own SGTip. No points awarded.'
+                    });
+                    return;
+                }
                 try {
                     const response = await sgtipActivityService.shareSGTip(sgTipId);
                     
@@ -197,17 +231,19 @@ const SGTipActions = ({
                     borderRadius: Metrix.VerticalSize(20),
                     backgroundColor: isLiked ? colors.redColor + '20' : 'transparent',
                 }}
-                onPress={isAuthor ? () => onShowLikes && onShowLikes() : handleLike}
+                onPress={handleLike}
                 disabled={isLiking || (!isAuthor && isLiked)}
             >
-                {isLiking ? (
-                    <ActivityIndicator size="small" color={colors.buttonColor} />
-                ) : (
-                    <LikesIcon 
-                        fill={isLiked ? colors.redColor : 'none'} 
-                        stroke={isLiked ? colors.redColor : colors.gray}
-                    />
-                )}
+                <Animated.View style={{ transform: [{ scale: likeScale }] }}>
+                    {isLiking ? (
+                        <ActivityIndicator size="small" color={colors.buttonColor} />
+                    ) : (
+                        <LikesIcon 
+                            fill={isLiked ? colors.redColor : 'none'} 
+                            stroke={isLiked ? colors.redColor : colors.gray}
+                        />
+                    )}
+                </Animated.View>
                 <Text style={{
                     fontSize: Metrix.FontSmall,
                     fontFamily: fonts.InterSemiBold,
@@ -228,14 +264,16 @@ const SGTipActions = ({
                     borderRadius: Metrix.VerticalSize(20),
                     backgroundColor: hasShared ? colors.buttonColor + '20' : 'transparent',
                 }}
-                onPress={isAuthor ? () => onShowShares && onShowShares() : handleShare}
+                onPress={handleShare}
                 disabled={isSharing}
             >
-                {isSharing ? (
-                    <ActivityIndicator size="small" color={colors.buttonColor} />
-                ) : (
-                    <ShareIcon stroke={hasShared ? colors.buttonColor : colors.gray} />
-                )}
+                <Animated.View style={{ transform: [{ scale: shareScale }] }}>
+                    {isSharing ? (
+                        <ActivityIndicator size="small" color={colors.buttonColor} />
+                    ) : (
+                        <ShareIcon stroke={hasShared ? colors.buttonColor : colors.gray} />
+                    )}
+                </Animated.View>
                 <Text style={{
                     fontSize: Metrix.FontSmall,
                     fontFamily: fonts.InterSemiBold,

@@ -490,15 +490,15 @@ export default function TipsDetail({ route }) {
                             authorId={sgtipDetail.author?.id}
                             initialStats={stats}
                             onStatsUpdate={handleStatsUpdate}
-                            onShowLikes={handleShowLikes}
-                            onShowShares={handleShowShares}
                             sgTipData={{
                                 title: sgtipDetail.title,
                                 description: sgtipDetail.description,
                                 author: sgtipDetail.author,
-                                isLiked: sgtipDetail.isLiked || false, // Use existing like status from API response
-                                hasShared: sgtipDetail.isShared || false // Use existing share status from API response (note: field name is isShared, not hasShared)
+                                isLiked: sgtipDetail.isLiked || false,
+                                hasShared: sgtipDetail.isShared || false
                             }}
+                            pulseLikeKey={stats.likes}
+                            pulseShareKey={stats.shares}
                         />
 
                         <View style={styles.commentContainer}>
@@ -508,6 +508,7 @@ export default function TipsDetail({ route }) {
                             </View>
 
                             {/* Add Comment Section */}
+                            {user?.id !== sgtipDetail.author?.id && (
                             <View style={{ marginTop: Metrix.VerticalSize(15), marginBottom: Metrix.VerticalSize(10) }}>
                                 <TextInput
                                     style={{
@@ -560,6 +561,7 @@ export default function TipsDetail({ route }) {
                                     </TouchableOpacity>
                                 </View>
                             </View>
+                            )}
                         </View>
                     </>
 
@@ -645,23 +647,7 @@ export default function TipsDetail({ route }) {
                 </View>
             </Modal>
 
-            {/* Likes Modal */}
-            <SGTipActivityModal
-                visible={showLikesModal}
-                onClose={() => setShowLikesModal(false)}
-                sgTipId={route.params.id}
-                activityType="like"
-                title="Who Liked This SGTip"
-            />
-
-            {/* Shares Modal */}
-            <SGTipActivityModal
-                visible={showSharesModal}
-                onClose={() => setShowSharesModal(false)}
-                sgTipId={route.params.id}
-                activityType="share"
-                title="Who Shared This SGTip"
-            />
+            {/* Bottom sheets removed per new requirement */}
 
         </KeyboardAvoidingView>
     );
