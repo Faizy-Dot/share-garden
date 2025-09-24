@@ -22,9 +22,12 @@ const styles = StyleSheet.create({
     },
     tipTitleConatiner: {
         paddingHorizontal: Metrix.HorizontalSize(15),
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between"
+        flexDirection: "column",
+        alignItems: "flex-start"
+    },
+    authorContainer: {
+        marginTop: Metrix.VerticalSize(8),
+        alignSelf: "flex-start"
     },
     categoryEarnContainer: {
         borderTopWidth: 1,

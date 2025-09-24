@@ -432,10 +432,10 @@ export default function TipsDetail({ route }) {
                         <View style={styles.tipTitleConatiner}>
                             <View style={styles.tipTitle}>
                                 <TipsTabIcon width={24} height={24} color={colors.buttonColor} />
-                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{sgtipDetail.title}</Text>
+                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold, flex: 1 }}>{sgtipDetail.title}</Text>
                             </View>
-                            <View>
-                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold }}>{sgtipDetail.author.firstName}{" "}{sgtipDetail.author.lastName}</Text>
+                            <View style={styles.authorContainer}>
+                                <Text style={{ fontSize: Metrix.FontSmall, fontFamily: fonts.InterBold, color: colors.buttonColor }}>by {sgtipDetail.author.firstName}{" "}{sgtipDetail.author.lastName}</Text>
                             </View>
                         </View>
 
