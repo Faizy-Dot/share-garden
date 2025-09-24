@@ -9,6 +9,7 @@ import fonts from "../../../config/Fonts";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { BlackBitIcon, PointsEarnIcon, StarIcon } from "../../../assets/svg";
+import Icon from 'react-native-vector-icons/FontAwesome';
 import axiosInstance from "../../../config/axios";
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -22,7 +23,7 @@ export default function RewardsTabScreen({ navigation }) {
 
     // State for API data
     const [reviewData, setReviewData] = useState({
-        averageRating: 4.5,
+        averageRating: 0,
         totalReviews: 0
     });
     const [rewardsSummary, setRewardsSummary] = useState({
@@ -216,7 +217,13 @@ export default function RewardsTabScreen({ navigation }) {
 
             <View style={styles.middleContainer}>
 
-                <Image source={user.profileImage ? { uri: user.profileImage } : Images.homeProfile} style={styles.profile} />
+                {user?.profileImage ? (
+                    <Image source={{ uri: user.profileImage }} style={styles.profile} />
+                ) : (
+                    <View style={styles.profilePlaceholder}>
+                        <Icon name="user" size={Metrix.HorizontalSize(40)} color="#ccc" />
+                    </View>
+                )}
                 <Text style={styles.sameText2}>{user.firstName} {user.lastName}</Text>
 
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
@@ -225,7 +232,6 @@ export default function RewardsTabScreen({ navigation }) {
                 </View>
 
                 <View style={{ gap: 3, alignItems: "center" }}>
-                    <Text style={styles.sameText1}>Your SG Balance is</Text>
                     <Text style={styles.sameText2}>{rewardsSummary.currentBalance || 0}</Text>
                 </View>
 

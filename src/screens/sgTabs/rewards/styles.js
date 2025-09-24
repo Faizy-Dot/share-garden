@@ -41,6 +41,15 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: colors.buttonColor,
     },
+    profilePlaceholder: {
+        width: Metrix.HorizontalSize(62),
+        height: Metrix.HorizontalSize(62),
+        borderRadius: Metrix.HorizontalSize(62) / 2,
+        borderWidth: 2,
+        borderColor: colors.buttonColor,
+        justifyContent: "center",
+        alignItems: "center",
+    },
     sameText1: {
         fontSize: Metrix.FontSmall,
         fontFamily: fonts.InterRegular
