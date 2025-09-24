@@ -13,7 +13,7 @@ import { useFocusEffect } from "@react-navigation/native";
 // Fallback image for ads without images
 const fallbackImage = Images.homePopularListing;
 
-export default function MerchantAds() {
+export default function MerchantAds({ navigation }) {
     const screenWidth = Dimensions.get('window').width;
     const itemWidth = (screenWidth - Metrix.HorizontalSize(45)) / 3; // 3 items per row with margins
 
@@ -164,7 +164,11 @@ export default function MerchantAds() {
         }
         
         return (
-            <View style={[styles.adsDataContainer, { width: itemWidth }]}>
+            <TouchableOpacity 
+                style={[styles.adsDataContainer, { width: itemWidth }]}
+                onPress={() => navigation.navigate('MerchantAdDetail', { adId: item.id })}
+                activeOpacity={0.8}
+            >
                 <View style={{ padding: Metrix.VerticalSize(5) }}>
                     <Image source={imageSource} style={styles.image} />
 
@@ -182,7 +186,7 @@ export default function MerchantAds() {
                         </View>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 

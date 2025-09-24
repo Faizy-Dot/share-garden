@@ -15,17 +15,18 @@ import moment from 'moment';
 import Toast from 'react-native-toast-message';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import ApiCaller from '../../../config/ApiCaller';
-import { Metrix } from '../../../config';
-import colors from '../../../config/Colors';
-import fonts from '../../../config/Fonts';
-import { Images } from '../../../config';
-import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
-import { ShareIcon, CallIcon, AdsLocationIcon, BlackEyeIcon, GreenBitIcon, PurchaseIcon } from '../../../assets/svg';
-import CustomButton from '../../../components/Button/Button';
-import styles from './adDetailStyles';
+import ApiCaller from '../../../../config/ApiCaller';
+import { Metrix } from '../../../../config';
+import colors from '../../../../config/Colors';
+import fonts from '../../../../config/Fonts';
+import { Images } from '../../../../config';
+import MerchantNavbar from '../../../../components/navBar/MerchantNavbar';
+import { ShareIcon, CallIcon, AdsLocationIcon, BlackEyeIcon, GreenBitIcon, PurchaseIcon, EditIcon, CrossIcon } from '../../../../assets/svg';
+import CustomButton from '../../../../components/Button/Button';
 
-export default function AdDetail({ route, navigation }) {
+import styles from './merchantAdDetailStyles';
+
+export default function MerchantAdDetail({ route, navigation }) {
   const { adId } = route.params;
   const { user } = useSelector((state) => state.login);
   const [ad, setAd] = useState(null);
@@ -72,27 +73,69 @@ export default function AdDetail({ route, navigation }) {
     }
   };
 
-  const handleCall = () => {
-    if (ad?.merchant?.phone) {
-      Linking.openURL(`tel:${ad.merchant.phone}`);
-    } else {
+  const handleEdit = () => {
+    // Navigate to edit ad screen
+    navigation.navigate('EditAd', { adId: adId, adData: ad });
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Ad',
+      'Are you sure you want to delete this ad? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: deleteAd,
+        },
+      ]
+    );
+  };
+
+  const deleteAd = async () => {
+    try {
+      await ApiCaller.Delete(`/api/ads/${adId}`);
       Toast.show({
-        type: 'info',
-        text1: 'No Phone Number',
-        text2: 'Phone number not available for this merchant',
+        type: 'success',
+        text1: 'Success',
+        text2: 'Ad deleted successfully',
+      });
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error deleting ad:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to delete ad',
       });
     }
   };
 
-  const handleLocation = () => {
-    if (ad?.merchant?.address) {
-      const encodedAddress = encodeURIComponent(ad.merchant.address);
-      Linking.openURL(`https://maps.google.com/?q=${encodedAddress}`);
-    } else {
+  const handlePublishToggle = async () => {
+    try {
+      const newStatus = ad.isPublished ? 'unpublish' : 'publish';
+      await ApiCaller.Patch(`/api/ads/${adId}/${newStatus}`);
+      
+      setAd(prev => ({
+        ...prev,
+        isPublished: !prev.isPublished
+      }));
+      
       Toast.show({
-        type: 'info',
-        text1: 'No Address',
-        text2: 'Address not available for this merchant',
+        type: 'success',
+        text1: 'Success',
+        text2: `Ad ${newStatus}ed successfully`,
+      });
+    } catch (error) {
+      console.error('Error toggling publish status:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update ad status',
       });
     }
   };
@@ -121,26 +164,48 @@ export default function AdDetail({ route, navigation }) {
 
   const imageSource = ad.images ? { uri: ad.images } : Images.homePopularListing;
   const merchantInitial = ad.merchant?.firstName?.charAt(0)?.toUpperCase() || 'M';
-  const validUntil = ad.coupon?.validUntil ? moment(ad.coupon.validUntil).format('MMM DD, YYYY') : 'N/A';
-  const discountText = ad.coupon?.discountPercentage ? `${ad.coupon.discountPercentage}% OFF` : 'Special Offer';
+  const validUntil = ad.coupon?.validTill ? moment(ad.coupon.validTill).format('MMM DD, YYYY') : 'N/A';
+  const discountText = ad.coupon?.discountValue ? 
+    (ad.coupon.type === 'PERCENTAGE' ? `${ad.coupon.discountValue}% OFF` : `$${ad.coupon.discountValue} OFF`) : 
+    'Special Offer';
 
   return (
     <View style={styles.previewContainer}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <BackArrowIcon />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Ad Details</Text>
-        <TouchableOpacity onPress={handleShare} style={styles.shareButton}>
-          <ShareIcon stroke={colors.black} width={20} height={20} />
-        </TouchableOpacity>
-      </View>
+      <MerchantNavbar 
+        title="Ad Details" 
+        showBackButton={true}
+        rightComponent={
+          <View style={styles.headerActions}>
+            <TouchableOpacity onPress={handleShare} style={styles.actionButton}>
+              <ShareIcon stroke={colors.black} width={20} height={20} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleEdit} style={styles.actionButton}>
+              <EditIcon stroke={colors.black} width={20} height={20} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleDelete} style={styles.actionButton}>
+              <CrossIcon stroke={colors.red} width={20} height={20} />
+            </TouchableOpacity>
+          </View>
+        }
+      />
 
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.scrollContainer}
       >
+        {/* Ad Status */}
+        <View style={styles.statusContainer}>
+          <View style={[styles.statusBadge, { backgroundColor: ad.isPublished ? colors.green : colors.orange }]}>
+            <Text style={styles.statusText}>
+              {ad.isPublished ? 'Published' : 'Draft'}
+            </Text>
+          </View>
+          <Text style={styles.statusDate}>
+            Created: {moment(ad.createdAt).format('MMM DD, YYYY')}
+          </Text>
+        </View>
+
         {/* Ad Header */}
         <View style={styles.headerContainer}>
           <Text style={styles.titleText}>{ad.title}</Text>
@@ -158,7 +223,11 @@ export default function AdDetail({ route, navigation }) {
                 <View>
                   <Text style={styles.couponTitle}>{ad.coupon.title || ad.title}</Text>
                   <Text style={styles.validUntil}>Valid Until: {validUntil}</Text>
-                  <Text style={styles.redeemText}>Redeem coupon: Online, Instore</Text>
+                  <Text style={styles.redeemText}>
+                    Redeem coupon: {ad.coupon.redeemBy?.includes('ONLINE') ? 'Online' : ''}
+                    {ad.coupon.redeemBy?.includes('ONLINE') && ad.coupon.redeemBy?.includes('INSTORE') ? ', ' : ''}
+                    {ad.coupon.redeemBy?.includes('INSTORE') ? 'Instore' : ''}
+                  </Text>
                 </View>
               </View>
               <View style={styles.discountContainer}>
@@ -182,7 +251,9 @@ export default function AdDetail({ route, navigation }) {
                 </View>
               </View>
               <View style={styles.statusContainer}>
-                <Text style={styles.statusText}>Active</Text>
+                <Text style={[styles.statusText, { backgroundColor: ad.coupon?.isActive ? colors.green : colors.red }]}>
+                  {ad.coupon?.isActive ? 'Active' : 'Inactive'}
+                </Text>
               </View>
             </View>
           </View>
@@ -200,53 +271,62 @@ export default function AdDetail({ route, navigation }) {
                 </Text>
                 <Text style={styles.merchantLocation}>
                   <AdsLocationIcon width={12} height={12} />
-                  {ad.merchant?.address || 'Address not available'}
+                  {ad.merchant?.businessAddress || 'Address not available'}
+                </Text>
+                <Text style={styles.merchantPhone}>
+                  📞 {ad.merchant?.businessPhone || ad.merchant?.phoneNumber || 'Phone not available'}
                 </Text>
               </View>
             </View>
           </View>
         </View>
 
-        {/* Grab Coupon Section */}
-        <View style={styles.grabCouponSection}>
-          <Text style={styles.grabTitle}>Grab this coupon</Text>
-          <View style={styles.pointsContainer}>
-            <GreenBitIcon width={40} height={40} />
-            <Text style={styles.pointsText}>{ad.coupon?.pointsRequired || 0}</Text>
+        {/* Ad Statistics */}
+        <View style={styles.statsContainer}>
+          <Text style={styles.statsTitle}>Ad Performance</Text>
+          <View style={styles.statsGrid}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{ad.viewCount || 0}</Text>
+              <Text style={styles.statLabel}>Views</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{ad.shareCount || 0}</Text>
+              <Text style={styles.statLabel}>Shares</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{ad.coupon?.usageCount || 0}</Text>
+              <Text style={styles.statLabel}>Redemptions</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{ad.likeCount || 0}</Text>
+              <Text style={styles.statLabel}>Likes</Text>
+            </View>
           </View>
-        </View>
-
-        {/* Disclaimer */}
-        <View style={styles.disclaimerContainer}>
-          <Text style={styles.disclaimerBold}>
-            Disclaimer:
-            <Text style={styles.disclaimerRegular}>
-              {" "}Valid for one-time use only per user. Cannot be combined with other offers or discounts. Show this page to the merchant to avail this coupon in store.
-            </Text>
-          </Text>
         </View>
 
         {/* Action Buttons */}
         <View style={styles.buttonRow}>
           <CustomButton
             flex={1}
-            title="CALL MERCHANT"
+            title={ad.isPublished ? "UNPUBLISH" : "PUBLISH"}
             height={Metrix.VerticalSize(42)}
+            borderRadius={4}
+            color={colors.white}
+            backgroundColor={ad.isPublished ? colors.orange : colors.green}
+            fontSize={Metrix.FontSmall}
+            onPress={handlePublishToggle}
+          />
+          <CustomButton
+            flex={1}
+            title="EDIT AD"
+            height={Metrix.VerticalSize(42)}
+            fontSize={Metrix.FontSmall}
             borderRadius={4}
             color={colors.black}
             backgroundColor={colors.white}
             borderColor="#D0D0D0"
-            fontSize={Metrix.FontSmall}
             borderWidth={1}
-            onPress={handleCall}
-          />
-          <CustomButton
-            flex={1}
-            title="GET DIRECTIONS"
-            height={Metrix.VerticalSize(42)}
-            fontSize={Metrix.FontSmall}
-            borderRadius={4}
-            onPress={handleLocation}
+            onPress={handleEdit}
           />
         </View>
       </KeyboardAwareScrollView>

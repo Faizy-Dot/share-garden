@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MerchantCoupons from "./coupons/MerchantCoupons";
 import MerchantAds from "./ads/MerchantAds";
+import MerchantAdDetail from "./ads/MerchantAdDetail";
 import MerchantTips from "./tips/MerchantTips";
 import MerchantItems from "./items/MerchantItems";
 import MerchantPostAD from "./PostAD/MerchantPostAD";
@@ -42,6 +43,7 @@ function MerchantItemsStackScreen() {
     return (
       <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
         <ItemsStack.Screen name="MerchantAdsList" component={MerchantAds} />
+        <ItemsStack.Screen name="MerchantAdDetail" component={MerchantAdDetail} />
         <ItemsStack.Screen name="MerchantProfileScreen" component={MerchantProfile} />
       </ItemsStack.Navigator>
     );
