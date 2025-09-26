@@ -52,7 +52,6 @@ const ProductDetail = ({ route, navigation }) => {
   const images = [Images.homePopularListing, Images.homeProfile, Images.homePopularListing,]
 
   const { width } = Dimensions.get('window');
-  console.log("product detail==>>", productDetail)
 
   const { user } = useSelector((state) => state.login);
 
@@ -90,7 +89,13 @@ const ProductDetail = ({ route, navigation }) => {
       return;
     }
 
+    if (loading) {
+      console.log('Already loading product details, skipping...');
+      return;
+    }
+
     try {
+      setLoading(true);
       const response = await axiosInstance.get(`/api/products/${productId}`);
       setProductDetail(response.data);
       
@@ -133,7 +138,9 @@ const ProductDetail = ({ route, navigation }) => {
 
   // Fetch product details and update time
   useEffect(() => {
-    fetchProductDetail();
+    if (productId) {
+      fetchProductDetail();
+    }
   }, [productId]);
 
   // Update countdown timer every second
@@ -168,7 +175,7 @@ const ProductDetail = ({ route, navigation }) => {
     const incrementProductView = async () => {
       try {
         // Only increment view if viewer is not the seller and hasn't been incremented yet
-        if (user?.id !== displayData.seller?.id && !viewIncremented.current) {
+        if (user?.id !== displayData?.seller?.id && !viewIncremented.current && displayData?.id) {
           await axiosInstance.post(`/api/products/${displayData.id}/views`);
           viewIncremented.current = true; // Mark as incremented
         }
@@ -177,11 +184,11 @@ const ProductDetail = ({ route, navigation }) => {
       }
     };
 
-    // Only call if we have both user and product data
-    if (user && displayData && displayData.id) {
+    // Only call if we have both user and product data, and view hasn't been incremented
+    if (user && displayData?.id && !viewIncremented.current) {
       incrementProductView();
     }
-  }, [user, displayData?.id]); // Only depend on user and product ID
+  }, [user?.id, displayData?.id]); // Only depend on user ID and product ID
 
   // Add function to handle favorite toggle
   const handleFavoritePress = async () => {
