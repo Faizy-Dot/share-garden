@@ -364,5 +364,42 @@ export const styles = StyleSheet.create({
         color: "#646464",
       },
      
-
+ middleBox: {
+        borderWidth: 1,
+        borderColor: colors.borderColor,
+        borderRadius: Metrix.VerticalSize(3)
+    },
+    imageContainer: {
+        width: Metrix.HorizontalSize(110),
+        height: Metrix.HorizontalSize(110),
+        backgroundColor : colors.borderColor
+    },
+       updateImage: {
+        width: Metrix.HorizontalSize(110),
+        height: Metrix.HorizontalSize(110),
+    },
+       middleTitle: {
+        fontSize: Metrix.FontMedium,
+        fontFamily: fonts.InterSemiBold,
+        paddingVertical : 20
+    },
+    middleDescription: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+    },
+    sameMiddleBox: {
+        borderBottomWidth: 1,
+        paddingHorizontal: Metrix.HorizontalSize(20),
+        borderColor: colors.borderColor,
+        paddingVertical: Metrix.VerticalSize(15)
+    },
+    itemConditionText: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterSemiBold,
+    },
+       bidsValue: {
+        fontSize: Metrix.FontExtraLarge,
+        fontFamily: fonts.InterBold,
+        color: colors.buttonColor
+    },
 })

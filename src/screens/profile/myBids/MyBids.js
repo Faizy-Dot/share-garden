@@ -24,7 +24,7 @@ export default function MyBids() {
         try {
             setLoading(true);
             const response = await axiosInstance.get('/api/bids/user');
-            console.log("API Response:", response.data);
+            console.log("bids ==>>>" , response.data)
             setBids(response.data);
         } catch (err) {
             setError('Failed to fetch bids. Please try again later.');
@@ -55,8 +55,8 @@ export default function MyBids() {
         const isDeclined = item.status === 'REJECTED';
         const isAccepted = item.status === 'ACCEPTED';
         
-        console.log("Full bid item:", JSON.stringify(item, null, 2));
-        console.log("Product data:", JSON.stringify(item.product, null, 2));
+        // console.log("Full bid item:", JSON.stringify(item, null, 2));
+        // console.log("Product data:", JSON.stringify(item.product, null, 2));
         
         return (
             <View style={styles.renderMyBidsContainer}>

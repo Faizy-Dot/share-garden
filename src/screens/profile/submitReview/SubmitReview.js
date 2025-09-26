@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, Image, TextInput, Modal } from 'react-native';
+import { View, Text, FlatList, Image, TextInput, Modal, TouchableOpacity } from 'react-native';
 import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
 import styles from './style';
 import { ProgressBar } from 'react-native-paper';
@@ -18,7 +18,7 @@ export default function SubmitReview({ route }) {
     const [comment, setComment] = useState('');
     const [submitReviewModal, setSubmitReviewModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+console.log("tradid from submit reviews==>>" , tradeId)
     const reviewsData = [
         { label: 'Excellent', percentage: 0.8 },
         { label: 'Good', percentage: 0.6 },

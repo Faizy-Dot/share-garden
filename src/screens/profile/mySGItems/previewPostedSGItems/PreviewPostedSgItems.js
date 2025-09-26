@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, TextInput, FlatList, Modal } from 
 import { styles } from './style';
 import BackArrowIcon from '../../../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../../../components/navBar/NavBar';
-import { BlackBitIcon, CrossIcon, DownArrowIcon, LikesIcon, ModalInfoIcon, NotificationIcon, RightArrowIcon, ShareIcon, TimeIcon, ViewsIcon } from '../../../../assets/svg';
+import { BlackBitIcon, CashIcon, CrossIcon, DownArrowIcon, LikesIcon, ModalInfoIcon, NotificationIcon, RightArrowIcon, ShareIcon, TimeIcon, ViewsIcon } from '../../../../assets/svg';
 import { Colors, Images, Metrix } from '../../../../config';
 import fonts from '../../../../config/Fonts';
 import colors from '../../../../config/Colors';
@@ -53,8 +53,9 @@ export default function PreviewPostedSgItems({ navigation, route }) {
   const [sgId, setSgId] = useState('')
   const [bidTradeMap, setBidTradeMap] = useState({}) // Map to track which bids have trades
 
-
-  console.log("tradeid==>>",tradeId)
+  console.log("item ==>>", item.isSGPoints
+  )
+  console.log("tradeid==>>", tradeId)
 
   const calculateTimeRemaining = (bidEndTime) => {
     const now = new Date();
@@ -93,11 +94,18 @@ export default function PreviewPostedSgItems({ navigation, route }) {
     }
   }, [productInfo?.bidEndTime]);
 
-  // useEffect(() => {
-  //   updateTimer();
-  //   const timer = setInterval(updateTimer, 1000);
-  //   return () => clearInterval(timer);
-  // }, [updateTimer]);
+  const getDisplayCondition = (apiCondition) => {
+    switch (apiCondition) {
+      case 'FAIRLY_USED':
+        return 'Fairly Used';
+      case 'GOOD':
+        return 'Good';
+      case 'EXCELLENT':
+        return 'Excellent';
+      default:
+        return 'Not specified';
+    }
+  };
 
   const fetchProductDetail = async () => {
     setLoading(true)
@@ -117,9 +125,9 @@ export default function PreviewPostedSgItems({ navigation, route }) {
 
 
       }
-      if(response.data.trades[0]?.tradeId){
+      if (response.data.trades[0]?.tradeId) {
         setTradeId(true)
-      }else{
+      } else {
         setTradeId(false)
       }
 
@@ -229,7 +237,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
             </TouchableOpacity>
             <View style={styles.bidAmountContainer}>
               <BlackBitIcon width={24} height={24} />
-              <Text style={styles.bidAmount}>{item.amount}</Text>
+              <Text style={styles.bidAmount}>{item.minBid}</Text>
             </View>
           </View>
         </View>
@@ -262,7 +270,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                     borderRadius={Metrix.VerticalSize(4)}
                     disabled={!hasTrade || !tradeIsPending}
                     onPress={() => {
-                      console.log("check==>>",item.trades[0].tradeId)
+                      console.log("check==>>", item.trades[0].tradeId)
                       if (item.trades.length > 0) {
                         Clipboard.setString(item.trades[0].tradeId);
                         if (Platform.OS === 'android') {
@@ -321,7 +329,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
               <Text style={styles.awaitingText}>Awaiting for the buyer to share trade id with you.</Text>
             )}
           </View>
-        ):null}
+        ) : null}
       </View>
     );
   };
@@ -342,8 +350,18 @@ export default function PreviewPostedSgItems({ navigation, route }) {
         <View style={styles.headerContainer}>
           <Text style={styles.titleText}>{productInfo?.title || item.title}</Text>
           <View style={styles.iconRow}>
-            <BlackBitIcon width={16} height={16} />
-            <Text style={styles.minBidText}>{productInfo?.minBid || item.minBid}</Text>
+            {
+              item?.isSGPoints ?
+                <>
+                  <BlackBitIcon width={16} height={16} />
+                  <Text style={styles.minBidText}>{item.minBid}</Text>
+                </>
+                :
+                <>
+                  <CashIcon />
+                  <Text style={styles.minBidText}>{item.price}</Text>
+                </>
+            }
           </View>
         </View>
 
@@ -362,10 +380,7 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                 <ShareIcon width={14} height={17} />
                 <Text style={styles.iconText}>{productInfo?.stats?.shares || productInfo?.shareCount || item.shareCount || 0}</Text>
               </View>
-              <View style={styles.iconRow}>
-                <LikesIcon width={14} height={12} />
-                <Text style={styles.iconText}>{productInfo?.stats?.favorites || productInfo?.favoriteCount || 0}</Text>
-              </View>
+
             </View>
 
             <CustomButton
@@ -407,100 +422,164 @@ export default function PreviewPostedSgItems({ navigation, route }) {
               </View>
             )
           }
-
-          <View style={[!viewItemsDetails ? styles.closedBox : styles.openBox]}>
-            <View style={styles.headerRow}>
-              <TouchableOpacity style={styles.arrowButton} activeOpacity={0.8} onPress={() => setViewItemsDetails(!viewItemsDetails)}>
-                {viewItemsDetails ? <DownArrowIcon stroke={colors.buttonColor} /> : <RightArrowIcon stroke={colors.white} />}
-              </TouchableOpacity>
-              <Text style={[styles.headerText, viewItemsDetails && styles.headerTextBlack]}>View item details</Text>
-            </View>
-
-            {viewItemsDetails && (
-              <View style={styles.itemDetailsContainer}>
-                <Image
-                  source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
-                  style={styles.itemImage}
-                />
-                <Text style={styles.itemDescription}>{item.description}</Text>
-              </View>
-            )}
-          </View>
-
-          <View style={[!viewBidsDetails ? styles.closedBox : styles.openBox]}>
-            <View style={styles.headerRow}>
-              <TouchableOpacity style={styles.arrowButton} activeOpacity={0.8} onPress={() => setViewBidsDetails(!viewBidsDetails)}>
-                {viewBidsDetails ? <DownArrowIcon stroke={colors.buttonColor} /> : <RightArrowIcon stroke={colors.white} />}
-              </TouchableOpacity>
-              <Text style={[styles.headerText, viewBidsDetails && styles.headerTextBlack]}>Bidding Details</Text>
-            </View>
-
-            {viewBidsDetails && (
-              <View style={styles.bidDetailsContainer}>
-                <View style={styles.bidSummaryBox}>
-                  <Text style={styles.bidSummaryText}>Total Bid: <Text style={styles.bidValue}>{productDetail.length}</Text></Text>
-                  <Text style={styles.bidSummaryText}>Highest Bid: <Text style={styles.bidValue}>{Math.max(...productDetail.map(bid => bid.amount))}</Text></Text>
-                  <Text style={styles.bidSummaryText}>Status: <Text style={styles.bidValue}>{productInfo?.status || 'Active'}</Text></Text>
-                </View>
-
-                <View style={styles.sameMiddleBox}>
-                  <View style={styles.timeRow}>
-                    <TimeIcon width={12} height={12} stroke="#5A5A5A" />
-                    <Text style={styles.bidEndsText}>Bid Ends</Text>
-                  </View>
-
-                  <View style={styles.timerRow}>
-                    {[
-                      { label: "Days", value: days, setter: setDays },
-                      { label: "Hours", value: hours, setter: setHours },
-                      { label: "Minutes", value: minutes, setter: setMinutes },
-                      { label: "Seconds", value: seconds, setter: setSeconds },
-                    ].map((item, index) => (
-                      <View key={index} style={styles.inputContainer}>
-                        <View style={styles.timeInputRow}>
-                          <TextInput
-                            style={styles.input}
-                            value={item.value}
-                            keyboardType="numeric"
-                            placeholder="00"
-                            placeholderTextColor="#000"
-                            editable={false}
-                            selectTextOnFocus={false}
-                            maxLength={2}
-                          />
-                          {index < 3 && <Text style={styles.separator}>:</Text>}
-                        </View>
-                        <Text style={styles.label}>{item.label}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              </View>
-            )}
-          </View>
-
-
-
-          {/* <FlatList
-                    data={requestBuyData}
-                    renderItem={renderRequestBitData}
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={{ gap: Metrix.VerticalSize(7) }}
-                /> */}
-
           {
-            loading ?
-              <ActivityIndicator style={{ marginTop: Metrix.VerticalSize(50) }} />
+            item?.isSGPoints ?
+              <>
+                <View style={[!viewItemsDetails ? styles.closedBox : styles.openBox]}>
+                  <View style={styles.headerRow}>
+                    <TouchableOpacity style={styles.arrowButton} activeOpacity={0.8} onPress={() => setViewItemsDetails(!viewItemsDetails)}>
+                      {viewItemsDetails ? <DownArrowIcon stroke={colors.buttonColor} /> : <RightArrowIcon stroke={colors.white} />}
+                    </TouchableOpacity>
+                    <Text style={[styles.headerText, viewItemsDetails && styles.headerTextBlack]}>View item details</Text>
+                  </View>
+
+                  {viewItemsDetails && (
+                    <View style={styles.itemDetailsContainer}>
+                      <Image
+                        source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
+                        style={styles.itemImage}
+                      />
+                      <Text style={styles.itemDescription}>{item.description}</Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={[!viewBidsDetails ? styles.closedBox : styles.openBox]}>
+                  <View style={styles.headerRow}>
+                    <TouchableOpacity style={styles.arrowButton} activeOpacity={0.8} onPress={() => setViewBidsDetails(!viewBidsDetails)}>
+                      {viewBidsDetails ? <DownArrowIcon stroke={colors.buttonColor} /> : <RightArrowIcon stroke={colors.white} />}
+                    </TouchableOpacity>
+                    <Text style={[styles.headerText, viewBidsDetails && styles.headerTextBlack]}>Bidding Details</Text>
+                  </View>
+
+                  {viewBidsDetails && (
+                    <View style={styles.bidDetailsContainer}>
+                      <View style={styles.bidSummaryBox}>
+                        <Text style={styles.bidSummaryText}>Total Bid: <Text style={styles.bidValue}>{productDetail.length}</Text></Text>
+                        <Text style={styles.bidSummaryText}>Highest Bid: <Text style={styles.bidValue}>{Math.max(...productDetail.map(bid => bid.amount))}</Text></Text>
+                        <Text style={styles.bidSummaryText}>Status: <Text style={styles.bidValue}>{productInfo?.status || 'Active'}</Text></Text>
+                      </View>
+
+                      <View style={styles.sameMiddleBox}>
+                        <View style={styles.timeRow}>
+                          <TimeIcon width={12} height={12} stroke="#5A5A5A" />
+                          <Text style={styles.bidEndsText}>Bid Ends</Text>
+                        </View>
+
+                        <View style={styles.timerRow}>
+                          {[
+                            { label: "Days", value: days, setter: setDays },
+                            { label: "Hours", value: hours, setter: setHours },
+                            { label: "Minutes", value: minutes, setter: setMinutes },
+                            { label: "Seconds", value: seconds, setter: setSeconds },
+                          ].map((item, index) => (
+                            <View key={index} style={styles.inputContainer}>
+                              <View style={styles.timeInputRow}>
+                                <TextInput
+                                  style={styles.input}
+                                  value={item.value}
+                                  keyboardType="numeric"
+                                  placeholder="00"
+                                  placeholderTextColor="#000"
+                                  editable={false}
+                                  selectTextOnFocus={false}
+                                  maxLength={2}
+                                />
+                                {index < 3 && <Text style={styles.separator}>:</Text>}
+                              </View>
+                              <Text style={styles.label}>{item.label}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    </View>
+                  )}
+                </View>
+
+
+                {
+                  loading ?
+                    <ActivityIndicator style={{ marginTop: Metrix.VerticalSize(50) }} />
+                    :
+                    !productDetail.length ?
+                      <Text style={{ fontSize: Metrix.FontMedium, fontFamily: fonts.InterLight, textAlign: "center", marginTop: Metrix.VerticalSize(50) }}>No Bids Available</Text>
+                      :
+                      productDetail.map((item, index) => {
+                        return (
+                          renderRequestBitData(item, index)
+                        )
+                      })
+                }
+              </>
+
               :
-              !productDetail.length ?
-                <Text style={{ fontSize: Metrix.FontMedium, fontFamily: fonts.InterLight, textAlign: "center", marginTop: Metrix.VerticalSize(50) }}>No Bids Available</Text>
-                :
-                productDetail.map((item, index) => {
-                  return (
-                    renderRequestBitData(item, index)
-                  )
-                })
+              <>
+                <View style={styles.middleBox}>
+                  <View >
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                      <View style={styles.imageContainer}>
+                        {
+                          item?.imagesArray[0] &&
+                          <Image source={{ uri: item?.imagesArray[0] }} style={styles.updateImage} />
+                        }
+                      </View>
+                      <View style={styles.imageContainer}>
+                        {
+                          item?.imagesArray[1] &&
+                          <Image source={{ uri: item?.imagesArray[1] }} style={styles.updateImage} />
+                        }
+                      </View>
+                      <View style={styles.imageContainer}>
+                        {
+                          item?.imagesArray[2] &&
+                          <Image source={{ uri: item?.imagesArray[2] }} style={styles.updateImage} />
+                        }
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={styles.sameMiddleBox}>
+                    <Text style={styles.middleDescription}>{item.description}</Text>
+                  </View>
+
+                  <View style={styles.sameMiddleBox}>
+                    <Text style={styles.itemConditionText}>Category : <Text style={{ fontFamily: fonts.InterRegular }}>{item.category.name}</Text></Text>
+                  </View>
+
+                  <View style={[styles.sameMiddleBox, { flexDirection: "row", gap: Metrix.HorizontalSize(5), }]}>
+                    <Text style={styles.itemConditionText}>
+                      Item Condition : <Text style={{ fontFamily: fonts.InterRegular, }}>
+                        {getDisplayCondition(item.condition)}
+                      </Text>
+                    </Text>
+                  </View>
+
+                  <View style={[styles.sameMiddleBox, { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(10) }}>
+                      <CashIcon width={32} height={32} />
+                      <Text style={[styles.itemConditionText, { fontFamily: fonts.InterBold }]}>
+                        Price
+                      </Text>
+                    </View>
+                    <Text style={styles.bidsValue}>{"$ "}{item.price}</Text>
+                  </View>
+                </View>
+                <View style={{marginTop : Metrix.VerticalSize(20)}}>
+                  <CustomButton title={"DELETE THIS POST"}
+                    width={"100%"}
+                    height={42}
+                    fontSize={16}
+                    borderRadius={3}
+                  />
+                </View>
+              </>
+
           }
+
+
+
+
+
 
 
         </View>
@@ -508,63 +587,63 @@ export default function PreviewPostedSgItems({ navigation, route }) {
       </KeyboardAwareScrollView>
 
       <Modal visible={modalVisible} transparent animationType="fade">
-  <View style={styles.modalContainer}>
-    <View style={styles.modalBox}>
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => {
-          setModalVisible(false);
-          setSgId('');
-        }}
-      >
-        <CrossIcon />
-      </TouchableOpacity>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalBox}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => {
+                setModalVisible(false);
+                setSgId('');
+              }}
+            >
+              <CrossIcon />
+            </TouchableOpacity>
 
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitle}>Kindly enter SG ID, to mark as sold.</Text>
-        <View style={styles.modalInputContainer}>
-          <View style={styles.inputRow}>
-            <Text style={styles.modalLabel}>SG ID:</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={sgId}
-              onChangeText={setSgId}
-              placeholder="Enter SG ID"
-            />
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Kindly enter SG ID, to mark as sold.</Text>
+              <View style={styles.modalInputContainer}>
+                <View style={styles.inputRow}>
+                  <Text style={styles.modalLabel}>SG ID:</Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    value={sgId}
+                    onChangeText={setSgId}
+                    placeholder="Enter SG ID"
+                  />
+                </View>
+                <CustomButton
+                  title={"SUBMIT"}
+                  width={Metrix.HorizontalSize(144)}
+                  height={Metrix.VerticalSize(36)}
+                  borderRadius={Metrix.VerticalSize(35)}
+                  fontSize={Metrix.FontSmall}
+                  onPress={async () => {
+                    if (sgId.trim()) {
+                      try {
+                        const response = await axiosInstance.post('/api/trades/verify', {
+                          tradeId: sgId.trim()
+                        });
+                        console.log('Trade verification response:', response.data);
+
+                        setModalVisible(false);
+                        setSgId('');
+                        fetchProductDetail();
+                      } catch (error) {
+                        console.error('Error verifying trade:', error);
+                      }
+                    }
+                  }}
+                  disabled={!sgId.trim()}
+                />
+              </View>
+              <View style={styles.infoContainer}>
+                <ModalInfoIcon outerStroke={colors.redColor} width={24} height={24} />
+                <Text style={styles.infoText}>Go back to your trade screen and copy trade Id to submit here</Text>
+              </View>
+            </View>
           </View>
-          <CustomButton
-            title={"SUBMIT"}
-            width={Metrix.HorizontalSize(144)}
-            height={Metrix.VerticalSize(36)}
-            borderRadius={Metrix.VerticalSize(35)}
-            fontSize={Metrix.FontSmall}
-            onPress={async () => {
-              if (sgId.trim()) {
-                try {
-                  const response = await axiosInstance.post('/api/trades/verify', {
-                    tradeId: sgId.trim()
-                  });
-                  console.log('Trade verification response:', response.data);
-
-                  setModalVisible(false);
-                  setSgId('');
-                  fetchProductDetail();
-                } catch (error) {
-                  console.error('Error verifying trade:', error);
-                }
-              }
-            }}
-            disabled={!sgId.trim()}
-          />
         </View>
-        <View style={styles.infoContainer}>
-          <ModalInfoIcon outerStroke={colors.redColor} width={24} height={24} />
-          <Text style={styles.infoText}>Go back to your trade screen and copy trade Id to submit here</Text>
-        </View>
-      </View>
-    </View>
-  </View>
-</Modal>
+      </Modal>
 
 
     </View>

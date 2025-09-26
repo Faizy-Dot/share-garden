@@ -58,15 +58,16 @@ export default function BidsReview() {
   const [tradeLoading, setTradeLoading] = useState(false)
   const [tradeCompleted, setTradeCompleted] = useState(false)
 
-
+console.log("trade id from bids==>>" , tradeResponse?.tradeId)
+console.log("bid deatil==>>" , bidDetail)
 
   const resetStates = useCallback(() => {
     setBuyProceed(false);
   }, []);
 
   useEffect(() => {
-    console.log("useEffect triggered");
-    console.log("Current route params:", JSON.stringify(route.params, null, 2));
+    // console.log("useEffect triggered");
+    // console.log("Current route params:", JSON.stringify(route.params, null, 2));
 
     resetStates();
 
@@ -78,14 +79,12 @@ export default function BidsReview() {
       return;
     }
 
-    const { productId, bidId } = route.params;
-    console.log("Parameters in useEffect:", { productId, bidId });
 
     if (productId && bidId) {
       console.log("Starting to fetch details...");
       fetchDetails();
     } else {
-      console.log("Missing required parameters:", { productId, bidId });
+      // console.log("Missing required parameters:", { productId, bidId });
       setError('Missing required parameters');
       setLoading(false);
     }
@@ -139,32 +138,6 @@ export default function BidsReview() {
         }
       })
 
-
-      // Check if there's a verified trade that matches the current bid
-      // if (productResponse.data.trades && productResponse.data.trades.length > 0) {
-      //   // Look for a matching trade (either VERIFIED or COMPLETED)
-      //   const matchingTrade = productResponse.data.trades.find(
-      //     trade => trade.bidId === bidId && (trade.status === 'VERIFIED' || trade.status === 'COMPLETED')
-      //   );
-
-      //   if (matchingTrade) {
-      //     console.log("Found matching trade for this bid:", matchingTrade);
-
-      //     // If the trade is already completed
-      //     if (matchingTrade.status === 'COMPLETED') {
-      //       setTradeCompleted(true);
-      //       setTradeResponse(matchingTrade);
-      //       setTradeProceed(true);
-      //     }
-      //     // If the trade is verified but not completed
-      //     else if (matchingTrade.status === 'VERIFIED') {
-      //       setVerifiedTrade(matchingTrade);
-      //       setTradeResponse(matchingTrade);
-      //       setTradeProceed(true);
-      //     }
-      //   }
-      // }
-
       // Instead of fetching individual bid, get all user bids and find the matching one
       console.log("Fetching user bids to find bid:", bidId);
       const bidsResponse = await axiosInstance.get('/api/bids/user');
@@ -176,17 +149,17 @@ export default function BidsReview() {
         bid.product?.id === productId
       );
 
-      console.log("Matching bid search:", {
-        bidId,
-        productId,
-        found: !!matchingBid,
-        allBids: bidsResponse.data.map(b => ({
-          id: b.id,
-          productId: b.product?.id,
-          amount: b.amount,
-          status: b.status
-        }))
-      });
+      // console.log("Matching bid search:", {
+      //   bidId,
+      //   productId,
+      //   found: !!matchingBid,
+      //   allBids: bidsResponse.data.map(b => ({
+      //     id: b.id,
+      //     productId: b.product?.id,
+      //     amount: b.amount,
+      //     status: b.status
+      //   }))
+      // });
 
       if (!matchingBid) {
         throw new Error(`Your bid for this product was not found`);
@@ -247,7 +220,6 @@ export default function BidsReview() {
     return name ? name.charAt(0).toUpperCase() : '?';
   };
 
-  console.log("productDetail===>>>", productDetail)
 
   return (
     <View style={styles.BidsReviewContainer}>
@@ -583,7 +555,12 @@ export default function BidsReview() {
               width={Metrix.HorizontalSize(261)}
               borderRadius={Metrix.VerticalSize(35)}
               fontSize={Metrix.FontSmall}
-              onPress={() => { navigation.navigate("SubmitReview") }}
+              onPress={() => {
+                navigation.navigate("SubmitReview", {
+                  tradeId: tradeResponse?.tradeId,
+                });
+              }}
+
             />
           </View>
         </View>

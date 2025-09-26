@@ -394,11 +394,10 @@ const ProductDetail = ({ route, navigation }) => {
       fetchProductDetail();
 
       // Show success message
-      Alert.alert(
-        'Success',
-        'Your bid has been placed successfully!',
-        [{ text: 'OK' }]
-      );
+      Toast.show({
+          type: "success",
+          text1: "Your bid has been placed successfully!"
+        })
     } catch (err) {
       // console.error('Error placing bid:', err);
       // Log the full error response
@@ -529,7 +528,7 @@ const ProductDetail = ({ route, navigation }) => {
                   </View>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(8) }}>
                     <TimeIcon stroke={colors.black} width={12} height={12} />
-                    <Text style={{ fontSize: Metrix.FontMedium, fontFamily: fonts.InterSemiBold }}>Bid ends</Text>
+                    <Text style={{ fontSize: Metrix.FontMedium, fontFamily: fonts.InterSemiBold }}>Bid duration</Text>
                   </View>
                 </View>
 

@@ -557,7 +557,7 @@ export default function PostTabScreen({ navigation, route }) {
                   <View style={[styles.sameMiddleBox, { flexDirection: "row", gap: Metrix.HorizontalSize(29) }]}>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: Metrix.HorizontalSize(15) }}>
                       <TimeIcon width={12} height={12} stroke="#5A5A5A" />
-                      <Text style={styles.bidEndsText}>Bid Ends</Text>
+                      <Text style={styles.bidEndsText}>Bid duration</Text>
                     </View>
 
                     <View style={styles.timerRow}>
