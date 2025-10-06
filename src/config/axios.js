@@ -17,9 +17,19 @@ axiosInstance.interceptors.request.use(
         }
         // If sending FormData, let axios set the correct multipart boundary
         if (config.data && typeof config.data === 'object' && typeof config.data.append === 'function') {
-            if (config.headers && config.headers['Content-Type']) {
+            // Always remove Content-Type header for FormData to let axios set multipart boundary
+            if (config.headers) {
                 delete config.headers['Content-Type'];
+                delete config.headers['content-type'];
             }
+            // Ensure axios doesn't set a default Content-Type for FormData
+            config.transformRequest = [(data, headers) => {
+                if (data && typeof data.append === 'function') {
+                    // Let axios handle FormData without setting Content-Type
+                    return data;
+                }
+                return data;
+            }];
         }
         return config;
     },

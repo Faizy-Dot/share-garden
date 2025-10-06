@@ -232,13 +232,11 @@ export default function PostTabScreen({ navigation, route }) {
 
         console.log("checkkkk")
 
-        const response = await axiosInstance.put(
+        const response = await ApiCaller.PutFormData(
           `/api/products/${forDraft.id}`,
           formData,
           {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+            Authorization: `Bearer ${user?.token}`,
           }
         );
 

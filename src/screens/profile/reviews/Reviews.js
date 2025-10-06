@@ -251,14 +251,6 @@ export default function Reviews() {
         </View>
       )}
 
-      <View style={{ paddingHorizontal: Metrix.HorizontalSize(40), marginBottom: Metrix.VerticalSize(5) }}>
-        <CustomButton 
-          title={"Write reviews"}
-          height={Metrix.VerticalSize(48)}
-          width={"100%"}
-          borderRadius={Metrix.VerticalSize(37)} 
-        />
-      </View>
 
     </View>
   );

@@ -162,7 +162,7 @@ const PreviewMerchantAd = ({ route , navigation }) => {
                   formData.append('addCoupon', 'false');
                 }
 
-                const res = await axiosInstance.post('/api/ads', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                const res = await axiosInstance.post('/api/ads', formData);
                 if (res.status === 201) {
                   try { await axiosInstance.patch(`/api/ads/${res.data.id}/publish`); } catch {}
                   Toast.show({ type: 'success', text1: 'Ad Published', text2: 'Your ad has been posted.' });

@@ -9,6 +9,7 @@ import colors from '../../../config/Colors';
 import fonts from '../../../config/Fonts';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../../config/axios';
+import ApiCaller from '../../../config/ApiCaller';
 import { BlackBitIcon, CashIcon, CrossIcon, LikesIcon, ModalInfoIcon, ModalSuccessLogo, ShareIcon, TimeIcon, ViewsIcon } from '../../../assets/svg';
 
 
@@ -101,13 +102,11 @@ export default function MySGItems({ navigation }) {
             });
 
 
-            const response = await axiosInstance.put(
+            const response = await ApiCaller.PutFormData(
                 `/api/products/${item.id}`,
                 formData,
                 {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
+                    Authorization: `Bearer ${user?.token}`,
                 }
             );
 

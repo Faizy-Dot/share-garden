@@ -33,6 +33,14 @@ const styles = StyleSheet.create({
         borderColor: "#C4C4C4",
         width: "100%",
     },
+    reviewButtonContainer: {
+        alignItems: "center",
+        paddingVertical: Metrix.VerticalSize(15),
+        paddingHorizontal: Metrix.HorizontalSize(20),
+        backgroundColor: "#F8F9FA",
+        borderBottomWidth: 1,
+        borderColor: "#E9ECEF",
+    },
     bidHeaderLeft: {
         flexDirection: "row",
         alignItems: "center",

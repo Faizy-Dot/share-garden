@@ -235,12 +235,7 @@ export default function MerchantPostAD() {
     try {
       const response = await axiosInstance.post(
         '/api/ads',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        formData
       );
       
       console.log("response first api ==>>", response.data);

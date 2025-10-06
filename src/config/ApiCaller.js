@@ -43,4 +43,12 @@ export default class ApiCaller {
       .then(res => res)
       .catch(err => err.response);
   };
+
+  static PutFormData = (url = '', body = {}, headers = {}) => {
+    return Axios.put(`${baseUrl}${url}`, body, {
+      headers: { 'Content-Type': 'multipart/form-data', ...headers },
+    })
+      .then(res => res)
+      .catch(err => err.response);
+  };
 }

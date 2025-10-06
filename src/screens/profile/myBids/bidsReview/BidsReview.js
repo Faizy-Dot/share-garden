@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useSelector } from 'react-redux';
 import styles from './style';
 import BackArrowIcon from '../../../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../../../components/navBar/NavBar';
@@ -9,7 +10,8 @@ import fonts from '../../../../config/Fonts';
 import colors from '../../../../config/Colors';
 import CustomButton from '../../../../components/Button/Button';
 import axiosInstance from '../../../../config/axios';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 // Add custom styles for completed trade
 const customStyles = StyleSheet.create({
@@ -35,6 +37,7 @@ const customStyles = StyleSheet.create({
 export default function BidsReview() {
   const route = useRoute();
   const navigation = useNavigation();
+  const { user } = useSelector((state) => state.login);
 
   // Log the entire route object to see what we're getting
   console.log("Full route object:", JSON.stringify(route, null, 2));
@@ -57,6 +60,8 @@ export default function BidsReview() {
   const [tradeResponse, setTradeResponse] = useState(null)
   const [tradeLoading, setTradeLoading] = useState(false)
   const [tradeCompleted, setTradeCompleted] = useState(false)
+  const [completedTrades, setCompletedTrades] = useState([])
+  const [hasUnreviewedTrades, setHasUnreviewedTrades] = useState(false)
 
 console.log("trade id from bids==>>" , tradeResponse?.tradeId)
 console.log("bid deatil==>>" , bidDetail)
@@ -65,11 +70,68 @@ console.log("bid deatil==>>" , bidDetail)
     setBuyProceed(false);
   }, []);
 
+  // Check for completed trades that need reviews
+  const checkForUnreviewedTrades = useCallback(async () => {
+    try {
+      const response = await axiosInstance.get('/api/trades');
+      const trades = response.data;
+      
+      // Filter for completed trades where user is the buyer
+      const userCompletedTrades = trades.filter(trade => 
+        trade.status === 'COMPLETED' && 
+        trade.buyerId === user?.id
+      );
+      
+      setCompletedTrades(userCompletedTrades);
+      
+      // Check if any completed trades don't have reviews yet
+      const unreviewedTrades = [];
+      
+      for (const trade of userCompletedTrades) {
+        try {
+          // Check if a review already exists for this trade
+          const reviewResponse = await axiosInstance.get(`/api/reviews/product/${trade.productId}`);
+          const existingReviews = reviewResponse.data;
+          
+          // Check if current user has already reviewed this product/trade
+          const hasReviewed = existingReviews.some(review => 
+            review.reviewerId === user?.id && 
+            review.tradeId === trade.id
+          );
+          
+          if (!hasReviewed) {
+            unreviewedTrades.push(trade);
+          }
+        } catch (reviewError) {
+          // If we can't check reviews, assume it needs a review
+          console.log('Could not check existing reviews for trade:', trade.id);
+          unreviewedTrades.push(trade);
+        }
+      }
+      
+      setHasUnreviewedTrades(unreviewedTrades.length > 0);
+      
+      console.log('Completed trades:', userCompletedTrades.length);
+      console.log('Unreviewed trades:', unreviewedTrades.length);
+      
+    } catch (error) {
+      console.error('Error checking for unreviewed trades:', error);
+    }
+  }, [user?.id]);
+
+  // Refresh review check when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      checkForUnreviewedTrades();
+    }, [checkForUnreviewedTrades])
+  );
+
   useEffect(() => {
     // console.log("useEffect triggered");
     // console.log("Current route params:", JSON.stringify(route.params, null, 2));
 
     resetStates();
+    checkForUnreviewedTrades(); // Check for completed trades that need reviews
 
     // Check if we have the required parameters
     if (!route.params) {
@@ -270,6 +332,26 @@ console.log("bid deatil==>>" , bidDetail)
           <Text style={[styles.bitValue, { marginLeft: Metrix.HorizontalSize(5) }]}>{bidDetail.amount}</Text>
         </View>
       </View>
+
+      {/* Review Button for Completed Trades */}
+      {hasUnreviewedTrades && completedTrades.length > 0 && (
+        <View style={styles.reviewButtonContainer}>
+          <CustomButton
+            title={`Review ${completedTrades.length} Completed Trade${completedTrades.length > 1 ? 's' : ''}`}
+            height={Metrix.VerticalSize(40)}
+            width={Metrix.HorizontalSize(280)}
+            borderRadius={Metrix.VerticalSize(20)}
+            fontSize={Metrix.FontSmall}
+            onPress={() => {
+              // Navigate to the most recent completed trade for review
+              const mostRecentTrade = completedTrades[0];
+              navigation.navigate("SubmitReview", {
+                tradeId: mostRecentTrade.tradeId || mostRecentTrade.id,
+              });
+            }}
+          />
+        </View>
+      )}
 
       <View style={styles.chatContainer}>
         <TouchableOpacity
@@ -556,8 +638,34 @@ console.log("bid deatil==>>" , bidDetail)
               borderRadius={Metrix.VerticalSize(35)}
               fontSize={Metrix.FontSmall}
               onPress={() => {
+                console.log("=== BidsReview Navigation Debug ===");
+                console.log("tradeResponse:", tradeResponse);
+                console.log("tradeResponse?.tradeId:", tradeResponse?.tradeId);
+                console.log("tradeResponse?.id:", tradeResponse?.id);
+                console.log("productDetail.activeTrade:", productDetail.activeTrade);
+                console.log("productDetail.activeTrade?.tradeId:", productDetail.activeTrade?.tradeId);
+                console.log("productDetail.activeTrade?.id:", productDetail.activeTrade?.id);
+                console.log("===================================");
+                
+                // Use the active trade from productDetail if tradeResponse doesn't have tradeId
+                const tradeIdToPass = tradeResponse?.tradeId || 
+                                   tradeResponse?.id || 
+                                   productDetail.activeTrade?.tradeId || 
+                                   productDetail.activeTrade?.id;
+                
+                console.log("Final tradeId being passed:", tradeIdToPass);
+                
+                if (!tradeIdToPass) {
+                  Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Trade ID not found. Cannot submit review.'
+                  });
+                  return;
+                }
+                
                 navigation.navigate("SubmitReview", {
-                  tradeId: tradeResponse?.tradeId,
+                  tradeId: tradeIdToPass,
                 });
               }}
 
