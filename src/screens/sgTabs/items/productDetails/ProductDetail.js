@@ -129,15 +129,25 @@ const ProductDetail = ({ route, navigation }) => {
           setMinutes(response.data.timeRemaining.minutes);
           setSeconds(response.data.timeRemaining.seconds);
         } else {
-          // Fallback to calculating from bidEndTime
+          // Check if bidding has ended
           const bidEndTime = new Date(response.data.bidEndTime);
           const now = new Date();
-          const durationInSeconds = Math.floor((bidEndTime - now) / 1000);
-          const timeRemaining = calculateTimeRemaining(durationInSeconds);
-          setDays(timeRemaining.days);
-          setHours(timeRemaining.hours);
-          setMinutes(timeRemaining.minutes);
-          setSeconds(timeRemaining.seconds);
+          
+          if (now >= bidEndTime) {
+            // Bidding has ended, set timer to 00:00:00:00
+            setDays(0);
+            setHours(0);
+            setMinutes(0);
+            setSeconds(0);
+          } else {
+            // Bidding is still active, calculate remaining time
+            const durationInSeconds = Math.floor((bidEndTime - now) / 1000);
+            const timeRemaining = calculateTimeRemaining(durationInSeconds);
+            setDays(timeRemaining.days);
+            setHours(timeRemaining.hours);
+            setMinutes(timeRemaining.minutes);
+            setSeconds(timeRemaining.seconds);
+          }
         }
       }
     } catch (error) {
@@ -176,6 +186,20 @@ const ProductDetail = ({ route, navigation }) => {
   useEffect(() => {
     if (!productDetail?.isSGPoints || !productDetail?.isBidding) return;
 
+    // Check if bidding has ended
+    if (productDetail?.bidEndTime) {
+      const bidEndTime = new Date(productDetail.bidEndTime);
+      const now = new Date();
+      if (now >= bidEndTime) {
+        // Bidding has ended, set timer to 0 and don't start the interval
+        setDays(0);
+        setHours(0);
+        setMinutes(0);
+        setSeconds(0);
+        return;
+      }
+    }
+
     const timer = setInterval(() => {
       setSeconds(prevSeconds => {
         if (prevSeconds > 0) {
@@ -207,7 +231,7 @@ const ProductDetail = ({ route, navigation }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [productDetail?.isSGPoints, productDetail?.isBidding]);
+  }, [productDetail?.isSGPoints, productDetail?.isBidding, productDetail?.bidEndTime]);
 
   // Periodically sync timer with API (every 30 seconds)
   useEffect(() => {
