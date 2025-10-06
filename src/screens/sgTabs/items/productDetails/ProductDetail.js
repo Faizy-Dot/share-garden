@@ -23,6 +23,7 @@ const ProductDetail = ({ route, navigation }) => {
   const productId = id || (item ? item.id : null);
   const [productDetail, setProductDetail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [fetchingProduct, setFetchingProduct] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Initialize time states with 0
@@ -89,12 +90,13 @@ const ProductDetail = ({ route, navigation }) => {
       return;
     }
 
-    if (loading) {
-      console.log('Already loading product details, skipping...');
+    if (fetchingProduct) {
+      console.log('Already fetching product details, skipping...');
       return;
     }
 
     try {
+      setFetchingProduct(true);
       setLoading(true);
       const response = await axiosInstance.get(`/api/products/${productId}`);
       setProductDetail(response.data);
@@ -120,19 +122,46 @@ const ProductDetail = ({ route, navigation }) => {
 
       // Update time if it's a bidding product
       if (response.data.isSGPoints && response.data.bidDuration) {
-        const bidEndTime = new Date(response.data.bidEndTime);
-        const now = new Date();
-        const durationInSeconds = Math.floor((bidEndTime - now) / 1000);
-        const timeRemaining = calculateTimeRemaining(durationInSeconds);
-        setDays(timeRemaining.days);
-        setHours(timeRemaining.hours);
-        setMinutes(timeRemaining.minutes);
-        setSeconds(timeRemaining.seconds);
+        // Use the timeRemaining object from API response if available
+        if (response.data.timeRemaining) {
+          setDays(response.data.timeRemaining.days);
+          setHours(response.data.timeRemaining.hours);
+          setMinutes(response.data.timeRemaining.minutes);
+          setSeconds(response.data.timeRemaining.seconds);
+        } else {
+          // Fallback to calculating from bidEndTime
+          const bidEndTime = new Date(response.data.bidEndTime);
+          const now = new Date();
+          const durationInSeconds = Math.floor((bidEndTime - now) / 1000);
+          const timeRemaining = calculateTimeRemaining(durationInSeconds);
+          setDays(timeRemaining.days);
+          setHours(timeRemaining.hours);
+          setMinutes(timeRemaining.minutes);
+          setSeconds(timeRemaining.seconds);
+        }
       }
     } catch (error) {
       console.error('Error fetching product details:', error);
     } finally {
+      setFetchingProduct(false);
       setLoading(false);
+    }
+  };
+
+  // Function to update timer without refetching product details
+  const updateTimerFromAPI = async () => {
+    if (!productId) return;
+    
+    try {
+      const response = await axiosInstance.get(`/api/products/${productId}`);
+      if (response.data.timeRemaining) {
+        setDays(response.data.timeRemaining.days);
+        setHours(response.data.timeRemaining.hours);
+        setMinutes(response.data.timeRemaining.minutes);
+        setSeconds(response.data.timeRemaining.seconds);
+      }
+    } catch (error) {
+      console.error('Error updating timer:', error);
     }
   };
 
@@ -145,28 +174,51 @@ const ProductDetail = ({ route, navigation }) => {
 
   // Update countdown timer every second
   useEffect(() => {
-    if (!productDetail?.isSGPoints) return;
+    if (!productDetail?.isSGPoints || !productDetail?.isBidding) return;
 
     const timer = setInterval(() => {
-      if (seconds > 0) {
-        setSeconds(seconds - 1);
-      } else if (minutes > 0) {
-        setMinutes(minutes - 1);
-        setSeconds(59);
-      } else if (hours > 0) {
-        setHours(hours - 1);
-        setMinutes(59);
-        setSeconds(59);
-      } else if (days > 0) {
-        setDays(days - 1);
-        setHours(23);
-        setMinutes(59);
-        setSeconds(59);
-      }
+      setSeconds(prevSeconds => {
+        if (prevSeconds > 0) {
+          return prevSeconds - 1;
+        } else {
+          setMinutes(prevMinutes => {
+            if (prevMinutes > 0) {
+              return prevMinutes - 1;
+            } else {
+              setHours(prevHours => {
+                if (prevHours > 0) {
+                  return prevHours - 1;
+                } else {
+                  setDays(prevDays => {
+                    if (prevDays > 0) {
+                      return prevDays - 1;
+                    }
+                    return 0;
+                  });
+                  return 23;
+                }
+              });
+              return 59;
+            }
+          });
+          return 59;
+        }
+      });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [days, hours, minutes, seconds, productDetail?.isSGPoints]);
+  }, [productDetail?.isSGPoints, productDetail?.isBidding]);
+
+  // Periodically sync timer with API (every 30 seconds)
+  useEffect(() => {
+    if (!productDetail?.isSGPoints || !productDetail?.isBidding) return;
+
+    const syncTimer = setInterval(() => {
+      updateTimerFromAPI();
+    }, 30000); // Sync every 30 seconds
+
+    return () => clearInterval(syncTimer);
+  }, [productDetail?.isSGPoints, productDetail?.isBidding, productId]);
 
   // Use productDetail if available, otherwise fallback to item
   const displayData = productDetail || item;
@@ -190,34 +242,33 @@ const ProductDetail = ({ route, navigation }) => {
     }
   }, [user?.id, displayData?.id]); // Only depend on user ID and product ID
 
-  // Add function to handle favorite toggle
-  const handleFavoritePress = async () => {
+  // Add function to handle like toggle (using like API but showing as favorites)
+  const handleLikePress = async () => {
+    if (!user?.id) return;
+    
     try {
-      const response = await axiosInstance.post(`/api/products/favorites/${productId}`);
-      if (response.status === 200) {
-        setIsFavorite(!isFavorite); // Toggle favorite status
-        
-        // Update local stats
+      const response = await axiosInstance.post(`/api/products/${productId}/like`);
+      
+      if (response.data.isLiked !== undefined) {
+        setIsLiked(response.data.isLiked);
         const newStats = {
           ...productStats,
-          favorites: isFavorite ? productStats.favorites - 1 : productStats.favorites + 1
+          likes: response.data.isLiked ? productStats.likes + 1 : productStats.likes - 1
         };
         setProductStats(newStats);
         
-        // Show success feedback
         Toast.show({
           type: 'success',
-          text1: isFavorite ? 'Removed from favorites' : 'Added to favorites',
+          text1: response.data.isLiked ? 'Product liked!' : 'Product unliked!',
           text2: response.data.message
         });
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
-      // Show error message to user
+      console.error('Error toggling like:', error);
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: error.response?.data?.message || 'Failed to update favorite status'
+        text2: 'Failed to update like status'
       });
     }
   };
@@ -278,36 +329,6 @@ const ProductDetail = ({ route, navigation }) => {
     setProductStats(newStats);
   };
 
-  // Add like handler
-  const handleLikePress = async () => {
-    if (!user?.id) return;
-    
-    try {
-      const response = await axiosInstance.post(`/api/products/${productId}/like`);
-      
-      if (response.data.isLiked !== undefined) {
-        setIsLiked(response.data.isLiked);
-        const newStats = {
-          ...productStats,
-          likes: response.data.isLiked ? productStats.likes + 1 : productStats.likes - 1
-        };
-        setProductStats(newStats);
-        
-        Toast.show({
-          type: 'success',
-          text1: response.data.isLiked ? 'Product liked!' : 'Product unliked!',
-          text2: response.data.message
-        });
-      }
-    } catch (error) {
-      console.error('Error toggling like:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to update like status'
-      });
-    }
-  };
 
   // Add this function near the top of your component
   const getInitialLetter = (name) => {
@@ -495,9 +516,6 @@ const ProductDetail = ({ route, navigation }) => {
                 <TouchableOpacity onPress={handleLikePress}>
                   <LikesIcon stroke={colors.white} fill={isLiked ? colors.white : 'none'} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleFavoritePress}>
-                  <LikesIcon stroke={colors.white} fill={isFavorite ? colors.white : 'none'} />
-                </TouchableOpacity>
                 <TouchableOpacity onPress={handleSharePress}>
                   <ShareIcon stroke={colors.white} />
                 </TouchableOpacity>
@@ -615,11 +633,11 @@ const ProductDetail = ({ route, navigation }) => {
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  onPress={isUserSeller() ? handleShowLikes : null}
+                  onPress={isUserSeller() ? handleShowFavorites : null}
                   style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Metrix.VerticalSize(5) }}
                 >
                   <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
-                    Likes: <Text style={{ color: colors.black }}>{productStats.likes || 0}</Text>
+                    Saves: <Text style={{ color: colors.black }}>{productStats.likes || 0}</Text>
                   </Text>
                 </TouchableOpacity>
                 
@@ -629,15 +647,6 @@ const ProductDetail = ({ route, navigation }) => {
                 >
                   <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
                     Shares: <Text style={{ color: colors.black }}>{productStats.shares || 0}</Text>
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  onPress={isUserSeller() ? handleShowFavorites : null}
-                  style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Metrix.VerticalSize(5) }}
-                >
-                  <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
-                    Saves: <Text style={{ color: colors.black }}>{productStats.favorites || 0}</Text>
                   </Text>
                 </TouchableOpacity>
               </View>

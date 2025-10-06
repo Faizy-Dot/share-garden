@@ -134,6 +134,14 @@ export default function PreviewPostedSgItems({ navigation, route }) {
       console.log("Product Detail Bid response", response.data);
       // console.log("Trades response:", response.data.trades);
       console.log("Bid End Time:", response.data.bidEndTime);
+      
+      // Update timer with API timeRemaining data if available
+      if (response.data.timeRemaining) {
+        setDays(response.data.timeRemaining.days);
+        setHours(response.data.timeRemaining.hours);
+        setMinutes(response.data.timeRemaining.minutes);
+        setSeconds(response.data.timeRemaining.seconds);
+      }
     } catch (error) {
       console.error('Error fetching product details:', error);
     } finally {
