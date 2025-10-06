@@ -57,9 +57,15 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-<string>App needs camera access to take product photos</string>
-<key>NSPhotoLibraryUsageDescription</key>
-<string>App needs photo library access to select product images</string>
+	<string>App needs camera access to take product photos</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>App needs photo library access to select product images</string>
+	
+	<!-- Push Notifications -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	
 	<!-- URL Scheme for deep linking -->
 	<key>CFBundleURLTypes</key>

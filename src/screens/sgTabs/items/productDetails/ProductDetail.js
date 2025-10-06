@@ -649,7 +649,7 @@ const ProductDetail = ({ route, navigation }) => {
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                 <TouchableOpacity 
                   onPress={isUserSeller() ? handleShowLikes : null}
-                  style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Metrix.VerticalSize(5) }}
+                  style={{ flex: 1, alignItems: 'center' }}
                 >
                   <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
                     Total Views: <Text style={{ color: colors.black }}>{productStats.views || displayData.viewCount || 0}</Text>
@@ -658,7 +658,7 @@ const ProductDetail = ({ route, navigation }) => {
                 
                 <TouchableOpacity 
                   onPress={isUserSeller() ? handleShowFavorites : null}
-                  style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Metrix.VerticalSize(5) }}
+                  style={{ flex: 1, alignItems: 'center' }}
                 >
                   <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
                     Saves: <Text style={{ color: colors.black }}>{productStats.likes || 0}</Text>
@@ -667,7 +667,7 @@ const ProductDetail = ({ route, navigation }) => {
                 
                 <TouchableOpacity 
                   onPress={isUserSeller() ? handleShowShares : null}
-                  style={{ flexDirection: 'row', alignItems: 'center', marginBottom: Metrix.VerticalSize(5) }}
+                  style={{ flex: 1, alignItems: 'center' }}
                 >
                   <Text style={{ fontSize: Metrix.normalize(13), fontFamily: fonts.InterBold, color: colors.buttonColor }}>
                     Shares: <Text style={{ color: colors.black }}>{productStats.shares || 0}</Text>

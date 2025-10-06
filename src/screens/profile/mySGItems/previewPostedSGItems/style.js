@@ -44,6 +44,7 @@ export const styles = StyleSheet.create({
         fontSize: Metrix.FontRegular,
         fontFamily: fonts.InterBold,
         paddingLeft: 0,
+        color: colors.black,
     },
     label: {
         fontSize: Metrix.FontExtraSmall,

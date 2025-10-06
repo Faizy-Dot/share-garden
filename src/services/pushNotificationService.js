@@ -1,5 +1,6 @@
 import messaging from '@react-native-firebase/messaging';
-import { Platform, Alert } from 'react-native';
+import { Platform, Alert, PermissionsAndroid } from 'react-native';
+import { NavigationService } from '../config/NavigationService';
 
 class PushNotificationService {
     constructor() {
@@ -8,21 +9,75 @@ class PushNotificationService {
         this.backgroundUnsubscribe = null;
     }
 
+    async checkPermissions() {
+        if (Platform.OS === 'android') {
+            const granted = await PermissionsAndroid.check(
+                PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+            );
+            return granted;
+        } else if (Platform.OS === 'ios') {
+            const authStatus = await messaging().hasPermission();
+            return authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                   authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        }
+        return true;
+    }
+
+    async requestPermissions() {
+        // First check if permissions are already granted
+        const alreadyGranted = await this.checkPermissions();
+        if (alreadyGranted) {
+            console.log('Notification permissions already granted');
+            return true;
+        }
+
+        if (Platform.OS === 'android') {
+            // Request notification permission for Android 13+
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+                {
+                    title: 'Notification Permission',
+                    message: 'This app needs notification permission to send you updates about your products and bids.',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK',
+                }
+            );
+            
+            if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                console.log('Android notification permission denied');
+                return false;
+            }
+            
+            console.log('Android notification permission granted');
+            return true;
+        } else if (Platform.OS === 'ios') {
+            const authStatus = await messaging().requestPermission();
+            const enabled =
+                authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+            if (!enabled) {
+                console.log('iOS notification permission denied');
+                return false;
+            }
+            
+            console.log('iOS notification permission granted');
+            return true;
+        }
+        
+        return true;
+    }
+
     async initialize() {
         if (this.initialized) return;
 
         try {
-            // Request permission for iOS
-            if (Platform.OS === 'ios') {
-                const authStatus = await messaging().requestPermission();
-                const enabled =
-                    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-                    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-                if (!enabled) {
-                    console.log('Notification permission denied');
-                    return false;
-                }
+            // Request notification permissions
+            const permissionGranted = await this.requestPermissions();
+            if (!permissionGranted) {
+                console.log('Notification permissions not granted');
+                return false;
             }
 
             // Get FCM token
@@ -53,7 +108,10 @@ class PushNotificationService {
                 .then(remoteMessage => {
                     if (remoteMessage) {
                         console.log('Notification opened app from quit state:', remoteMessage);
-                        this.handleNotificationTap(remoteMessage);
+                        // Add longer delay for app startup
+                        setTimeout(() => {
+                            this.handleNotificationTap(remoteMessage);
+                        }, 2000);
                     }
                 });
 
@@ -84,6 +142,86 @@ class PushNotificationService {
                     }
                 ]
             );
+        } else if (data?.type === 'PRODUCT_LIKED') {
+            // Show in-app notification for product likes
+            Alert.alert(
+                notification?.title || 'Product Update',
+                notification?.body || 'Someone liked your product',
+                [
+                    {
+                        text: 'View',
+                        onPress: () => this.handleNotificationTap(remoteMessage)
+                    },
+                    {
+                        text: 'Dismiss',
+                        style: 'cancel'
+                    }
+                ]
+            );
+        } else if (data?.type === 'NEW_BID') {
+            // Show in-app notification for new bids
+            Alert.alert(
+                notification?.title || 'New Bid',
+                notification?.body || 'You received a new bid',
+                [
+                    {
+                        text: 'View',
+                        onPress: () => this.handleNotificationTap(remoteMessage)
+                    },
+                    {
+                        text: 'Dismiss',
+                        style: 'cancel'
+                    }
+                ]
+            );
+        } else if (data?.type === 'BID_ACCEPTED') {
+            // Show in-app notification for bid acceptance
+            Alert.alert(
+                notification?.title || 'Bid Accepted',
+                notification?.body || 'Your bid was accepted',
+                [
+                    {
+                        text: 'View',
+                        onPress: () => this.handleNotificationTap(remoteMessage)
+                    },
+                    {
+                        text: 'Dismiss',
+                        style: 'cancel'
+                    }
+                ]
+            );
+        } else if (data?.type === 'BID_REJECTED') {
+            // Show in-app notification for bid rejection
+            Alert.alert(
+                notification?.title || 'Bid Update',
+                notification?.body || 'Your bid was not accepted',
+                [
+                    {
+                        text: 'View',
+                        onPress: () => this.handleNotificationTap(remoteMessage)
+                    },
+                    {
+                        text: 'Dismiss',
+                        style: 'cancel'
+                    }
+                ]
+            );
+        } else {
+            // Show generic notification for other types
+            Alert.alert(
+                notification?.title || 'Notification',
+                notification?.body || 'You have a new notification',
+                [
+                    {
+                        text: 'View',
+                        onPress: () => this.handleNotificationTap(remoteMessage)
+                    },
+                    {
+                        text: 'Dismiss',
+                        style: 'cancel'
+                    }
+                ]
+            );
         }
     }
 
@@ -94,18 +232,40 @@ class PushNotificationService {
 
     handleNotificationTap(remoteMessage) {
         const { data } = remoteMessage;
+        console.log('Handling notification tap:', data);
         
-        if (data?.type === 'SGTIP_LIKED' || data?.type === 'SGTIP_SHARED') {
-            // Navigate to SGTip detail screen
-            if (data.sgTipId) {
-                // You can use navigation service or Redux to handle navigation
-                // For now, we'll just log the action
-                console.log('Navigate to SGTip:', data.sgTipId);
-                
-                // Example navigation (you'll need to implement this based on your navigation setup)
-                // NavigationService.navigate('TipsDetail', { id: data.sgTipId });
+        // Add a small delay to ensure app is fully loaded
+        setTimeout(() => {
+            try {
+                if (data?.type === 'SGTIP_LIKED' || data?.type === 'SGTIP_SHARED') {
+                    // Navigate to SGTip detail screen
+                    if (data.sgTipId) {
+                        console.log('Navigate to SGTip:', data.sgTipId);
+                        NavigationService.navigate('TipsDetail', { id: data.sgTipId });
+                    }
+                } else if (data?.type === 'PRODUCT_LIKED') {
+                    // Navigate to product detail screen
+                    if (data.productId) {
+                        console.log('Navigate to Product:', data.productId);
+                        NavigationService.navigate('ProductDetail', { productId: data.productId });
+                    }
+                } else if (data?.type === 'NEW_BID' || data?.type === 'BID_ACCEPTED' || data?.type === 'BID_REJECTED') {
+                    // Navigate to product detail screen for bid-related notifications
+                    if (data.productId) {
+                        console.log('Navigate to Product for bid:', data.productId);
+                        NavigationService.navigate('ProductDetail', { productId: data.productId });
+                    }
+                } else {
+                    // Navigate to notifications screen for other types
+                    console.log('Navigate to Notifications');
+                    NavigationService.navigate('SgUserNotification');
+                }
+            } catch (error) {
+                console.error('Error handling notification tap:', error);
+                // Fallback: navigate to main screen
+                NavigationService.navigate('SgTabs');
             }
-        }
+        }, 1000); // 1 second delay
     }
 
     // Get FCM token
@@ -115,6 +275,32 @@ class PushNotificationService {
         } catch (error) {
             console.error('Error getting FCM token:', error);
             return null;
+        }
+    }
+
+    // Manual permission request (can be called from UI)
+    async requestNotificationPermission() {
+        try {
+            const granted = await this.requestPermissions();
+            if (granted) {
+                // Re-initialize to get token and set up handlers
+                await this.initialize();
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error requesting notification permission:', error);
+            return false;
+        }
+    }
+
+    // Check if notifications are enabled
+    async areNotificationsEnabled() {
+        try {
+            return await this.checkPermissions();
+        } catch (error) {
+            console.error('Error checking notification permissions:', error);
+            return false;
         }
     }
 

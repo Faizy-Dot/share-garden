@@ -24,16 +24,20 @@ const styles = StyleSheet.create({
         padding : 20,
         gap : 20
     },
+    textContainer: {
+        flex: 1
+    },
     title: {
         fontSize: Metrix.FontRegular,
         fontFamily: fonts.InterBold,
         color: colors.buttonColor,
-        width : Metrix.HorizontalSize(270)
+        marginBottom: 4
     },
     description: {
         fontSize: Metrix.normalize(13),
         fontFamily: fonts.InterRegular,
-        width : Metrix.HorizontalSize(220)
+        color: colors.black,
+        lineHeight: 18
     },
     imageContainer: {
         width : Metrix.HorizontalSize(56),

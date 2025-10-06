@@ -137,10 +137,19 @@ export default function PreviewPostedSgItems({ navigation, route }) {
       
       // Update timer with API timeRemaining data if available
       if (response.data.timeRemaining) {
-        setDays(response.data.timeRemaining.days);
-        setHours(response.data.timeRemaining.hours);
-        setMinutes(response.data.timeRemaining.minutes);
-        setSeconds(response.data.timeRemaining.seconds);
+        setDays(response.data.timeRemaining.days.toString().padStart(2, '0'));
+        setHours(response.data.timeRemaining.hours.toString().padStart(2, '0'));
+        setMinutes(response.data.timeRemaining.minutes.toString().padStart(2, '0'));
+        setSeconds(response.data.timeRemaining.seconds.toString().padStart(2, '0'));
+      } else {
+        // Fallback to calculating from bidEndTime
+        if (response.data.bidEndTime) {
+          const timeRemaining = calculateTimeRemaining(response.data.bidEndTime);
+          setDays(timeRemaining.days);
+          setHours(timeRemaining.hours);
+          setMinutes(timeRemaining.minutes);
+          setSeconds(timeRemaining.seconds);
+        }
       }
     } catch (error) {
       console.error('Error fetching product details:', error);
@@ -153,6 +162,37 @@ export default function PreviewPostedSgItems({ navigation, route }) {
   useEffect(() => {
     fetchProductDetail();
   }, [item.id]);
+
+  // Update countdown timer every second
+  useEffect(() => {
+    if (!productInfo?.isSGPoints || !productInfo?.isBidding) return;
+
+    // Check if bidding has ended
+    if (productInfo?.bidEndTime) {
+      const bidEndTime = new Date(productInfo.bidEndTime);
+      const now = new Date();
+      if (now >= bidEndTime) {
+        // Bidding has ended, set timer to 0 and don't start the interval
+        setDays('00');
+        setHours('00');
+        setMinutes('00');
+        setSeconds('00');
+        return;
+      }
+    }
+
+    const timer = setInterval(() => {
+      if (productInfo?.bidEndTime) {
+        const timeRemaining = calculateTimeRemaining(productInfo.bidEndTime);
+        setDays(timeRemaining.days);
+        setHours(timeRemaining.hours);
+        setMinutes(timeRemaining.minutes);
+        setSeconds(timeRemaining.seconds);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [productInfo?.isSGPoints, productInfo?.isBidding, productInfo?.bidEndTime]);
 
   const handleDeclinePress = async (idx) => {
     setDeclineState((prevState) => ({
