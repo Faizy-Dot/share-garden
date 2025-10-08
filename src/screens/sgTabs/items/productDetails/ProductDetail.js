@@ -50,11 +50,30 @@ const ProductDetail = ({ route, navigation }) => {
   const [productStats, setProductStats] = useState({ views: 0, likes: 0, shares: 0, favorites: 0 });
   const [isLiked, setIsLiked] = useState(false);
 
+  // Add states for cash product interest
+  const [hasShownInterest, setHasShownInterest] = useState(false);
+  const [chatStarted, setChatStarted] = useState(false);
+  const [interestLoading, setInterestLoading] = useState(false);
+  
+  // Add states for review prompts
+  const [showReviewPrompt, setShowReviewPrompt] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
+
   const images = [Images.homePopularListing, Images.homeProfile, Images.homePopularListing,]
 
   const { width } = Dimensions.get('window');
 
   const { user } = useSelector((state) => state.login);
+  
+  // Debug user authentication status
+  useEffect(() => {
+    console.log('User authentication status:', {
+      isLoggedIn: !!user,
+      hasId: !!user?.id,
+      hasToken: !!user?.token,
+      tokenLength: user?.token?.length || 0
+    });
+  }, [user]);
 
   const viewIncremented = useRef(false);
 
@@ -181,6 +200,63 @@ const ProductDetail = ({ route, navigation }) => {
       fetchProductDetail();
     }
   }, [productId]);
+
+  // Check if user has shown interest (only for logged-in users)
+  useEffect(() => {
+    const checkInterestStatus = async () => {
+      // Only check if user is logged in and viewing a cash product
+      if (!user?.id || !user?.token || !productId || displayData?.isSGPoints || displayData?.isBidding) {
+        console.log('Skipping interest check - user not logged in or not a cash product');
+        return;
+      }
+      
+      // Skip interest check for buyers - they can't access seller's interests list
+      // The interest status will be determined when they try to show interest
+      console.log('Skipping interest check for buyer - will be determined on action');
+    };
+
+    if (displayData && user?.id && user?.token) {
+      checkInterestStatus();
+    }
+  }, [displayData, user?.id, user?.token, productId]);
+
+  // Check if user has reviewed and show review prompt for sold cash products
+  useEffect(() => {
+    const checkReviewStatus = async () => {
+      if (!user?.id || !productId || !displayData?.isSGPoints || displayData?.isBidding) return;
+      if (displayData?.status !== 'SOLD') return;
+      if (!user?.token) {
+        console.log('No user token available for review check');
+        return;
+      }
+      
+      try {
+        const response = await axiosInstance.get(`/api/reviews/check?productId=${productId}`);
+        
+        if (response.status === 403) {
+          console.log('Not authorized to check reviews - user may not be logged in properly');
+          return;
+        }
+        
+        if (response.status === 200 && response.data) {
+          const hasReviewedProduct = response.data?.hasReviewed || false;
+          setHasReviewed(hasReviewedProduct);
+          
+          // Show review prompt if product is sold and user hasn't reviewed
+          if (!hasReviewedProduct && displayData?.soldToId === user.id) {
+            setShowReviewPrompt(true);
+          }
+        }
+      } catch (error) {
+        console.log('Error checking review status:', error);
+        // Don't show error to user, just log it
+      }
+    };
+
+    if (displayData && user?.id && user?.token) {
+      checkReviewStatus();
+    }
+  }, [displayData, user?.id, user?.token, productId]);
 
   // Update countdown timer every second
   useEffect(() => {
@@ -463,6 +539,53 @@ const ProductDetail = ({ route, navigation }) => {
 
   const handlePurchaseRequest = () => {
     setPurchaseModalVisible(true);
+    // Enable "I HAVE GOT THIS" button after user shows interest in purchasing
+    setChatStarted(true);
+  };
+
+  // Add function to handle "I HAVE GOT THIS" button
+  const handleHaveGotThis = async () => {
+    if (!user?.id || !productId) return;
+    
+    try {
+      setInterestLoading(true);
+      console.log('Sending interest request for product:', productId);
+      const response = await axiosInstance.post(`/api/products/${productId}/interest`);
+      
+      console.log('Interest response:', response);
+      console.log('Response status:', response.status);
+      console.log('Response data:', response.data);
+      
+      if (response.status === 201 && response.data?.success) {
+        setHasShownInterest(true);
+        Toast.show({
+          type: 'success',
+          text1: 'Interest recorded!',
+          text2: 'Seller has been notified of your interest'
+        });
+      } else if (response.status === 400 && response.data?.message?.includes('already')) {
+        // User has already shown interest
+        setHasShownInterest(true);
+        Toast.show({
+          type: 'info',
+          text1: 'Interest already recorded',
+          text2: 'You have already shown interest in this product'
+        });
+      } else {
+        console.error('Unexpected response:', response);
+        throw new Error(response.data?.message || 'Failed to record interest');
+      }
+    } catch (error) {
+      console.error('Error showing interest:', error);
+      console.error('Error response:', error.response);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to record interest. Please try again.'
+      });
+    } finally {
+      setInterestLoading(false);
+    }
   };
 
   // Add this function to check if bidding is allowed
@@ -617,16 +740,42 @@ const ProductDetail = ({ route, navigation }) => {
                 backgroundColor={isBiddingAllowed() && !isUserSeller() ? colors.buttonColor : colors.grey}
               />
             ) : (
-              <CustomButton
-                title={isUserSeller() ? "YOU ARE THE SELLER" : "I WANT TO PURCHASE THIS"}
-                height={Metrix.VerticalSize(46)}
-                width={"100%"}
-                borderRadius={Metrix.VerticalSize(3)}
-                fontSize={Metrix.FontSmall}
-                onPress={handlePurchaseRequest}
-                disabled={isUserSeller()}
-                backgroundColor={isUserSeller() ? colors.grey : colors.buttonColor}
-              />
+              <>
+                <CustomButton
+                  title={isUserSeller() ? "YOU ARE THE SELLER" : "I WANT TO PURCHASE THIS"}
+                  height={Metrix.VerticalSize(46)}
+                  width={"100%"}
+                  borderRadius={Metrix.VerticalSize(3)}
+                  fontSize={Metrix.FontSmall}
+                  onPress={handlePurchaseRequest}
+                  disabled={isUserSeller()}
+                  backgroundColor={isUserSeller() ? colors.grey : colors.buttonColor}
+                />
+                
+                {/* I HAVE GOT THIS button - only for cash products and non-sellers */}
+                {!isUserSeller() && !displayData.isSGPoints && !displayData.isBidding && (
+                  <View style={{ marginTop: Metrix.VerticalSize(15) }}>
+                    <CustomButton
+                      title={
+                        hasShownInterest 
+                          ? "INTEREST RECORDED" 
+                          : "I HAVE GOT THIS"
+                      }
+                      height={Metrix.VerticalSize(46)}
+                      width={"100%"}
+                      borderRadius={Metrix.VerticalSize(3)}
+                      fontSize={Metrix.FontSmall}
+                      onPress={handleHaveGotThis}
+                      disabled={hasShownInterest || interestLoading || !chatStarted}
+                      backgroundColor={
+                        hasShownInterest 
+                          ? "#C4C4C4" 
+                          : (chatStarted ? "#FFC202" : "#C4C4C4")
+                      }
+                    />
+                  </View>
+                )}
+              </>
             )}
           </View>
         </View>
@@ -909,6 +1058,49 @@ const ProductDetail = ({ route, navigation }) => {
         activityType="favorite"
         title="Who Saved This Product"
       />
+
+      {/* Review Prompt Modal for Cash Products */}
+      <Modal
+        visible={showReviewPrompt}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowReviewPrompt(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowReviewPrompt(false)}
+            >
+              <CrossIcon />
+            </TouchableOpacity>
+            
+            <View style={{ alignItems: 'center' }}>
+              <HandShakeIcon />
+              <Text style={styles.modalTitle}>Rate & Review Seller</Text>
+            </View>
+
+            <Text style={styles.modalText}>
+              How was your experience with this seller? Your feedback helps other buyers make informed decisions.
+            </Text>
+
+            <CustomButton
+              title="REVIEW SELLER"
+              height={Metrix.VerticalSize(46)}
+              width={"100%"}
+              borderRadius={Metrix.VerticalSize(3)}
+              fontSize={Metrix.FontSmall}
+              onPress={() => {
+                setShowReviewPrompt(false);
+                navigation.navigate('SubmitReview', {
+                  productId: productId,
+                  sellerId: displayData?.sellerId
+                });
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
     </KeyboardAwareScrollView>
   );
 };

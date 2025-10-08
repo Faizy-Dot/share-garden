@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, TextInput, FlatList, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, Image, TextInput, FlatList, Modal, Alert } from 'react-native';
 import { styles } from './style';
 import BackArrowIcon from '../../../../components/backArrowIcon/BackArrowIcon';
 import NavBar from '../../../../components/navBar/NavBar';
-import { BlackBitIcon, CashIcon, CrossIcon, DownArrowIcon, LikesIcon, ModalInfoIcon, NotificationIcon, RightArrowIcon, ShareIcon, TimeIcon, ViewsIcon } from '../../../../assets/svg';
+import { BlackBitIcon, CashIcon, CrossIcon, DownArrowIcon, LikesIcon, ModalInfoIcon, ModalSuccessLogo, NotificationIcon, RightArrowIcon, ShareIcon, TimeIcon, ViewsIcon } from '../../../../assets/svg';
 import { Colors, Images, Metrix } from '../../../../config';
 import fonts from '../../../../config/Fonts';
 import colors from '../../../../config/Colors';
@@ -15,6 +15,7 @@ import { ActivityIndicator } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ToastAndroid, Platform } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
+import Toast from 'react-native-toast-message';
 
 
 
@@ -52,10 +53,15 @@ export default function PreviewPostedSgItems({ navigation, route }) {
   const [productInfo, setProductInfo] = useState(null)
   const [sgId, setSgId] = useState('')
   const [bidTradeMap, setBidTradeMap] = useState({}) // Map to track which bids have trades
+  const [tradeCompletedModal, setTradeCompletedModal] = useState(false)
+  const [interests, setInterests] = useState([])
+  const [interestsModalVisible, setInterestsModalVisible] = useState(false)
+  const [hasReviewed, setHasReviewed] = useState(false)
+  const [completionModalShown, setCompletionModalShown] = useState(false)
+  const [reviewCheckDone, setReviewCheckDone] = useState(false)
+  const [latestTradeReadableId, setLatestTradeReadableId] = useState(null)
 
-  console.log("item ==>>", item.isSGPoints
-  )
-  console.log("tradeid==>>", tradeId)
+  // Avoid noisy render logs
 
   const calculateTimeRemaining = (bidEndTime) => {
     const now = new Date();
@@ -127,8 +133,10 @@ export default function PreviewPostedSgItems({ navigation, route }) {
       }
       if (response.data.trades[0]?.tradeId) {
         setTradeId(true)
+        setLatestTradeReadableId(response.data.trades[0].tradeId)
       } else {
         setTradeId(false)
+        setLatestTradeReadableId(null)
       }
 
       console.log("Product Detail Bid response", response.data);
@@ -151,6 +159,17 @@ export default function PreviewPostedSgItems({ navigation, route }) {
           setSeconds(timeRemaining.seconds);
         }
       }
+
+      // For cash products, fetch interests
+      if (!response.data.isBidding && !response.data.isSGPoints) {
+        try {
+          const interestsResponse = await axiosInstance.get(`/api/products/${item.id}/interests`);
+          setInterests(interestsResponse.data || []);
+        } catch (interestsError) {
+          console.error('Error fetching interests:', interestsError);
+          setInterests([]);
+        }
+      }
     } catch (error) {
       console.error('Error fetching product details:', error);
     } finally {
@@ -158,10 +177,47 @@ export default function PreviewPostedSgItems({ navigation, route }) {
     }
   };
 
+  const checkReviewStatus = async (prodId, tradeReadableId) => {
+    try {
+      let url = '/api/reviews/check?';
+      if (tradeReadableId) {
+        url += `tradeId=${encodeURIComponent(tradeReadableId)}`;
+      } else if (prodId) {
+        url += `productId=${encodeURIComponent(prodId)}`;
+      }
+      const res = await axiosInstance.get(url);
+      if (res?.data?.hasReviewed) {
+        setHasReviewed(true);
+      } else {
+        setHasReviewed(false);
+      }
+    } catch (e) {
+      setHasReviewed(false);
+    } finally {
+      setReviewCheckDone(true);
+    }
+  };
+
   // Fetch product details and update time
   useEffect(() => {
     fetchProductDetail();
   }, [item.id]);
+
+  // When product is SOLD, check if seller already reviewed
+  useEffect(() => {
+    if (productInfo?.id && productInfo?.status === 'SOLD') {
+      // Prefer tradeId for bidding products to correctly match the stored review
+      checkReviewStatus(productInfo.id, latestTradeReadableId);
+    }
+  }, [productInfo?.id, productInfo?.status, latestTradeReadableId]);
+
+  // If product is SOLD and no review exists, show one-time review modal immediately
+  useEffect(() => {
+    if (productInfo?.status === 'SOLD' && reviewCheckDone && !hasReviewed && !completionModalShown) {
+      setTradeCompletedModal(true);
+      setCompletionModalShown(true);
+    }
+  }, [productInfo?.status, hasReviewed, completionModalShown, reviewCheckDone]);
 
   // Update countdown timer every second
   useEffect(() => {
@@ -194,6 +250,85 @@ export default function PreviewPostedSgItems({ navigation, route }) {
     return () => clearInterval(timer);
   }, [productInfo?.isSGPoints, productInfo?.isBidding, productInfo?.bidEndTime]);
 
+  // Check for completed trades and show success modal
+  useEffect(() => {
+    const checkTradeCompletion = async () => {
+      if (productInfo?.id && productInfo?.status === 'SOLD' && tradeId && !hasReviewed && !completionModalShown) {
+        try {
+          // Check if there's a completed trade for this product
+          const response = await axiosInstance.get(`/api/products/${productInfo.id}`);
+          const productData = response.data;
+          
+          // Check if there's a completed trade
+          const completedTrade = productData.trades?.find(trade => trade.status === 'COMPLETED');
+          if (completedTrade) {
+            // Show success modal
+            setTradeCompletedModal(true);
+            setCompletionModalShown(true);
+          }
+        } catch (error) {
+          console.error('Error checking trade completion:', error);
+        }
+      }
+    };
+
+    checkTradeCompletion();
+  }, [productInfo?.id, productInfo?.status, tradeId, hasReviewed, completionModalShown]);
+
+  // Poll for trade completion updates every 5 seconds
+  useEffect(() => {
+    if (!productInfo?.id || productInfo?.status !== 'SOLD' || !tradeId || hasReviewed || completionModalShown) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await axiosInstance.get(`/api/products/${productInfo.id}`);
+        const productData = response.data;
+        
+        // Check if there's a completed trade
+        const completedTrade = productData.trades?.find(trade => trade.status === 'COMPLETED');
+        if (completedTrade && !tradeCompletedModal && !completionModalShown) {
+          console.log('Trade completed, showing success modal');
+          setTradeCompletedModal(true);
+          setCompletionModalShown(true);
+        }
+      } catch (error) {
+        console.error('Error polling for trade completion:', error);
+      }
+    }, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [productInfo?.id, productInfo?.status, tradeId, tradeCompletedModal, hasReviewed, completionModalShown]);
+
+  // Poll for new trades (when buyer starts trade) every 5 seconds
+  useEffect(() => {
+    if (!productInfo?.id || !productInfo?.isBidding) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await axiosInstance.get(`/api/products/${productInfo.id}`);
+        const productData = response.data;
+        
+        // Check if there's a new trade that we don't know about yet
+        if (productData.trades && productData.trades.length > 0) {
+          const activeTrade = productData.trades.find(trade => 
+            trade.status === 'PENDING' || trade.status === 'VERIFIED'
+          );
+          
+          if (activeTrade && !tradeId) {
+            console.log('New trade detected, updating UI');
+            setTradeId(activeTrade.tradeId);
+            // Refresh product details to show trade info
+            fetchProductDetail();
+          }
+        }
+      } catch (error) {
+        console.error('Error polling for new trades:', error);
+      }
+    }, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [productInfo?.id, productInfo?.isBidding, tradeId]);
+
   const handleDeclinePress = async (idx) => {
     setDeclineState((prevState) => ({
       ...prevState,
@@ -214,6 +349,53 @@ export default function PreviewPostedSgItems({ navigation, route }) {
       }));
     }
   }
+
+  const handleDeleteProduct = async () => {
+    try {
+      // Show confirmation alert
+      const confirmed = await new Promise((resolve) => {
+        Alert.alert(
+          'Delete Product',
+          'Are you sure you want to delete this product? This action cannot be undone.',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+              onPress: () => resolve(false)
+            },
+            {
+              text: 'Delete',
+              style: 'destructive',
+              onPress: () => resolve(true)
+            }
+          ]
+        );
+      });
+
+      if (!confirmed) return;
+
+      // Call soft delete API
+      const response = await axiosInstance.delete(`/api/products/${item.id}/soft-delete`);
+      
+      if (response.data.success) {
+        Toast.show({
+          type: 'success',
+          text1: 'Product Deleted',
+          text2: 'Your product has been deleted successfully'
+        });
+        
+        // Navigate back to My SG Items
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Delete Failed',
+        text2: error.response?.data?.message || 'Failed to delete product'
+      });
+    }
+  };
 
 
 
@@ -431,29 +613,59 @@ export default function PreviewPostedSgItems({ navigation, route }) {
 
             </View>
 
+            {productInfo?.status !== 'SOLD' ? (
             <CustomButton
               title={"MARK AS SOLD"}
               fontSize={Metrix.FontSmall}
               fontFamily={fonts.InterBold}
-              color={tradeId ? colors.white : '#A39696'}
+              color={(tradeId || (interests && interests.length > 0)) ? colors.white : '#A39696'}
               width={Metrix.HorizontalSize(144)}
               height={Metrix.VerticalSize(36)}
-              backgroundColor={!tradeId ? "#C4C4C4" : colors.buttonColor}
+              backgroundColor={(!tradeId && !(interests && interests.length > 0)) ? "#C4C4C4" : colors.buttonColor}
               borderRadius={Metrix.VerticalSize(4)}
-              disabled={productInfo?.status === 'SOLD' || (tradeId ? false : true)}
+                disabled={!tradeId && !(interests && interests.length > 0)}
               onPress={async () => {
-                if (productInfo?.isBidding) {
-                  setModalVisible(true);
-                } else {
-                  try {
-                    const response = await axiosInstance.post(`/api/products/${item.id}/mark-sold`);
-                    fetchProductDetail(); // Refresh product details
-                  } catch (error) {
-                    console.error('Error marking product as sold:', error);
+                try {
+                  if (productInfo?.isBidding) {
+                    setModalVisible(true);
+                    return;
                   }
+                  // CASH FLOW: ensure confirmed interest
+                  const res = await axiosInstance.get(`/api/products/${item.id}/interests`);
+                  const list = Array.isArray(res?.data) ? res.data : [];
+                  setInterests(list);
+
+                  const confirmed = list.find(i => i.status === 'CONFIRMED');
+                  if (!confirmed) {
+                    // Open picker modal; seller will confirm a buyer first
+                    setInterestsModalVisible(true);
+                    return;
+                  }
+
+                  // Confirmed exists -> mark sold
+                  await axiosInstance.post(`/api/products/${item.id}/mark-sold`);
+                  fetchProductDetail();
+                } catch (error) {
+                  console.error('Error marking product as sold:', error);
                 }
               }}
             />
+            ) : (
+              <View style={{
+                paddingHorizontal: Metrix.HorizontalSize(16),
+                height: Metrix.VerticalSize(36),
+                borderRadius: Metrix.VerticalSize(4),
+                backgroundColor: '#C4C4C4',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Text style={{
+                  fontSize: Metrix.FontSmall,
+                  fontFamily: fonts.InterBold,
+                  color: '#FFFFFF'
+                }}>SOLD</Text>
+              </View>
+            )}
           </View>
 
 
@@ -613,11 +825,13 @@ export default function PreviewPostedSgItems({ navigation, route }) {
                   </View>
                 </View>
                 <View style={{marginTop : Metrix.VerticalSize(20)}}>
-                  <CustomButton title={"DELETE THIS POST"}
+                  <CustomButton 
+                    title={"DELETE THIS POST"}
                     width={"100%"}
                     height={42}
                     fontSize={16}
                     borderRadius={3}
+                    onPress={handleDeleteProduct}
                   />
                 </View>
               </>
@@ -693,6 +907,124 @@ export default function PreviewPostedSgItems({ navigation, route }) {
         </View>
       </Modal>
 
+      {/* Trade Completed Modal */}
+      <Modal visible={tradeCompletedModal} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalBox}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setTradeCompletedModal(false)}
+            >
+              <CrossIcon />
+            </TouchableOpacity>
+
+            <ModalSuccessLogo checkColor={colors.buttonColor} />
+            <View>
+              <Text style={styles.modalTitle}>
+                {productInfo?.isBidding ? "SG ID Confirmed" : "Product Sold!"}
+              </Text>
+              <Text style={styles.modalSmallCenterText}>
+                {productInfo?.isBidding 
+                  ? "SG Points credited to your account"
+                  : "Thank you for using Share Garden."
+                }
+              </Text>
+              <Text style={styles.thanksText}>
+                {productInfo?.isBidding 
+                  ? "Thanks you for using ShareGarden."
+                  : "We would love to hear your experience"
+                }
+              </Text>
+            </View>
+
+            <CustomButton
+              title={"RATE & REVIEW BUYER"}
+              height={Metrix.VerticalSize(36)}
+              width={Metrix.HorizontalSize(200)}
+              borderRadius={Metrix.VerticalSize(35)}
+              fontSize={Metrix.FontSmall}
+              onPress={() => {
+                setTradeCompletedModal(false);
+                // Navigate to review screen
+                navigation.navigate('SubmitReview', {
+                  productId: item.id,
+                  sellerId: productInfo?.sellerId
+                });
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Interests Picker Modal (Seller selects buyer) */}
+      <Modal visible={interestsModalVisible} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalBox}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setInterestsModalVisible(false)}>
+              <CrossIcon />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Select Buyer to Confirm</Text>
+            <View style={{ gap: Metrix.VerticalSize(10) }}>
+              {interests && interests.length ? (
+                interests.map((it) => (
+                  <View key={it.id} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: Metrix.HorizontalSize(10) }}>
+                      {it?.buyer?.profileImage ? (
+                        <Image source={{ uri: it.buyer.profileImage }} style={{ width: 32, height: 32, borderRadius: 16 }} />
+                      ) : (
+                        <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#E8F3FF', alignItems: 'center', justifyContent: 'center' }}>
+                          <Text style={{ fontFamily: fonts.InterBold, color: colors.buttonColor }}>
+                            {(it?.buyer?.firstName || '?').charAt(0).toUpperCase()}
+                          </Text>
+                        </View>
+                      )}
+                      <Text style={{ fontFamily: fonts.InterSemiBold }}>{`${it?.buyer?.firstName || ''} ${it?.buyer?.lastName || ''}`.trim()}</Text>
+                      <Text style={{ fontFamily: fonts.InterRegular, color: '#646464' }}>({it.status})</Text>
+                    </View>
+                    {it.status !== 'CONFIRMED' ? (
+                      <CustomButton
+                        title={'CONFIRM'}
+                        height={Metrix.VerticalSize(30)}
+                        width={Metrix.HorizontalSize(100)}
+                        borderRadius={Metrix.VerticalSize(20)}
+                        fontSize={Metrix.FontSmall}
+                        onPress={async () => {
+                          try {
+                            await axiosInstance.post(`/api/products/${item.id}/confirm-buyer`, { buyerId: it.buyerId });
+                            setInterestsModalVisible(false);
+                            // After confirm, proceed to mark-sold
+                            await axiosInstance.post(`/api/products/${item.id}/mark-sold`);
+                            await fetchProductDetail();
+                            
+                            // Show review popup for cash products after marking as sold
+                            setTimeout(() => {
+                              setTradeCompletedModal(true);
+                            }, 1000);
+                          } catch (e) {
+                            console.error('Confirm buyer error:', e);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <CustomButton
+                        title={'CONFIRMED'}
+                        height={Metrix.VerticalSize(30)}
+                        width={Metrix.HorizontalSize(120)}
+                        borderRadius={Metrix.VerticalSize(20)}
+                        fontSize={Metrix.FontSmall}
+                        backgroundColor={'#C4C4C4'}
+                        onPress={() => {}}
+                      />
+                    )}
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.modalSmallCenterText}>No interests yet</Text>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
 
     </View>
   );

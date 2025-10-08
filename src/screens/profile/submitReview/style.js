@@ -50,21 +50,24 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: "100%",
-        justifyContent: "space-between",
         marginVertical: Metrix.VerticalSize(3),
         paddingHorizontal: Metrix.HorizontalSize(22)
     },
     reviewLabel: {
         fontSize: Metrix.FontSmall,
-        fontFamily: fonts.InterSemiBold
+        fontFamily: fonts.InterSemiBold,
+        width: Metrix.HorizontalSize(120),
+        minWidth: Metrix.HorizontalSize(120),
+        maxWidth: Metrix.HorizontalSize(120)
     },
     progressBar: {
-        height: Metrix.VerticalSize(10),
+        height: Metrix.VerticalSize(8),
         borderRadius: Metrix.LightRadius,
         backgroundColor: colors.white,
         borderWidth: 1,
         borderColor: colors.borderColor,
-        width: Metrix.HorizontalSize(220)
+        width: Metrix.HorizontalSize(180),
+        marginLeft: Metrix.HorizontalSize(10)
     },
     ratingText:{
         fontSize : Metrix.FontMedium,
@@ -75,9 +78,11 @@ const styles = StyleSheet.create({
         flex :1,
         backgroundColor : "#E6E6E6",
         marginTop : Metrix.VerticalSize(20),
-        paddingHorizontal : Metrix.HorizontalSize(20),
+        paddingHorizontal : Metrix.HorizontalSize(40),
         justifyContent : "space-between",
-        paddingVertical : Metrix.VerticalSize(15)
+        paddingVertical : Metrix.VerticalSize(15),
+        marginHorizontal: -Metrix.HorizontalSize(20),
+        paddingBottom: Metrix.VerticalSize(40)
     },
     reviewDescription:{
         height : Metrix.VerticalSize(122),

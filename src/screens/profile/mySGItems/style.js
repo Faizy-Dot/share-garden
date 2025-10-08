@@ -128,6 +128,27 @@ const styles = StyleSheet.create({
     closeButton: {
         alignSelf: "flex-end"
     },
+    soldBadge: {
+        backgroundColor: colors.green,
+        paddingHorizontal: Metrix.HorizontalSize(8),
+        paddingVertical: Metrix.VerticalSize(4),
+        borderRadius: Metrix.VerticalSize(4),
+    },
+    soldText: {
+        color: colors.white,
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterBold,
+    },
+    soldBottomContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    soldDateText: {
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterRegular,
+        color: colors.grey,
+    },
 })
 
 export default styles;

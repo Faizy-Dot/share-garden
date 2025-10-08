@@ -26,9 +26,54 @@ const NoItemsMessage = ({ text }) => (
 );
 
 export default function MySGItems({ navigation }) {
+    const formatBidDuration = (item) => {
+        // Helper to humanize remaining seconds
+        const humanize = (secs) => {
+            const days = Math.floor(secs / 86400);
+            const hours = Math.floor((secs % 86400) / 3600);
+            const mins = Math.floor((secs % 3600) / 60);
+            if (secs <= 0) return 'Bidding ended';
+            if (days > 0) return `${days}d ${hours}h left`;
+            if (hours > 0) return `${hours}h ${mins}m left`;
+            return `${Math.max(mins, 1)}m left`;
+        };
+
+        // 1) Prefer explicit bidEndTime if valid
+        if (item?.bidEndTime) {
+            const endMs = Date.parse(item.bidEndTime);
+            if (!Number.isNaN(endMs)) {
+                const diffMs = endMs - Date.now();
+                return humanize(Math.floor(diffMs / 1000));
+            }
+        }
+
+        // 2) Derive end time from bidStartTime + bidDuration (seconds)
+        if (item?.bidStartTime && typeof item?.bidDuration === 'number') {
+            const startMs = Date.parse(item.bidStartTime);
+            if (!Number.isNaN(startMs)) {
+                const endMs = startMs + (item.bidDuration * 1000);
+                const diffMs = endMs - Date.now();
+                return humanize(Math.floor(diffMs / 1000));
+            }
+        }
+
+        // 3) As a last resort, show total duration if provided
+        if (typeof item?.bidDuration === 'number' && item.bidDuration > 0) {
+            const secs = item.bidDuration;
+            const days = Math.floor(secs / 86400);
+            const hours = Math.floor((secs % 86400) / 3600);
+            const mins = Math.floor((secs % 3600) / 60);
+            if (days > 0) return `${days}d ${hours}h`;
+            if (hours > 0) return `${hours}h ${mins}m`;
+            return `${Math.max(mins, 1)}m`;
+        }
+
+        return 'Ends soon';
+    };
     const [publishedItems, setPublishedItems] = useState([]);
     const [draftItems, setDraftItems] = useState([]);
     const [favouritesData, setFavouritesData] = useState([]);
+    const [soldItems, setSoldItems] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const { user } = useSelector((state) => state.login);
     const [loading, setLoading] = useState(false)
@@ -42,6 +87,9 @@ export default function MySGItems({ navigation }) {
 
             const draftsResponse = await axiosInstance.get(`/api/products/user/${user.id}/drafts`);
             setDraftItems(draftsResponse.data);
+
+            const soldResponse = await axiosInstance.get(`/api/products/user/${user.id}/sold`);
+            setSoldItems(soldResponse.data);
         } catch (error) {
             console.error('Error fetching products:', error);
         }
@@ -200,7 +248,7 @@ export default function MySGItems({ navigation }) {
             <View style={styles.bottomContainer}>
                 <View style={styles.bottomIcon}>
                     <TimeIcon />
-                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{item.bidDuration ? `${Math.floor(item.bidDuration / (24 * 3600))} d` : "N/A"}</Text>
+                    <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterBold }}>{formatBidDuration(item)}</Text>
                 </View>
                 <View style={styles.bottomIcon}>
                     <ViewsIcon />
@@ -332,6 +380,38 @@ export default function MySGItems({ navigation }) {
         )
     }
 
+    const renderSoldItems = (item) => {
+        return (
+            <TouchableOpacity
+                key={item.id}
+                style={styles.draftsContainer}
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('PreviewPostedSgItems', { item })}
+            >
+                <View style={{ flexDirection: "row", gap: Metrix.HorizontalSize(10), }}>
+                    <Image
+                        source={item.images ? { uri: item.images.split(',')[0] } : Images.homePopularListing}
+                        style={styles.postedImg}
+                    />
+                    <View style={{ gap: Metrix.VerticalSize(15), flex: 1 }}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                            <Text style={styles.title}>{item.title}</Text>
+                            <View style={styles.soldBadge}>
+                                <Text style={styles.soldText}>SOLD</Text>
+                            </View>
+                        </View>
+                        <Text style={styles.description}>{item.description}</Text>
+                        <View style={styles.soldBottomContainer}>
+                            <Text style={styles.soldDateText}>
+                                Sold on {new Date(item.soldAt).toLocaleDateString()}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            </TouchableOpacity>
+        )
+    }
+
     const handleModalClose = () => {
         setModalVisible(false)
         fetchUserProducts();
@@ -361,6 +441,13 @@ export default function MySGItems({ navigation }) {
                 <View style={styles.Container}>
                     <Text style={styles.titleContainerText}>Favorites</Text>
                     {favouritesData.map(renderFavourites)}
+                </View>
+                <View style={styles.Container}>
+                    <Text style={styles.titleContainerText}>Sold Items</Text>
+                    {soldItems.length > 0 ?
+                        soldItems.map(renderSoldItems) :
+                        <NoItemsMessage text="No sold items found" />
+                    }
                 </View>
 
 

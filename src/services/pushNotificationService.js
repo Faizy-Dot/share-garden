@@ -206,6 +206,22 @@ class PushNotificationService {
                     }
                 ]
             );
+        } else if (data?.type === 'TRADE_COMPLETED') {
+            // Show in-app notification for trade completion
+            Alert.alert(
+                notification?.title || 'Trade Completed',
+                notification?.body || 'Your trade has been completed',
+                [
+                    {
+                        text: 'View',
+                        onPress: () => this.handleNotificationTap(remoteMessage)
+                    },
+                    {
+                        text: 'Dismiss',
+                        style: 'cancel'
+                    }
+                ]
+            );
         } else {
             // Show generic notification for other types
             Alert.alert(
@@ -255,6 +271,10 @@ class PushNotificationService {
                         console.log('Navigate to Product for bid:', data.productId);
                         NavigationService.navigate('ProductDetail', { productId: data.productId });
                     }
+                } else if (data?.type === 'TRADE_COMPLETED') {
+                    // Navigate to My SG Items screen for completed trades so seller can review buyer
+                    console.log('Navigate to My SG Items for completed trade');
+                    NavigationService.navigate('MySGItems');
                 } else {
                     // Navigate to notifications screen for other types
                     console.log('Navigate to Notifications');

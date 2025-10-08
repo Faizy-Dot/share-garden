@@ -53,21 +53,28 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         width: "100%",
-        justifyContent: "space-between",
         marginVertical: Metrix.VerticalSize(3),
         paddingHorizontal: Metrix.HorizontalSize(22)
     },
     reviewLabel: {
-        fontSize: Metrix.FontSmall,
-        fontFamily: fonts.InterSemiBold
+        fontSize: Metrix.FontExtraSmall,
+        fontFamily: fonts.InterSemiBold,
+        minWidth: Metrix.HorizontalSize(85),
+        maxWidth: Metrix.HorizontalSize(85)
     },
     progressBar: {
-        height: Metrix.VerticalSize(10),
+        height: Metrix.VerticalSize(8),
         borderRadius: Metrix.LightRadius,
         backgroundColor: colors.white,
         borderWidth: 1,
         borderColor: colors.borderColor,
-        width: Metrix.HorizontalSize(220)
+        width: Metrix.HorizontalSize(180),
+        marginHorizontal: Metrix.HorizontalSize(8)
+    },
+    ratingCount: {
+        fontSize: Metrix.FontSmall,
+        fontFamily: fonts.InterSemiBold,
+        minWidth: Metrix.HorizontalSize(30)
     },
     line:{
         width : "100%",

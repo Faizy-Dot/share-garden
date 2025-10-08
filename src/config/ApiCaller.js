@@ -1,10 +1,10 @@
 import Axios from 'axios';
 // Use localhost for development
 // For iOS simulator and web
-// var baseUrl = 'http://localhost:4500';
+var baseUrl = 'http://localhost:4500';
 // For Android emulator and physical devices, use your computer's IP address
-//var baseUrl = 'http://192.168.1.8:4500'; // Replace xxx with your actual IP address
-var baseUrl = 'https://api.sharegarden.ca'; // Production URL
+//var baseUrl = 'http://192.168.1.7:4500'; // Your PC's IP address
+//var baseUrl = 'https://api.sharegarden.ca'; // Production URL
 export const Img_url = '';
 
 export default class ApiCaller {
@@ -18,10 +18,10 @@ export default class ApiCaller {
 
   static Post = (endPoint = '', body = {},
     headers = {
-      " content-type": "application/json",
+      "Content-Type": "application/json",
     }) => {
     return Axios.post(`${baseUrl}${endPoint}`, body, {
-      headers: { 'Content-Type': 'application/json charset=utf-8', ...headers },
+      headers: { 'Content-Type': 'application/json; charset=utf-8', ...headers },
     })
       .then(res => res)
       .catch(err => err.response);

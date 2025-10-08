@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, TextInput, Modal, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import { View, Text, TextInput, Modal, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
 import styles from './style';
 import { ProgressBar } from 'react-native-paper';
@@ -9,117 +9,164 @@ import CustomButton from '../../../components/Button/Button';
 import { ModalSuccessLogo, StarIcon } from '../../../assets/svg';
 import NavBar from '../../../components/navBar/NavBar';
 import fonts from '../../../config/Fonts';
-import axiosInstance from '../../../config/axios';
 import ApiCaller from '../../../config/ApiCaller';
+import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
-import Toast from 'react-native-toast-message';
 
 export default function SubmitReview({ route }) {
-    const { tradeId } = route.params || {};
-    const { user } = useSelector(state => state.login);
+    console.log("=== SubmitReview Component Started ===");
+    
+    // Get navigation hook
+    const navigation = useNavigation();
+    
+    // Minimal parameter extraction with maximum safety
+    let tradeId = null;
+    let productId = null;
+    let sellerId = null;
+    
+    try {
+        console.log("Route object:", route);
+        console.log("Route params:", route?.params);
+        
+        if (route && route.params) {
+            // Convert everything to strings to avoid type casting issues
+            tradeId = route.params.tradeId ? String(route.params.tradeId) : null;
+            productId = route.params.productId ? String(route.params.productId) : null;
+            sellerId = route.params.sellerId ? String(route.params.sellerId) : null;
+        }
+        
+        console.log("Extracted parameters:", { tradeId, productId, sellerId });
+    } catch (error) {
+        console.error("Error extracting parameters:", error);
+    }
+    
     const [rating, setRating] = useState(4);
     const [comment, setComment] = useState('');
     const [submitReviewModal, setSubmitReviewModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [sellerName, setSellerName] = useState('Seller');
-    const [loading, setLoading] = useState(true);
+    const [sellerName, setSellerName] = useState('Buyer');
+    const [loading, setLoading] = useState(false);
+    const [isReviewingBuyer, setIsReviewingBuyer] = useState(false);
+    const [tradeData, setTradeData] = useState(null);
     
-    console.log("=== SubmitReview Debug Info ===");
-    console.log("Route params:", route.params);
-    console.log("TradeId from params:", tradeId);
-    console.log("User info:", user?.id, user?.firstName);
-    console.log("===============================");
+    // Get user from Redux store
+    const user = useSelector(state => state.login?.user);
     
-    // If no tradeId is provided, try to get seller name from the most recent trade
-    const shouldFetchAllTrades = !tradeId;
+    console.log("=== SubmitReview State Initialized ===");
     
-    // Fetch trade details to get seller name
-    const fetchTradeDetails = async () => {
+    // Check for existing review and fetch buyer details when component mounts
+    useEffect(() => {
+        console.log("=== useEffect for buyer review ===");
         try {
-            setLoading(true);
-            console.log('Fetching trade details for tradeId:', tradeId);
-            console.log('User token available:', !!user?.token);
-            console.log('Should fetch all trades:', shouldFetchAllTrades);
-            
-            if (!user?.token) {
-                console.log('Missing user token');
-                setLoading(false);
-                return;
+            if (sellerId && productId) {
+                console.log('Setting up buyer review mode');
+                setIsReviewingBuyer(true);
+                setSellerName('Buyer');
+                fetchBuyerDetails();
+                checkExistingReview();
             }
+        } catch (error) {
+            console.error('Error in buyer review useEffect:', error);
+        }
+    }, [sellerId, productId]);
+
+
+    const checkExistingReview = async () => {
+        try {
+            console.log("Checking for existing review...");
             
-            if (!tradeId && !shouldFetchAllTrades) {
-                console.log('No tradeId provided and not fetching all trades');
-                setLoading(false);
-                return;
+            const params = new URLSearchParams();
+            if (tradeId) {
+                params.append('tradeId', tradeId);
+            } else if (productId) {
+                params.append('productId', productId);
             }
 
+            const response = await ApiCaller.Get(`/api/reviews/check?${params.toString()}`, '', {
+                Authorization: `Bearer ${user.token}`
+            });
+
+            console.log("Review check response:", response);
+
+            if (response.status === 200 && response.data) {
+                if (response.data.hasReviewed) {
+                    console.log("User has already reviewed this product/trade");
+                    Alert.alert(
+                        "Already Reviewed",
+                        "You have already submitted a review for this product/trade.",
+                        [
+                            {
+                                text: "OK",
+                                onPress: () => navigation.goBack()
+                            }
+                        ]
+                    );
+                    return;
+                }
+            }
+
+            // If no existing review, proceed to fetch buyer details
+            fetchBuyerDetails();
+        } catch (error) {
+            console.error("Error checking existing review:", error);
+            // Continue with normal flow if check fails
+            fetchBuyerDetails();
+        }
+    };
+    
+    // Fetch comprehensive trade details using the new dedicated API endpoint
+    const fetchBuyerDetails = async () => {
+        try {
+            setLoading(true);
+            console.log('Fetching comprehensive trade details for productId:', productId);
+            
+            if (!user?.token) {
+                console.error('No user token available for API call');
+                setLoading(false);
+                return;
+            }
+            
+            // Use the new dedicated API endpoint with authentication
             const response = await ApiCaller.Get(
-                '/api/trades',
+                `/api/products/${productId}/buyer-info`,
                 '',
                 { Authorization: `Bearer ${user.token}` }
             );
-
-            console.log('Trades API response:', response?.status, response?.data);
             
-            if (response.status === 200 && Array.isArray(response.data)) {
-                console.log('Total trades found:', response.data.length);
-                console.log('Looking for tradeId:', tradeId);
-                console.log('All trades:', response.data.map(t => ({ id: t.id, tradeId: t.tradeId, seller: t.seller?.firstName })));
+            console.log('Trade info response:', response);
+            
+            if (response?.data?.success && response.data.data) {
+                const data = response.data.data;
+                console.log('Trade data received:', data);
                 
-                let trade = null;
+                // Store comprehensive trade data
+                setTradeData(data);
                 
-                if (tradeId) {
-                    // Try multiple ways to find the specific trade
-                    // Method 1: Find by tradeId (human-readable ID)
-                    trade = response.data.find(t => t.tradeId === tradeId);
-                    console.log('Found trade by tradeId:', trade);
-                    
-                    // Method 2: Find by id (UUID)
-                    if (!trade) {
-                        trade = response.data.find(t => t.id === tradeId);
-                        console.log('Found trade by id:', trade);
-                    }
-                    
-                    // Method 3: Find by partial match
-                    if (!trade) {
-                        trade = response.data.find(t => t.tradeId?.includes(tradeId) || t.id?.includes(tradeId));
-                        console.log('Found trade by partial match:', trade);
-                    }
+                // Set buyer name for display
+                if (data.buyer?.firstName || data.buyer?.lastName) {
+                    const buyerName = `${data.buyer.firstName || ''} ${data.buyer.lastName || ''}`.trim();
+                    setSellerName(buyerName);
+                    console.log('Set buyer name to:', buyerName);
                 } else {
-                    // No specific tradeId provided, use the most recent trade
-                    console.log('No tradeId provided, using most recent trade');
-                    trade = response.data[0]; // Most recent trade (they're ordered by createdAt desc)
-                    console.log('Using most recent trade:', trade);
+                    setSellerName('Buyer');
                 }
                 
-                if (trade && trade.seller) {
-                    const sellerFullName = `${trade.seller.firstName} ${trade.seller.lastName}`;
-                    setSellerName(sellerFullName);
-                    console.log('Successfully set seller name:', sellerFullName);
-                } else {
-                    console.log('Trade not found or no seller info. Available trades:', response.data.length);
-                    // Set a fallback name based on the first trade's seller if available
-                    const firstTrade = response.data[0];
-                    if (firstTrade && firstTrade.seller) {
-                        const fallbackName = `${firstTrade.seller.firstName} ${firstTrade.seller.lastName}`;
-                        setSellerName(fallbackName);
-                        console.log('Using fallback seller name:', fallbackName);
-                    }
+                // Update tradeId from API data if available
+                if (data.trade?.id) {
+                    console.log('Trade ID from API:', data.trade.id);
                 }
             } else {
-                console.log('Error fetching trades:', response?.status, response?.data);
+                console.log('No trade data found or API error');
+                setSellerName('Buyer');
             }
         } catch (error) {
             console.error('Error fetching trade details:', error);
+            setSellerName('Buyer');
         } finally {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        fetchTradeDetails();
-    }, [tradeId, user?.token]);
-
+    
     const reviewsData = [
         { label: 'Excellent', percentage: 0.8 },
         { label: 'Good', percentage: 0.6 },
@@ -129,76 +176,160 @@ export default function SubmitReview({ route }) {
     ];
 
     const handleStarPress = (index) => {
+        console.log("Star pressed:", index + 1);
         setRating(index + 1);
     };
 
     const handleSubmitReview = async () => {
-        if (!tradeId) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Trade ID is required'
-            });
+        console.log("Submit review clicked");
+        console.log("Rating:", rating);
+        console.log("Comment:", comment);
+        console.log("Is reviewing buyer:", isReviewingBuyer);
+        console.log("Trade data available:", !!tradeData);
+        console.log("Trade ID from data:", tradeData?.trade?.tradeId);
+        console.log("Trade ID from params:", tradeId);
+        
+        // Use trade ID from API data if available, otherwise fall back to params
+        // Backend expects human-readable tradeId (like "SGH4LR"), not UUID
+        const finalTradeId = tradeData?.trade?.tradeId || tradeId;
+        
+        // For cash products, we don't need tradeId - we use productId instead
+        if (!finalTradeId && !productId) {
+            console.error("No trade ID or product ID available for review submission");
+            console.error("Trade data available:", !!tradeData);
+            console.error("Trade data trade ID:", tradeData?.trade?.id);
+            console.error("Params trade ID:", tradeId);
+            console.error("Product ID:", productId);
             return;
         }
-
+        
+        console.log("Using trade ID for review:", finalTradeId);
+        console.log("Using product ID for review:", productId);
+        console.log("Review data:", {
+            tradeId: finalTradeId,
+            rating,
+            comment,
+            isReviewingBuyer,
+            buyerName: tradeData?.buyer?.fullName,
+            productTitle: tradeData?.product?.title
+        });
+        
         try {
             setIsSubmitting(true);
-            const response = await axiosInstance.post('/api/reviews', {
-                tradeId,
-                rating,
-                comment: comment.trim()
-            });
+            
+            const reviewData = {
+                rating: rating,
+                comment: comment
+            };
 
-            console.log('Review submitted successfully:', response.data);
-            setSubmitReviewModal(true);
-            setTimeout(() => {
-                setSubmitReviewModal(false);
-            }, 1500);
-        } catch (error) {
-            console.error('Error submitting review:', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to submit review'
+            // Send tradeId for bidding products, productId for cash products
+            if (finalTradeId) {
+                // For bidding products: API will determine reviewedId automatically
+                reviewData.tradeId = finalTradeId;
+            } else {
+                // For cash products: we need to send reviewedId
+                reviewData.productId = productId;
+                reviewData.reviewedId = isReviewingBuyer ? tradeData?.buyer?.id : tradeData?.seller?.id;
+            }
+            
+            console.log("=== FRONTEND REQUEST DEBUG ===");
+            console.log("User logged in:", !!user);
+            console.log("User ID:", user?.id);
+            console.log("User token:", user?.token ? "Present" : "Missing");
+            console.log("Final tradeId:", finalTradeId);
+            console.log("ProductId:", productId);
+            console.log("Is reviewing buyer:", isReviewingBuyer);
+            console.log("Trade data available:", !!tradeData);
+            console.log("Buyer ID:", tradeData?.buyer?.id);
+            console.log("Seller ID:", tradeData?.seller?.id);
+            console.log("Product type:", finalTradeId ? "BIDDING (API will determine reviewedId)" : "CASH (sending reviewedId)");
+            if (!finalTradeId) {
+                console.log("Reviewed ID (who is being reviewed):", isReviewingBuyer ? tradeData?.buyer?.id : tradeData?.seller?.id);
+            }
+            console.log("Reviewer ID (will be extracted from Bearer token):", user?.id);
+            console.log("Review data being sent:", JSON.stringify(reviewData, null, 2));
+            console.log("===============================");
+            
+            const response = await ApiCaller.Post('/api/reviews', reviewData, {
+                Authorization: `Bearer ${user.token}`
             });
+            
+            console.log("Review submission response:", response);
+            
+            if (response?.data?.success) {
+                console.log("Review submitted successfully!");
+                setSubmitReviewModal(true);
+                setTimeout(() => {
+                    setSubmitReviewModal(false);
+                    navigation.goBack();
+                }, 2000);
+            } else {
+                console.error("Review submission failed:", response?.data?.message);
+                alert("Failed to submit review: " + (response?.data?.message || "Unknown error"));
+            }
+        } catch (error) {
+            console.error("Error submitting review:", error);
+            alert("Error submitting review: " + error.message);
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    console.log("=== SubmitReview Render Started ===");
+    
     if (loading) {
         return (
             <View style={styles.reviewsContainer}>
                 <View style={styles.topContainer}>
-                    <BackArrowIcon />
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <BackArrowIcon />
+                    </TouchableOpacity>
                     <NavBar title={"Review"} />
                 </View>
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <Text style={styles.ratingText}>Loading seller information...</Text>
+                    <Text style={styles.ratingText}>Loading buyer information...</Text>
                 </View>
             </View>
         );
     }
-
+    
     return (
-        <KeyboardAvoidingView 
-            style={styles.reviewsContainer} 
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-        >
+        <View style={styles.reviewsContainer}>
             <View style={styles.topContainer}>
-                <BackArrowIcon />
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <BackArrowIcon />
+                </TouchableOpacity>
                 <NavBar title={"Review"} />
             </View>
+            
+            <ScrollView style={{ flex: 1 }}>
+                {/* Debug Information */}
+                {/* <View style={{ backgroundColor: '#f0f0f0', padding: 15, marginBottom: 20, borderRadius: 8 }}>
+                    <Text style={[styles.ratingText, { fontSize: 16, marginBottom: 10 }]}>🔍 Debug Data:</Text>
+                    <Text style={[styles.ratingText, { fontSize: 12 }]}>TradeId: {tradeId || 'None'}</Text>
+                    <Text style={[styles.ratingText, { fontSize: 12 }]}>ProductId: {productId || 'None'}</Text>
+                    <Text style={[styles.ratingText, { fontSize: 12 }]}>SellerId: {sellerId || 'None'}</Text>
+                    <Text style={[styles.ratingText, { fontSize: 12 }]}>Is Reviewing Buyer: {isReviewingBuyer ? 'Yes' : 'No'}</Text>
+                    <Text style={[styles.ratingText, { fontSize: 12 }]}>Seller Name: {sellerName}</Text>
+                    <Text style={[styles.ratingText, { fontSize: 12 }]}>Loading: {loading ? 'Yes' : 'No'}</Text>
+                    <Text style={[styles.ratingText, { fontSize: 12 }]}>User Token: {user?.token ? 'Present' : 'Missing'}</Text>
+                    
+                    {tradeData && (
+                        <>
+                            <Text style={[styles.ratingText, { fontSize: 14, marginTop: 10, fontWeight: 'bold' }]}>📊 Trade Data:</Text>
+                            <Text style={[styles.ratingText, { fontSize: 12 }]}>Trade ID: {tradeData.trade?.tradeId || 'N/A'}</Text>
+                            <Text style={[styles.ratingText, { fontSize: 12 }]}>Trade Status: {tradeData.trade?.status || 'N/A'}</Text>
+                            <Text style={[styles.ratingText, { fontSize: 12 }]}>Buyer: {tradeData.buyer?.fullName || 'N/A'}</Text>
+                            <Text style={[styles.ratingText, { fontSize: 12 }]}>Buyer Email: {tradeData.buyer?.email || 'N/A'}</Text>
+                            <Text style={[styles.ratingText, { fontSize: 12 }]}>Product: {tradeData.product?.title || 'N/A'}</Text>
+                            <Text style={[styles.ratingText, { fontSize: 12 }]}>Bid Amount: {tradeData.bid?.amount || 'N/A'} SG Points</Text>
+                            <Text style={[styles.ratingText, { fontSize: 12 }]}>Sold At: {tradeData.product?.soldAt ? new Date(tradeData.product.soldAt).toLocaleDateString() : 'N/A'}</Text>
+                        </>
+                    )}
+                </View> */}
 
-            <ScrollView 
-                style={{ flex: 1 }}
-                contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-            >
-                <View style={styles.averageRatingContainer}>
+                {/* Rating Section - White Background */}
+                <View style={[styles.averageRatingContainer, { paddingHorizontal: 20 }]}>
                     <Text style={styles.ratingText}>Rate your experience with {sellerName}</Text>
                     <Text style={styles.averageRating}>{rating.toFixed(1)}</Text>
                     <View style={styles.starsContainer}>
@@ -216,7 +347,7 @@ export default function SubmitReview({ route }) {
                     </View>
                 </View>
 
-                {/* Review Breakdown */}
+                {/* Review Breakdown - Progress Bars */}
                 {reviewsData.map((item, index) => (
                     <View style={styles.reviewRow} key={index}>
                         <Text style={styles.reviewLabel}>{item.label}</Text>
@@ -224,46 +355,58 @@ export default function SubmitReview({ route }) {
                     </View>
                 ))}
 
+                {/* Review Writing Section - Light Gray Background */}
                 <View style={styles.bottomContainer}>
                     <View>
-                        <Text style={styles.ratingText}>Write Review</Text>
+                        <Text style={styles.ratingText}>Write review</Text>
                         <TextInput
                             style={styles.reviewDescription}
                             multiline={true}
                             numberOfLines={4}
-                            placeholder="Review"
+                            placeholder="Would you like to write anything about the product!?"
                             placeholderTextColor={colors.borderColor}
                             textAlignVertical="top"
                             value={comment}
                             onChangeText={setComment}
                         />
+                        <Text style={[styles.ratingText, { fontSize: 12, color: colors.grey, textAlign: 'right', marginTop: 5 }]}>
+                            {400 - comment.length} characters remaining
+                        </Text>
                     </View>
-                    <CustomButton 
-                        title={"Submit Review"}
-                        height={Metrix.VerticalSize(48)}
-                        width={"100%"}
-                        borderRadius={Metrix.VerticalSize(37)}
-                        onPress={handleSubmitReview}
-                        disabled={isSubmitting}
-                    />
+                    
+                    {/* Submit Button - Inside gray background */}
+                    <View style={{ paddingTop: 20 }}>
+                        <CustomButton 
+                            title={isSubmitting ? "Submitting..." : "Submit Review"}
+                            height={Metrix.VerticalSize(48)}
+                            width={"100%"}
+                            borderRadius={Metrix.VerticalSize(37)}
+                            onPress={handleSubmitReview}
+                            disabled={isSubmitting}
+                        />
+                    </View>
                 </View>
             </ScrollView>
 
             <Modal visible={submitReviewModal} transparent animationType="fade">
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalBox}>
-                        <View style={{alignItems: "center", gap: Metrix.VerticalSize(10)}}>
-                            <ModalSuccessLogo checkColor={colors.buttonColor} width={69} height={69} />
-                            <Text style={[styles.modalText, {width: Metrix.HorizontalSize(200)}]}>
-                                Your Review Has been Posted
-                            </Text>
-                        </View>
-                        <Text style={[styles.modalText, { fontFamily: fonts.InterRegular, width: Metrix.HorizontalSize(220) }]}>
-                            10 SG points added to your balance
-                        </Text>
+                <View style={{
+                    flex: 1,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <View style={{
+                        backgroundColor: 'white',
+                        padding: 30,
+                        borderRadius: 10,
+                        alignItems: 'center'
+                    }}>
+                        <ModalSuccessLogo width={80} height={80} />
+                        <Text style={[styles.ratingText, { fontSize: 18, marginTop: 15 }]}>Review Submitted!</Text>
+                        <Text style={[styles.ratingText, { fontSize: 14, marginTop: 5 }]}>Thank you for your feedback.</Text>
                     </View>
                 </View>
             </Modal>
-        </KeyboardAvoidingView>
+        </View>
     );
 }
