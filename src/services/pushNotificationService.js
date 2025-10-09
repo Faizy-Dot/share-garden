@@ -126,6 +126,37 @@ class PushNotificationService {
     handleForegroundMessage(remoteMessage) {
         const { notification, data } = remoteMessage;
         
+        console.log('=== NOTIFICATION RECEIVED ===');
+        console.log('Notification title:', notification?.title);
+        console.log('Notification type:', data?.type);
+        console.log('Notification data:', JSON.stringify(data, null, 2));
+        
+        // IMPORTANT: Filter notifications to only show those meant for the current user
+        // This prevents cross-account notifications when testing with multiple accounts on same device
+        if (data?.targetUserId) {
+            // Get current user from Redux store
+            const store = require('../redux/store').default;
+            const currentUserId = store.getState()?.login?.user?.id;
+            
+            console.log('Checking notification target:');
+            console.log('Current logged-in user ID:', currentUserId);
+            console.log('Notification target user ID:', data.targetUserId);
+            console.log('Match?', currentUserId === data.targetUserId);
+            
+            if (currentUserId !== data.targetUserId) {
+                console.log('🚫 NOTIFICATION FILTERED: meant for different user', {
+                    currentUser: currentUserId,
+                    targetUser: data.targetUserId,
+                    notificationType: data.type
+                });
+                return; // Don't show notification if it's not for the current user
+            }
+            
+            console.log('✅ NOTIFICATION ALLOWED: meant for current user');
+        } else {
+            console.log('⚠️ WARNING: Notification has no targetUserId, showing anyway');
+        }
+        
         if (data?.type === 'SGTIP_LIKED' || data?.type === 'SGTIP_SHARED') {
             // Show in-app notification for SGTip interactions
             Alert.alert(
@@ -222,6 +253,38 @@ class PushNotificationService {
                     }
                 ]
             );
+        } else if (data?.type === 'CASH_INTEREST') {
+            // Show in-app notification for buyer interest in cash products
+            Alert.alert(
+                notification?.title || 'New Buyer Interest!',
+                notification?.body || 'Someone wants to buy your product',
+                [
+                    {
+                        text: 'View',
+                        onPress: () => this.handleNotificationTap(remoteMessage)
+                    },
+                    {
+                        text: 'Dismiss',
+                        style: 'cancel'
+                    }
+                ]
+            );
+        } else if (data?.type === 'CASH_SOLD') {
+            // Show in-app notification when seller marks product as sold to buyer
+            Alert.alert(
+                notification?.title || 'Product Sold to You!',
+                notification?.body || 'The seller has confirmed your purchase',
+                [
+                    {
+                        text: 'View',
+                        onPress: () => this.handleNotificationTap(remoteMessage)
+                    },
+                    {
+                        text: 'Dismiss',
+                        style: 'cancel'
+                    }
+                ]
+            );
         } else {
             // Show generic notification for other types
             Alert.alert(
@@ -275,6 +338,21 @@ class PushNotificationService {
                     // Navigate to My SG Items screen for completed trades so seller can review buyer
                     console.log('Navigate to My SG Items for completed trade');
                     NavigationService.navigate('MySGItems');
+                } else if (data?.type === 'CASH_INTEREST') {
+                    // Navigate to product detail screen for cash interest notifications
+                    if (data.productId) {
+                        console.log('Navigate to Product for cash interest:', data.productId);
+                        NavigationService.navigate('ProductDetail', { id: data.productId });
+                    } else {
+                        // Fallback to My SG Items to see interested buyers
+                        NavigationService.navigate('MySGItems');
+                    }
+                } else if (data?.type === 'CASH_SOLD') {
+                    // Navigate to product detail screen when product is marked as sold
+                    if (data.productId) {
+                        console.log('Navigate to Product for sold confirmation:', data.productId);
+                        NavigationService.navigate('ProductDetail', { id: data.productId });
+                    }
                 } else {
                     // Navigate to notifications screen for other types
                     console.log('Navigate to Notifications');

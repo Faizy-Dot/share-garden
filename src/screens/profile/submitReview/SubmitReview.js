@@ -256,7 +256,8 @@ export default function SubmitReview({ route }) {
             
             console.log("Review submission response:", response);
             
-            if (response?.data?.success) {
+            // Check for successful status codes (200, 201)
+            if (response?.status === 200 || response?.status === 201) {
                 console.log("Review submitted successfully!");
                 setSubmitReviewModal(true);
                 setTimeout(() => {

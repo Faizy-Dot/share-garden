@@ -18,9 +18,7 @@ import DatePicker from 'react-native-date-picker';
 import { updateUserProfile } from '../../../redux/Actions/authActions/loginAction';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { CameraIcon } from '../../../assets/svg';
-
-
-var baseUrl = 'https://api.sharegarden.ca';
+import axiosInstance from '../../../config/axios';
 
 
 export default function EditProfile({ navigation }) {
@@ -59,10 +57,6 @@ export default function EditProfile({ navigation }) {
         { label: "Quebec", value: "Quebec" },
         { label: "Saskatchewan", value: "Saskatchewan" }
     ];
-
-    const config = {
-        headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'application/json' }
-    }
 
     console.log("user from edit profile==>>>", user)
 
@@ -104,8 +98,8 @@ export default function EditProfile({ navigation }) {
         }
         setLoading(true)
         try {
-            const response = await Axios.put(
-                `${baseUrl}/api/auth/profile`,
+            const response = await axiosInstance.put(
+                '/api/auth/profile',
                 {
                     firstName: fname,
                     lastName: lname,
@@ -117,8 +111,7 @@ export default function EditProfile({ navigation }) {
                     province: selectedProvince,
                     city: selectedCity,
                     address1: address1
-                },
-                config
+                }
             );
 
             if (response.status === 200) {
@@ -265,15 +258,9 @@ export default function EditProfile({ navigation }) {
                 name: imageFile.fileName || 'image.jpg',
             });
 
-            const response = await Axios.post(
-                `${baseUrl}/api/auth/upload-profile-image`,
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${user.token}`,
-                        'Content-Type': 'multipart/form-data',
-                    },
-                }
+            const response = await axiosInstance.post(
+                '/api/auth/upload-profile-image',
+                formData
             );
 
             if (response.status === 200) {
