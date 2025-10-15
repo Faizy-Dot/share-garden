@@ -10,6 +10,7 @@ import fonts from '../../../config/Fonts';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../../config/axios';
 import ApiCaller from '../../../config/ApiCaller';
+import Toast from 'react-native-toast-message';
 import { BlackBitIcon, CashIcon, CrossIcon, LikesIcon, ModalInfoIcon, ModalSuccessLogo, ShareIcon, TimeIcon, ViewsIcon } from '../../../assets/svg';
 
 
@@ -118,41 +119,15 @@ export default function MySGItems({ navigation }) {
 
 
     const handlePublish = async (item) => {
-
         setLoading(true);
         try {
-            const formData = new FormData();
-
-            // Required fields
-            formData.append('title', item.title);
-            formData.append('description', item.description);
-            formData.append('categoryId', item.categoryId);
-            formData.append('condition', item.condition);
-            formData.append('isSGPoints', item.isSGPoints.toString());
-            formData.append('isPublished', true);
-            formData.append('status', 'ACTIVE')
-
-            // Conditional fields based on payment type
-            if (item.isSGPoints) {
-                formData.append('minBid', item.minBid.toString());
-                formData.append('bidDuration', item.bidDuration.toString());
-            } else {
-                formData.append('price', item.price.toString());
-            }
-
-            // Append images
-            item.imagesArray.filter(img => img !== null).forEach((image, index) => {
-                formData.append('images', {
-                    uri: image,
-                    type: 'image/jpeg',
-                    name: `image${index}.jpg`,
-                });
-            });
-
-
-            const response = await ApiCaller.PutFormData(
-                `/api/products/${item.id}`,
-                formData,
+            // For published items, we should not have a publish button
+            // This function should only be called for draft items
+            console.log('Attempting to publish draft item:', item.id);
+            
+            const response = await ApiCaller.Post(
+                `/api/products/${item.id}/publish`,
+                {},
                 {
                     Authorization: `Bearer ${user?.token}`,
                 }
@@ -170,10 +145,8 @@ export default function MySGItems({ navigation }) {
                 }, 7000);
             }
 
-
-
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Failed to create product';
+            const errorMessage = error.response?.data?.message || 'Failed to publish product';
             Toast.show({
                 type: 'error',
                 text1: 'Error',
@@ -199,7 +172,7 @@ export default function MySGItems({ navigation }) {
                     style={styles.postedImg}
                 />
                 <View style={{ gap: Metrix.VerticalSize(15), flex: 1 }}>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <Text style={styles.title}>{item.title}</Text>
                         {item.isSGPoints ? (
                             <View style={styles.amount}>
@@ -223,7 +196,12 @@ export default function MySGItems({ navigation }) {
                                 fontSize={Metrix.FontRegular}
                                 onPress={() => navigation.navigate("Post", {
                                     screen: "PostList",
-                                    params: { ...item, SGItems: true }
+                                    params: { 
+                                        ...item, 
+                                        SGItems: true,
+                                        isEditing: true,
+                                        imagesArray: item.images ? item.images.split(',') : []
+                                    }
                                 })} />
                         </View>
                     </View>
@@ -280,7 +258,7 @@ export default function MySGItems({ navigation }) {
                         style={styles.postedImg}
                     />
                     <View style={{ gap: Metrix.VerticalSize(15), flex: 1 }}>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
                             <Text style={styles.title}>{item.title}</Text>
                             {item.isSGPoints ? (
                                 <View style={styles.amount}>
@@ -338,7 +316,7 @@ export default function MySGItems({ navigation }) {
                         style={styles.postedImg}
                     />
                     <View style={{ gap: Metrix.VerticalSize(15), flex: 1 }}>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
                             <Text style={styles.title}>{product.title}</Text>
                             {product.isSGPoints ? (
                                 <View style={styles.amount}>
@@ -394,7 +372,7 @@ export default function MySGItems({ navigation }) {
                         style={styles.postedImg}
                     />
                     <View style={{ gap: Metrix.VerticalSize(15), flex: 1 }}>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
                             <Text style={styles.title}>{item.title}</Text>
                             <View style={styles.soldBadge}>
                                 <Text style={styles.soldText}>SOLD</Text>

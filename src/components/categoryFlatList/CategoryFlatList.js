@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Metrix } from '../../config';
 import fonts from '../../config/Fonts';
@@ -39,6 +39,7 @@ import colors from '../../config/Colors';
 export default function CategoryFlatList({ onCategorySelect, selectedCategory }) {
   const [selectedId, setSelectedId] = useState(selectedCategory);
   const [categories, setCategories] = useState([]);
+  const listRef = useRef(null);
 
   useEffect(() => {
     fetchCategories();
@@ -46,7 +47,23 @@ export default function CategoryFlatList({ onCategorySelect, selectedCategory })
 
   useEffect(() => {
     setSelectedId(selectedCategory);
+    if (selectedCategory && categories.length > 0) {
+      const index = categories.findIndex(c => c.id === selectedCategory);
+      if (index >= 0 && listRef.current?.scrollToIndex) {
+        listRef.current.scrollToIndex({ index, animated: true, viewPosition: 0.5 });
+      }
+    }
   }, [selectedCategory]);
+
+  useEffect(() => {
+    // When categories load initially, center the selected one if any
+    if (selectedId && categories.length > 0) {
+      const index = categories.findIndex(c => c.id === selectedId);
+      if (index >= 0 && listRef.current?.scrollToIndex) {
+        listRef.current.scrollToIndex({ index, animated: false, viewPosition: 0.5 });
+      }
+    }
+  }, [categories]);
 
   const fetchCategories = async () => {
     try {
@@ -113,12 +130,21 @@ export default function CategoryFlatList({ onCategorySelect, selectedCategory })
 
   return (
     <FlatList
+      ref={listRef}
       data={categories}
       renderItem={renderCategory}
       keyExtractor={(item) => item.id}
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.categoryList}
+      onScrollToIndexFailed={(info) => {
+        // In case the list isn't measured yet, wait and retry
+        setTimeout(() => {
+          if (listRef.current?.scrollToIndex) {
+            listRef.current.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.5 });
+          }
+        }, 250);
+      }}
     />
   );
 }

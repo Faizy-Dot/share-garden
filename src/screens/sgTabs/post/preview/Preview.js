@@ -228,9 +228,7 @@ export default function PostTabScreen({ navigation, route }) {
 
 
       if (forDraft?.id) {
-
-
-        console.log("checkkkk")
+        console.log("Updating existing product with ID:", forDraft.id)
 
         const response = await ApiCaller.PutFormData(
           `/api/products/${forDraft.id}`,
@@ -488,7 +486,7 @@ export default function PostTabScreen({ navigation, route }) {
         </View>
 
         <View>
-          <NavBar title={activeButton === "SG Tip" ? "Publish SG Tips" : "Create a Post"}
+          <NavBar title={activeButton === "SG Tip" ? "Publish SG Tips" : (forDraft?.id ? "Edit Post" : "Create a Post")}
             fontSize={Metrix.FontRegular}
           />
         </View>
@@ -676,7 +674,7 @@ export default function PostTabScreen({ navigation, route }) {
 
         <CustomButton
           height={Metrix.VerticalSize(42)}
-          title={loading ? "PUBLISHING..." : "PUBLISH"}
+          title={loading ? (forDraft?.id ? "UPDATING..." : "PUBLISHING...") : (forDraft?.id ? "UPDATE" : "PUBLISH")}
           backgroundColor={colors.buttonColor}
           borderRadius={Metrix.VerticalSize(4)}
           flex={1}
@@ -702,9 +700,13 @@ export default function PostTabScreen({ navigation, route }) {
             ) : (
               <Text style={styles.modalTitle}>
                 {activeButton === "SG Item" ? (
-                  <>Your SG item has been posted on <Text style={{ color: colors.buttonColor }}>SG marketplace</Text></>
+                  forDraft?.id ? (
+                    <>Your SG item has been updated on <Text style={{ color: colors.buttonColor }}>SG marketplace</Text></>
+                  ) : (
+                    <>Your SG item has been posted on <Text style={{ color: colors.buttonColor }}>SG marketplace</Text></>
+                  )
                 ) : (
-                  "Your SG Tip has been posted"
+                  forDraft?.id ? "Your SG Tip has been updated" : "Your SG Tip has been posted"
                 )}
               </Text>
             )}

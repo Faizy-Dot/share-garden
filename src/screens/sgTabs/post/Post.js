@@ -324,7 +324,8 @@ export default function PostTabScreen({ navigation, route }) {
             pointOrCashValue: pointOrCashValue,
             onSuccess: resetForm,
             activeButton: activeButton,
-            forDraft: route.params
+            forDraft: route.params,
+            isEditing: route.params?.isEditing || false
         });
     };
 
@@ -335,7 +336,7 @@ export default function PostTabScreen({ navigation, route }) {
             </View>
 
             <View style={{ marginTop: Metrix.VerticalSize(15) }}>
-                <NavBar title={"Create a Post"} />
+                <NavBar title={route.params?.isEditing ? "Edit Post" : "Create a Post"} />
             </View>
 
             <View style={styles.buttonsContainer}>

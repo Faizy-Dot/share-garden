@@ -409,9 +409,27 @@ export default function PreviewPostedSgItems({ navigation, route }) {
     try {
       const response = await axiosInstance.post(`/api/bids/${productDetail[idx].id}/accept`);
       console.log("accept bid ==>>", response.data)
+      // Immediately refresh product details to reflect accepted status
+      await fetchProductDetail();
+      // Provide user feedback
+      Toast.show({
+        type: 'success',
+        text1: 'Bid Accepted',
+        text2: 'The bid has been accepted successfully.'
+      });
       return response.data; // Handle the response as needed
     } catch (error) {
       console.error("Error accepting bid:", error);
+      // Revert local accept flag on error
+      setAcceptState((prevState) => ({
+        ...prevState,
+        [idx]: false,
+      }));
+      Toast.show({
+        type: 'error',
+        text1: 'Accept Failed',
+        text2: error?.response?.data?.message || 'Unable to accept bid'
+      });
       throw error; // Re-throw the error to handle it later if necessary
     }
 

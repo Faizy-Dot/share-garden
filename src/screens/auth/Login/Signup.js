@@ -25,6 +25,7 @@ import fonts from "../../../config/Fonts";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { Dropdown } from "react-native-element-dropdown";
 import DropdownComponent from "../../../components/dropDown/DropDownInput";
+import { countryCodes } from "../../../config/countryCodes";
 import Logo from '../../../assets/svg/Logo';
 
 const isValidEmail = (email) => {
@@ -68,7 +69,7 @@ export default function SignUpScreen({ navigation }) {
         confirmpassword: '',
         postalcode: '',
         address1: '',
-        phonenumber1: '',
+        phonenumber1: '+1',
         phonenumber2: '',
     });
 
@@ -80,6 +81,7 @@ export default function SignUpScreen({ navigation }) {
 
     const [selectedCountry, setSelectedCountry] = useState("")
 const [selectedProvince , setSelectedProvince] = useState("")
+    const [selectedCountryCode, setSelectedCountryCode] = useState('+1')
 
     const countries = [{
         label: "Canada",
@@ -156,6 +158,8 @@ const [selectedProvince , setSelectedProvince] = useState("")
 
     const [selectedCity, setSelectedCity] = useState("");
 
+    // Large preset moved to config/countryCodes.js
+
     const dispatch = useDispatch();
     const { loading, error, user } = useSelector((state) => state.auth);
     console.log("user=>>>", user)
@@ -178,8 +182,20 @@ const [selectedProvince , setSelectedProvince] = useState("")
     });
 
     const handleInputChange = (key, value) => {
+        // Specialized handling for phone fields
+        let nextValue = value;
+        if (key === 'phonenumber1') {
+            // Always start with + and accept only up to 5 digits after it
+            const digitsOnly = value.replace(/\D/g, '');
+            const limitedDigits = digitsOnly.slice(0, 5);
+            nextValue = `+${limitedDigits}`;
+        } else if (key === 'phonenumber2') {
+            // Accept only digits for the main phone number part
+            nextValue = value.replace(/\D/g, '');
+        }
+
         // First update the form state
-        setForm(prev => ({ ...prev, [key]: value }));
+        setForm(prev => ({ ...prev, [key]: nextValue }));
 
         // Then handle specific validations
         if (key === 'emailaddress') {
@@ -188,7 +204,7 @@ const [selectedProvince , setSelectedProvince] = useState("")
 
         if (key === 'password') {
             // Only run validation if there's a value
-            const validation = isValidPassword(value);
+            const validation = isValidPassword(nextValue);
             setPasswordValidation({
                 minLength: validation.minLength,
                 hasUpperCase: validation.hasUpperCase,
@@ -454,16 +470,24 @@ const [selectedProvince , setSelectedProvince] = useState("")
                 {form.confirmpassword.length > 0 && form.password !== form.confirmpassword && (
                     <Text style={styles.errorText}>Passwords do not match!</Text>
                 )}
-                <View style={styles.row}>
-                    <TextInput
-                        placeholder="+1"
-                        style={[styles.input, styles.smallInput]}
-                        onChangeText={(text) => handleInputChange('phonenumber1', text)}
-                    />
+                <View style={[styles.row, { gap: Metrix.HorizontalSize(10) }]}>
+                    <View style={{ width: "35%" }}>
+                        <DropdownComponent
+                            data={countryCodes}
+                            placeholder={"+1 (US/CA)"}
+                            value={selectedCountryCode}
+                            onChange={(item) => {
+                                setSelectedCountryCode(item.value);
+                                handleInputChange('phonenumber1', item.value);
+                            }}
+                            height={Metrix.VerticalSize(40)}
+                        />
+                    </View>
                     <TextInput
                         placeholder="786 124 - 3425"
                         style={[styles.input, styles.largeInput]}
                         onChangeText={(text) => handleInputChange('phonenumber2', text)}
+                        keyboardType="number-pad"
                     />
                 </View>
                 <View style={styles.row}>
@@ -502,14 +526,14 @@ const [selectedProvince , setSelectedProvince] = useState("")
                 By signing up, you're agreeing to our{" "}
                 <Text
                     style={styles.link}
-                    onPress={() => Linking.openURL("https://example.com/terms")}
+                    onPress={() => Linking.openURL("https://sharegarden.ca/terms")}
                 >
                     Terms & Conditions
                 </Text>{" "}
                 and{" "}
                 <Text
                     style={styles.link}
-                    onPress={() => Linking.openURL("https://example.com/privacy")}
+                    onPress={() => Linking.openURL("https://sharegarden.ca/privacy")}
                 >
                     Privacy Policy
                 </Text>

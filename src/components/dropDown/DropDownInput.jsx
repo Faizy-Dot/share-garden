@@ -67,11 +67,13 @@ const styles = StyleSheet.create({
         borderColor: colors.borderColor
     },
     placeholderStyle: {
-        color: "#6E6E6E",
-        fontSize: Metrix.FontRegular,
+        color: colors.black,
+        fontSize: Metrix.FontExtraSmall,
         fontFamily: fonts.InterRegular,
     },
     selectedTextStyle: {
-        fontSize: Metrix.FontSmall
+        fontSize: Metrix.FontExtraSmall,
+        color: colors.black,
+        fontFamily: fonts.InterRegular,
     },
 });

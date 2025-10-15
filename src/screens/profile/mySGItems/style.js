@@ -34,11 +34,14 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: Metrix.HorizontalSize(5),
+        flexShrink: 0,
     },
     title: {
         fontSize: Metrix.FontMedium,
         fontFamily: fonts.InterSemiBold,
-        color: colors.buttonColor
+        color: colors.buttonColor,
+        flex: 1,
+        marginRight: Metrix.HorizontalSize(6)
     },
     description: {
         fontSize: Metrix.FontExtraSmall,

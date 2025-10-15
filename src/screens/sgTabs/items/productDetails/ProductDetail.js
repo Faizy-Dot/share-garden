@@ -479,11 +479,8 @@ const ProductDetail = ({ route, navigation }) => {
       return;
     }
 
-    // Check if bid meets minimum bid requirement
-    if (parseInt(bidAmount) < displayData?.minBid) {
-      setBidError(`Bid must be at least ${displayData.minBid} SG Points`);
-      return;
-    }
+    // Note: Removed minimum bid requirement to allow bids less than seller's bidding value
+    // The seller's bidding value is now just a reference point, not a minimum requirement
 
     // Check if bid is higher than current highest bid
     if (displayData?.highestBid && parseInt(bidAmount) <= displayData.highestBid) {
@@ -537,10 +534,29 @@ const ProductDetail = ({ route, navigation }) => {
     }
   };
 
-  const handlePurchaseRequest = () => {
-    setPurchaseModalVisible(true);
-    // Enable "I HAVE GOT THIS" button after user shows interest in purchasing
-    setChatStarted(true);
+  const handlePurchaseRequest = async () => {
+    try {
+      if (!user?.id || !productId) {
+        Toast.show({ type: 'error', text1: 'Error', text2: 'Please login to continue' });
+        return;
+      }
+
+      // Notify seller (cash products only) that buyer wants to purchase
+      await axiosInstance.post(`/api/products/${productId}/notify-purchase`);
+
+      // Show modal and allow chat
+      setPurchaseModalVisible(true);
+      setChatStarted(true);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Seller notified',
+        text2: 'You can now start a chat with the seller'
+      });
+    } catch (e) {
+      console.log('notify-purchase error', e?.response || e);
+      Toast.show({ type: 'error', text1: 'Failed to notify seller', text2: 'Please try again' });
+    }
   };
 
   // Add function to handle "I HAVE GOT THIS" button

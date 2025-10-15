@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { View, Text, TextInput, Image, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -34,6 +34,8 @@ const ItemsTabScreen = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [searchResults, setSearchResults] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [filteredProducts, setFilteredProducts] = useState([]);
     const searchInputRef = useRef('');
 
     const fetchProducts = async () => {
@@ -42,6 +44,7 @@ const ItemsTabScreen = () => {
             const response = await axiosInstance.get('/api/products');
             if (response.data) {
                 setProducts(response.data);
+                setFilteredProducts(response.data);
                 setError(null);
             }
         } catch (err) {
@@ -66,6 +69,32 @@ const ItemsTabScreen = () => {
         }
     };
 
+    const filterProductsByCategory = (categoryId) => {
+        if (!categoryId) {
+            setFilteredProducts(products);
+            return;
+        }
+        
+        const filtered = products.filter(product => 
+            product.categoryId === categoryId || product.category?.id === categoryId
+        );
+        setFilteredProducts(filtered);
+    };
+
+    const handleCategorySelect = (category) => {
+        setSelectedCategory(category);
+        filterProductsByCategory(category.id);
+        // Clear search results when category is selected
+        setSearchResults(null);
+    };
+
+    // Filter products when selectedCategory changes
+    useEffect(() => {
+        if (selectedCategory && products.length > 0) {
+            filterProductsByCategory(selectedCategory.id);
+        }
+    }, [selectedCategory, products]);
+
     useFocusEffect(
         React.useCallback(() => {
             fetchProducts();
@@ -77,7 +106,7 @@ const ItemsTabScreen = () => {
 
     console.log(products);
 
-    const ListHeaderComponent = () => (
+    const listHeader = useMemo(() => (
         <>
             <View style={styles.header}>
                 <HomeLogo />
@@ -121,7 +150,8 @@ const ItemsTabScreen = () => {
                                 searchInputRef.current.clear();
                             }
                             setSearchResults(null);
-                            fetchProducts();
+                            setSelectedCategory(null);
+                            setFilteredProducts(products);
                         }}
                         style={styles.clearButton}
                     >
@@ -136,12 +166,15 @@ const ItemsTabScreen = () => {
 
             <View style={styles.categoryContainer}>
                 <View style={{ marginTop: Metrix.VerticalSize(15) }}>
-                    <CategoryFlatList />
+                    <CategoryFlatList 
+                        onCategorySelect={handleCategorySelect}
+                        selectedCategory={selectedCategory?.id}
+                    />
                 </View>
 
             </View>
         </>
-    );
+    ), [user, selectedCategory, products]);
 
     const renderProduct = ({ item }) => (
         <TouchableOpacity
@@ -174,7 +207,7 @@ const ItemsTabScreen = () => {
     if (loading) {
         return (
             <View style={styles.container}>
-                <ListHeaderComponent />
+                {listHeader}
                 <ActivityIndicator size="large" color={colors.buttonColor} style={styles.loader} />
             </View>
         );
@@ -183,7 +216,7 @@ const ItemsTabScreen = () => {
     if (error) {
         return (
             <View style={styles.container}>
-                <ListHeaderComponent />
+                {listHeader}
                 <Text style={styles.errorText}>{error}</Text>
             </View>
         );
@@ -192,14 +225,14 @@ const ItemsTabScreen = () => {
     return (
         <View style={styles.container}>
             <FlatList
-                data={searchResults || products}
+                data={searchResults || filteredProducts}
                 renderItem={renderProduct}
                 keyExtractor={(item) => item.id}
                 numColumns={2}
                 columnWrapperStyle={styles.productRow}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.productList}
-                ListHeaderComponent={ListHeaderComponent}
+                ListHeaderComponent={listHeader}
                 onRefresh={fetchProducts}
                 refreshing={loading}
             />

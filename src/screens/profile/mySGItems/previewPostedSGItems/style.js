@@ -184,11 +184,14 @@ export const styles = StyleSheet.create({
       titleText: {
         fontSize: Metrix.FontRegular,
         fontFamily: fonts.InterBold,
+        flex: 1,
+        marginRight: Metrix.HorizontalSize(8)
       },
       iconRow: {
         flexDirection: "row",
         alignItems: "center",
         gap: Metrix.HorizontalSize(5),
+        flexShrink: 0
       },
       minBidText: {
         fontSize: Metrix.FontMedium,
