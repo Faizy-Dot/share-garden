@@ -19,6 +19,7 @@ import { updateUserProfile } from '../../../redux/Actions/authActions/loginActio
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { CameraIcon } from '../../../assets/svg';
 import axiosInstance from '../../../config/axios';
+import { BASE_URL } from '../../../config/constants';
 
 
 export default function EditProfile({ navigation }) {
@@ -258,27 +259,42 @@ export default function EditProfile({ navigation }) {
                 name: imageFile.fileName || 'image.jpg',
             });
 
-            const response = await axiosInstance.post(
-                '/api/auth/upload-profile-image',
-                formData
-            );
+            // Get user token from Redux store
+            const token = user?.token;
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
 
-            if (response.status === 200) {
-                console.log("response.data.imageUrl==>>>", response.data.imageUrl)
-                setProfileImage(response.data.imageUrl);
-                setImageUri(response.data.imageUrl);
+            // Use fetch instead of axios for FormData upload
+            const response = await fetch(`${BASE_URL}/api/auth/upload-profile-image`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    // Don't set Content-Type - let React Native set it automatically with boundary
+                },
+                body: formData,
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok && response.status === 200) {
+                console.log("response.data.imageUrl==>>>", responseData.imageUrl)
+                setProfileImage(responseData.imageUrl);
+                setImageUri(responseData.imageUrl);
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
                     text2: 'Profile image updated successfully',
                 });
+            } else {
+                throw new Error(responseData.message || 'Failed to upload image');
             }
         } catch (error) {
             console.error('Image upload error:', error);
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Failed to upload image',
+                text2: error.message || 'Failed to upload image',
             });
         } finally {
             setImageLoading(false);

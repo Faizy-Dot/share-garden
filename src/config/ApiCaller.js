@@ -1,9 +1,9 @@
 import Axios from 'axios';
 // Use production API for live
 // For iOS simulator and web
-// var baseUrl = 'https://api.sharegarden.ca';
+var baseUrl = 'https://api.sharegarden.ca';
 // For local development
-var baseUrl = 'http://localhost:4500';
+// var baseUrl = 'http://localhost:4500';
 // For Android emulator and physical devices, use your computer's IP address
 //var baseUrl = 'http://192.168.1.7:4500'; // Your PC's IP address
 export const Img_url = '';
