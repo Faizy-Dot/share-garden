@@ -66,15 +66,29 @@ export default function AdDetail({ route, navigation }) {
   }, [fetchAdDetails]);
 
   const handleLike = async () => {
-    if (!user?.id || isLiking || isLiked) return; // Prevent if already liked or not logged in
+    // Prevent if already liked, not logged in, or currently processing
+    if (!user?.id || isLiking || isLiked) {
+      if (isLiked) {
+        Toast.show({
+          type: 'info',
+          text1: 'Already Liked',
+          text2: 'Ads cannot be unliked once liked'
+        });
+      }
+      return;
+    }
     
     try {
       setIsLiking(true);
       const response = await axiosInstance.post(`/api/ads/${adId}/like`);
       
-      // If already liked, just return
-      if (response.data.alreadyLiked) {
+      // If already liked, ensure state is set and return
+      if (response.data.alreadyLiked || response.data.canUnlike === false) {
         setIsLiked(true);
+        setAd(prev => ({
+          ...prev,
+          likeCount: response.data.likeCount || prev?.likeCount
+        }));
         return;
       }
 
@@ -96,7 +110,7 @@ export default function AdDetail({ route, navigation }) {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Failed to like ad'
+        text2: error.response?.data?.message || 'Failed to like ad'
       });
     } finally {
       setIsLiking(false);
@@ -187,7 +201,11 @@ export default function AdDetail({ route, navigation }) {
           <TouchableOpacity 
             onPress={handleLike}
             disabled={isLiking || !user?.id || isLiked}
-            style={{ padding: 4 }}
+            style={[
+              { padding: 4 },
+              (isLiked || !user?.id) && { opacity: 0.6 }
+            ]}
+            activeOpacity={isLiked || !user?.id ? 1 : 0.7}
           >
             {isLiking ? (
               <ActivityIndicator size="small" color={colors.buttonColor} />
@@ -238,9 +256,13 @@ export default function AdDetail({ route, navigation }) {
             <View style={styles.couponFooter}>
               <View style={styles.iconRow}>
                 <TouchableOpacity 
-                  style={styles.iconWithText}
+                  style={[
+                    styles.iconWithText,
+                    (isLiked || !user?.id) && { opacity: 0.6 }
+                  ]}
                   onPress={handleLike}
                   disabled={isLiking || !user?.id || isLiked}
+                  activeOpacity={isLiked || !user?.id ? 1 : 0.7}
                 >
                   {isLiking ? (
                     <ActivityIndicator size="small" color={colors.buttonColor} />
