@@ -17,6 +17,7 @@ const SGTipActions = ({
     sgTipData = {}, // Add SGTip data for sharing
     pulseLikeKey, // triggers like icon pulse when changes
     pulseShareKey, // triggers share icon pulse when changes
+    onShareSuccess, // Callback to refresh data after successful share
 }) => {
     const [isLiked, setIsLiked] = useState(false);
     const [isLiking, setIsLiking] = useState(false);
@@ -71,12 +72,7 @@ const SGTipActions = ({
 
         // Prevent multiple interactions (check if already liked)
         if (isLiked) {
-            Toast.show({
-                type: 'info',
-                text1: 'Already Liked',
-                text2: 'You have already liked this SGTip'
-            });
-            return;
+            return; // Already liked, do nothing
         }
 
         if (isLiking) return;
@@ -85,6 +81,12 @@ const SGTipActions = ({
         try {
             const response = await sgtipActivityService.likeSGTip(sgTipId);
             
+            // If already liked, just return
+            if (response.alreadyLiked) {
+                setIsLiked(true);
+                return;
+            }
+
             // Update local state - only allow liking (not unliking)
             setIsLiked(true);
             setStats(prev => ({
@@ -121,81 +123,63 @@ const SGTipActions = ({
     const handleShare = async () => {
         if (isSharing) return;
 
-        // Check if user has already shared this SGTip
-        if (hasShared) {
-            Toast.show({
-                type: 'info',
-                text1: 'Already Shared',
-                text2: 'You have already shared this SGTip'
-            });
-            return;
-        }
+        // Note: We no longer check hasShared here - allow sharing once per day
 
         setIsSharing(true);
         try {
             // Use native share dialog directly
             const result = await shareService.shareSGTip(sgTipData, sgTipId);
 
-            // Only call API if share was successful and user hasn't shared before
-            if (result.action === 'shared' && !hasShared) {
-                // If author shares own SGTip, do NOT award points or open bottom sheets
+            // Check if share was successful
+            // Android returns 'sharedAction', iOS returns 'shared'
+            const isShareSuccessful = result.action === 'shared' || result.action === 'sharedAction';
+
+            if (isShareSuccessful) {
+                // If author shares own SGTip, just update local count
                 if (isAuthor) {
-                    setHasShared(true);
                     setStats(prev => ({ ...prev, shares: prev.shares + 1 }));
                     if (onStatsUpdate) {
                         onStatsUpdate({ ...stats, shares: stats.shares + 1 });
                     }
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Shared Successfully!',
-                        text2: 'You shared your own SGTip. No points awarded.'
-                    });
                     return;
                 }
+
+                // Call API to record share (backend will handle once-per-day logic)
                 try {
                     const response = await sgtipActivityService.shareSGTip(sgTipId);
                     
-                    // Mark as shared to prevent duplicate API calls
-                    setHasShared(true);
+                    // Update stats with count from backend
+                    const newShareCount = response.totalShares !== undefined 
+                        ? response.totalShares 
+                        : stats.shares;
                     
-                    // Update local state
                     setStats(prev => ({
                         ...prev,
-                        shares: prev.shares + 1
+                        shares: newShareCount
                     }));
 
-                    // Notify parent component
                     if (onStatsUpdate) {
                         onStatsUpdate({
                             ...stats,
-                            shares: stats.shares + 1
+                            shares: newShareCount
                         });
                     }
 
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Shared Successfully!',
-                        text2: `SGTip shared! +${response.pointsAwarded || 0} points earned`
-                    });
+                    // Only show success message if points were awarded (first share of the day)
+                    if (response.pointsAwarded > 0) {
+                        Toast.show({
+                            type: 'success',
+                            text1: 'Shared Successfully!',
+                            text2: `SGTip shared! +${response.pointsAwarded} points earned`
+                        });
+                    }
+
+                    if (onShareSuccess) {
+                        onShareSuccess();
+                    }
                 } catch (apiError) {
-                    console.error('Error recording share in API:', apiError);
-                    // Still show success for the share action, but mention API issue
-                    Toast.show({
-                        type: 'info',
-                        text1: 'Shared Successfully!',
-                        text2: 'SGTip shared, but stats may not update immediately'
-                    });
+                    console.error('❌ Error recording share in API:', apiError);
                 }
-            } else if (result.action === 'dismissed') {
-                // User dismissed the share dialog
-                console.log('Share dismissed by user');
-            } else if (hasShared) {
-                // User tried to share again but already shared
-                Toast.show({
-                    type: 'info',
-                    text1: 'Already Shared',
-                    text2: 'You have already shared this SGTip'
-                });
             }
 
         } catch (error) {

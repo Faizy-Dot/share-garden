@@ -6,7 +6,7 @@ import CategoryFlatList from "../../../components/categoryFlatList/CategoryFlatL
 import { Images, Metrix } from "../../../config";
 // Remove KeyboardAwareScrollView import since we're using FlatList
 import { AdsLocationIcon, AdsStickerIcon, CrossIcon } from "../../../assets/svg";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import ApiCaller from "../../../config/ApiCaller";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -290,105 +290,109 @@ export default function AdsTabScreen({ navigation }) {
         );
     };
 
+    const listHeader = useMemo(() => (
+        <>
+            <View>
+                <NavBar title={"Merchant Ads"} />
+            </View>
 
+            <View style={styles.searchInputContainer}>
+                <View style={{flex : 1 , justifyContent : "center"}}>
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search ads..."
+                        placeholderTextColor="#999"
+                        value={searchText}
+                        onChangeText={(text) => {
+                            setSearchText(text);
+                            debouncedSearch(text);
+                        }}
+                    />
+                    <TouchableOpacity
+                        onPress={() => {
+                            // Clear search timeout
+                            if (searchTimeoutRef.current) {
+                                clearTimeout(searchTimeoutRef.current);
+                            }
+                            
+                            setSearchText('');
+                            if (searchInputRef.current?.clear) {
+                                searchInputRef.current.clear();
+                            }
+                            setSearchResults(null);
+                            fetchAds(selectedCategory, 1, false);
+                        }}
+                        style={styles.clearButton}
+                    >
+                        <CrossIcon width={16} height={16} strokeColor="#999" />
+                    </TouchableOpacity>
+                </View>
+            </View>
 
-    return (
-        <View style={styles.adsContainer}>
-            {/* Fixed Header with Search */}
-            <View style={styles.topContainer}>
+            <View style={{ marginTop: Metrix.VerticalSize(10) }}>
+                <CategoryFlatList 
+                    onCategorySelect={handleCategorySelect}
+                    selectedCategory={selectedCategory}
+                />
+            </View>
+
+            {/* Clear Filter Button - Show only when there are active filters */}
+            {(searchText || selectedCategory) && (
+                <View style={styles.clearFilterContainer}>
+                    <TouchableOpacity onPress={clearFilters} style={styles.clearFilterButton}>
+                        <Text style={styles.clearFilterText}>Clear All Filters</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+        </>
+    ), [searchText, selectedCategory]);
+
+    if (loading && (!ads || ads.length === 0)) {
+        return (
+            <View style={styles.adsContainer}>
                 <View>
                     <BackArrowIcon />
                 </View>
-
-                <View>
-                    <NavBar title={"Merchant Ads"} />
-                </View>
-
-                <View style={styles.searchInputContainer}>
-                    <View style={{flex : 1 , justifyContent : "center"}}>
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="Search ads..."
-                            placeholderTextColor="#999"
-                            value={searchText}
-                            onChangeText={(text) => {
-                                setSearchText(text);
-                                debouncedSearch(text);
-                            }}
-                        />
-                        <TouchableOpacity
-                            onPress={() => {
-                                // Clear search timeout
-                                if (searchTimeoutRef.current) {
-                                    clearTimeout(searchTimeoutRef.current);
-                                }
-                                
-                                setSearchText('');
-                                if (searchInputRef.current?.clear) {
-                                    searchInputRef.current.clear();
-                                }
-                                setSearchResults(null);
-                                fetchAds(selectedCategory, 1, false);
-                            }}
-                            style={styles.clearButton}
-                        >
-                            <CrossIcon width={16} height={16} strokeColor="#999" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-                <View style={{ marginTop: Metrix.VerticalSize(10) }}>
-                    <CategoryFlatList 
-                        onCategorySelect={handleCategorySelect}
-                        selectedCategory={selectedCategory}
-                    />
-                </View>
-
-                {/* Clear Filter Button - Show only when there are active filters */}
-                {(searchText || selectedCategory) && (
-                    <View style={styles.clearFilterContainer}>
-                        <TouchableOpacity onPress={clearFilters} style={styles.clearFilterButton}>
-                            <Text style={styles.clearFilterText}>Clear All Filters</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-
-
-            </View>
-
-            {/* Content */}
-            {loading && (!ads || ads.length === 0) ? (
+                {listHeader}
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#003034" />
                     <Text style={styles.loadingText}>Loading ads...</Text>
                 </View>
-            ) : (searchResults || ads || []).length > 0 ? (
-                <FlatList 
-                    data={searchResults || ads || []}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderAdsData}
-                    numColumns={2}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={styles.adsDataStyle}
-                    onEndReached={loadMoreAds}
-                    onEndReachedThreshold={0.1}
-                    ListFooterComponent={renderFooter}
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    columnWrapperStyle={styles.rowContainer}
-                    keyboardShouldPersistTaps="handled"
-                />
-            ) : (
-                <View style={styles.noAdsContainer}>
-                    <Text style={styles.noAdsText}>
-                        {searchResults || selectedCategory 
-                            ? 'No ads found matching your search criteria.' 
-                            : 'No ads available at the moment.'
-                        }
-                    </Text>
+            </View>
+        );
+    }
 
-                </View>
-            )}
+    return (
+        <View style={styles.adsContainer}>
+            <View>
+                <BackArrowIcon />
+            </View>
+            <FlatList 
+                data={searchResults || ads || []}
+                keyExtractor={(item) => item.id}
+                renderItem={renderAdsData}
+                numColumns={2}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.adsDataStyle}
+                onEndReached={loadMoreAds}
+                onEndReachedThreshold={0.1}
+                ListHeaderComponent={listHeader}
+                ListFooterComponent={renderFooter}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                columnWrapperStyle={styles.rowContainer}
+                keyboardShouldPersistTaps="handled"
+                ListEmptyComponent={() => (
+                    <View style={styles.noAdsContainer}>
+                        <Text style={styles.noAdsText}>
+                            {searchResults || selectedCategory 
+                                ? 'No ads found matching your search criteria.' 
+                                : 'No ads available at the moment.'
+                            }
+                        </Text>
+                    </View>
+                )}
+            />
         </View>
     )
 }

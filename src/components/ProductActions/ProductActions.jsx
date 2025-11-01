@@ -31,33 +31,39 @@ const ProductActions = ({
   }, [initialStats]);
 
   const handleLike = async () => {
-    if (isLiking || !userId) return;
+    if (isLiking || !userId || isLiked) return; // Prevent if already liked
     
     try {
       setIsLiking(true);
       const response = await axiosInstance.post(`/api/products/${productId}/like`);
       
-      if (response.data.isLiked !== undefined) {
-        setIsLiked(response.data.isLiked);
+      // If already liked, just return
+      if (response.data.alreadyLiked) {
+        setIsLiked(true);
+        return;
+      }
+
+      if (response.data.isLiked) {
+        setIsLiked(true);
         const newStats = {
           ...stats,
-          likes: response.data.isLiked ? stats.likes + 1 : stats.likes - 1
+          likes: stats.likes + 1
         };
         setStats(newStats);
         onStatsUpdate && onStatsUpdate(newStats);
         
         Toast.show({
           type: 'success',
-          text1: response.data.isLiked ? 'Product liked!' : 'Product unliked!',
+          text1: 'Product liked!',
           text2: response.data.message
         });
       }
     } catch (error) {
-      console.error('Error toggling like:', error);
+      console.error('Error liking product:', error);
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Failed to update like status'
+        text2: 'Failed to like product'
       });
     } finally {
       setIsLiking(false);
@@ -174,7 +180,7 @@ const ProductActions = ({
       <TouchableOpacity
         style={{ alignItems: 'center' }}
         onPress={isOwner ? () => onShowLikes && onShowLikes() : handleLike}
-        disabled={isLiking || (!isOwner && !userId)}
+        disabled={isLiking || (!isOwner && (!userId || isLiked))}
       >
         {isLiking ? (
           <ActivityIndicator size="small" color={colors.buttonColor} />

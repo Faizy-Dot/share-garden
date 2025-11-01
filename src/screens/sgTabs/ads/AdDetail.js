@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,15 +15,16 @@ import moment from 'moment';
 import Toast from 'react-native-toast-message';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import ApiCaller from '../../../config/ApiCaller';
 import { Metrix } from '../../../config';
 import colors from '../../../config/Colors';
 import fonts from '../../../config/Fonts';
 import { Images } from '../../../config';
 import BackArrowIcon from '../../../components/backArrowIcon/BackArrowIcon';
-import { ShareIcon, CallIcon, AdsLocationIcon, BlackEyeIcon, GreenBitIcon, PurchaseIcon } from '../../../assets/svg';
+import { ShareIcon, CallIcon, AdsLocationIcon, BlackEyeIcon, GreenBitIcon, PurchaseIcon, LikesIcon } from '../../../assets/svg';
 import CustomButton from '../../../components/Button/Button';
 import styles from './adDetailStyles';
+import axiosInstance from '../../../config/axios';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function AdDetail({ route, navigation }) {
   const { adId } = route.params;
@@ -31,24 +32,74 @@ export default function AdDetail({ route, navigation }) {
   const [ad, setAd] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
 
-  useEffect(() => {
-    fetchAdDetails();
-  }, [adId]);
-
-  const fetchAdDetails = async () => {
+  const fetchAdDetails = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await ApiCaller.Get(`/api/ads/${adId}`);
+      // Use axiosInstance to include auth token so backend can check if user liked the ad
+      const response = await axiosInstance.get(`/api/ads/${adId}`);
       setAd(response.data);
+      setIsLiked(response.data.isLiked || false);
     } catch (err) {
       console.error('Error fetching ad details:', err);
       setError('Failed to load ad details');
       Alert.alert('Error', 'Failed to load ad details. Please try again.');
     } finally {
       setLoading(false);
+    }
+  }, [adId]);
+
+  // Fetch when screen comes into focus (when user comes back)
+  useFocusEffect(
+    useCallback(() => {
+      fetchAdDetails();
+    }, [fetchAdDetails])
+  );
+
+  // Also fetch on mount
+  useEffect(() => {
+    fetchAdDetails();
+  }, [fetchAdDetails]);
+
+  const handleLike = async () => {
+    if (!user?.id || isLiking || isLiked) return; // Prevent if already liked or not logged in
+    
+    try {
+      setIsLiking(true);
+      const response = await axiosInstance.post(`/api/ads/${adId}/like`);
+      
+      // If already liked, just return
+      if (response.data.alreadyLiked) {
+        setIsLiked(true);
+        return;
+      }
+
+      if (response.data.isLiked) {
+        setIsLiked(true);
+        setAd(prev => ({
+          ...prev,
+          likeCount: response.data.likeCount || (prev?.likeCount || 0) + 1
+        }));
+        
+        Toast.show({
+          type: 'success',
+          text1: 'Ad liked!',
+          text2: response.data.message
+        });
+      }
+    } catch (error) {
+      console.error('Error liking ad:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to like ad'
+      });
+    } finally {
+      setIsLiking(false);
     }
   };
 
@@ -132,9 +183,27 @@ export default function AdDetail({ route, navigation }) {
           <BackArrowIcon />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Ad Details</Text>
-        <TouchableOpacity onPress={handleShare} style={styles.shareButton}>
-          <ShareIcon stroke={colors.black} width={20} height={20} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 12 }}>
+          <TouchableOpacity 
+            onPress={handleLike}
+            disabled={isLiking || !user?.id || isLiked}
+            style={{ padding: 4 }}
+          >
+            {isLiking ? (
+              <ActivityIndicator size="small" color={colors.buttonColor} />
+            ) : (
+              <LikesIcon 
+                stroke={isLiked ? colors.redColor || '#FF0000' : colors.black} 
+                fill={isLiked ? colors.redColor || '#FF0000' : 'none'}
+                width={24} 
+                height={24} 
+              />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleShare} style={styles.shareButton}>
+            <ShareIcon stroke={colors.black} width={20} height={20} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <KeyboardAwareScrollView
@@ -168,6 +237,25 @@ export default function AdDetail({ route, navigation }) {
 
             <View style={styles.couponFooter}>
               <View style={styles.iconRow}>
+                <TouchableOpacity 
+                  style={styles.iconWithText}
+                  onPress={handleLike}
+                  disabled={isLiking || !user?.id || isLiked}
+                >
+                  {isLiking ? (
+                    <ActivityIndicator size="small" color={colors.buttonColor} />
+                  ) : (
+                    <LikesIcon 
+                      stroke={isLiked ? colors.redColor || '#FF0000' : colors.black} 
+                      fill={isLiked ? colors.redColor || '#FF0000' : 'none'}
+                      width={16} 
+                      height={16} 
+                    />
+                  )}
+                  <Text style={[styles.iconText, isLiked && { color: colors.redColor || '#FF0000' }]}>
+                    {ad.likeCount || 0}
+                  </Text>
+                </TouchableOpacity>
                 <View style={styles.iconWithText}>
                   <ShareIcon stroke={colors.black} width={16} height={19} />
                   <Text style={styles.iconText}>{ad.shareCount || 0}</Text>

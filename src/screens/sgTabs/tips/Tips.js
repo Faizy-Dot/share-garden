@@ -8,7 +8,7 @@ import CategoryFlatList from "../../../components/categoryFlatList/CategoryFlatL
 import fonts from "../../../config/Fonts";
 import colors from "../../../config/Colors";
 import { LikesIcon, ShareIcon, TimeIcon, ViewsIcon } from "../../../assets/svg";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import axiosInstance from "../../../config/axios";
 import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
@@ -187,6 +187,7 @@ export default function TipsTabScreen({ navigation }) {
         }, [fetchTips])
     );
 
+
     // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -222,13 +223,31 @@ export default function TipsTabScreen({ navigation }) {
         fetchTips();
     };
 
+    // Function to update tip share count in the list
+    const updateTipShareCount = (tipId, newShareCount) => {
+        setTips(prevTips => 
+            prevTips.map(tip => 
+                tip.id === tipId 
+                    ? { ...tip, shares: newShareCount }
+                    : tip
+            )
+        );
+    };
+
     const renderCategory = ({ item }) => {
         console.log('Rendering tip with ID:', item.id);
         const firstImage = item.imageArray && item.imageArray.length > 0 ? item.imageArray[0] : null;
         const timeAgo = calculateTimeAgo(item.publishedAt);
 
         return (
-            <TouchableOpacity onPress={() => navigation.navigate("TipsDetail", item)} style={styles.categoryContainer}>
+            <TouchableOpacity 
+                onPress={() => navigation.navigate("TipsDetail", { 
+                    id: item.id,
+                    ...item, 
+                    onShareUpdate: updateTipShareCount 
+                })} 
+                style={styles.categoryContainer}
+            >
                 <View style={{ flexDirection: "row", padding: 20, gap: Metrix.HorizontalSize(15), width: "100%" }}>
                     <Image
                         source={firstImage ? { uri: firstImage } : Images.homePopularListing}
@@ -279,17 +298,13 @@ export default function TipsTabScreen({ navigation }) {
         );
     };
 
-    return (
-        <View style={styles.tipsContainer}>
-            <View>
-                <BackArrowIcon />
-            </View>
-
+    const listHeader = useMemo(() => (
+        <>
             <View style={{ marginTop: Metrix.VerticalSize(7) }}>
                 <NavBar title={"Explore SG Tips"} />
             </View>
 
-            <View style={{ marginTop: Metrix.VerticalSize(22), gap: 10, flex: 1 }}>
+            <View style={{ marginTop: Metrix.VerticalSize(22), gap: 10 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     <View style={{ flex: 1 }}>
                         <CustomInput
@@ -325,27 +340,45 @@ export default function TipsTabScreen({ navigation }) {
                         </TouchableOpacity>
                     )}
                 </View>
-
-                {loading ? (
-                    <View style={styles.loadingContainer}>
-                        <Text>Loading...</Text>
-                    </View>
-                ) : (
-                    <FlatList
-                        data={tips}
-                        renderItem={renderCategory}
-                        keyExtractor={(item) => item.id.toString()}
-                        contentContainerStyle={styles.categoryList}
-                        showsVerticalScrollIndicator={false}
-                        style={{ flex: 1 }}
-                        ListEmptyComponent={() => (
-                            <View style={styles.emptyContainer}>
-                                <Text style={styles.emptyText}>No tips found</Text>
-                            </View>
-                        )}
-                    />
-                )}
             </View>
+        </>
+    ), [searchQuery, selectedCategory]);
+
+    if (loading && (!tips || tips.length === 0)) {
+        return (
+            <View style={styles.tipsContainer}>
+                <View>
+                    <BackArrowIcon />
+                </View>
+                {listHeader}
+                <View style={styles.loadingContainer}>
+                    <Text>Loading...</Text>
+                </View>
+            </View>
+        );
+    }
+
+    return (
+        <View style={styles.tipsContainer}>
+            <View>
+                <BackArrowIcon />
+            </View>
+            <FlatList
+                data={tips}
+                renderItem={renderCategory}
+                keyExtractor={(item) => item.id.toString()}
+                contentContainerStyle={styles.categoryList}
+                showsVerticalScrollIndicator={false}
+                style={{ flex: 1 }}
+                ListHeaderComponent={listHeader}
+                ListEmptyComponent={() => (
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.emptyText}>No tips found</Text>
+                    </View>
+                )}
+                refreshing={loading}
+                onRefresh={fetchTips}
+            />
         </View>
     );
 }

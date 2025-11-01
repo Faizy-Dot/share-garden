@@ -26,12 +26,25 @@ class SGTipActivityService {
     // Share a SGTip
     async shareSGTip(sgTipId, shareType = 'GENERAL') {
         try {
+            console.log('📡 Share API Request:', {
+                url: `/api/sgtips/${sgTipId}/share`,
+                method: 'POST',
+                body: { shareType }
+            });
+            
             const response = await axiosInstance.post(`/api/sgtips/${sgTipId}/share`, {
                 shareType
             });
+            
+            console.log('📥 Share API Raw Response:', response);
+            console.log('📥 Share API Response Data:', response.data);
+            console.log('📥 Share API Response Status:', response.status);
+            
             return response.data;
         } catch (error) {
-            console.error('Error sharing SGTip:', error);
+            console.error('❌ Error sharing SGTip:', error);
+            console.error('❌ Error response data:', error?.response?.data);
+            console.error('❌ Error response status:', error?.response?.status);
             throw error;
         }
     }

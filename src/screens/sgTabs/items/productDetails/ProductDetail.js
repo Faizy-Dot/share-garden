@@ -342,33 +342,39 @@ const ProductDetail = ({ route, navigation }) => {
     }
   }, [user?.id, displayData?.id]); // Only depend on user ID and product ID
 
-  // Add function to handle like toggle (using like API but showing as favorites)
+  // Add function to handle like (one-time only)
   const handleLikePress = async () => {
-    if (!user?.id) return;
+    if (!user?.id || isLiked) return; // Prevent if already liked
     
     try {
       const response = await axiosInstance.post(`/api/products/${productId}/like`);
       
-      if (response.data.isLiked !== undefined) {
-        setIsLiked(response.data.isLiked);
+      // If already liked, just update state
+      if (response.data.alreadyLiked) {
+        setIsLiked(true);
+        return;
+      }
+
+      if (response.data.isLiked) {
+        setIsLiked(true);
         const newStats = {
           ...productStats,
-          likes: response.data.isLiked ? productStats.likes + 1 : productStats.likes - 1
+          likes: productStats.likes + 1
         };
         setProductStats(newStats);
         
         Toast.show({
           type: 'success',
-          text1: response.data.isLiked ? 'Product liked!' : 'Product unliked!',
+          text1: 'Product liked!',
           text2: response.data.message
         });
       }
     } catch (error) {
-      console.error('Error toggling like:', error);
+      console.error('Error liking product:', error);
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Failed to update like status'
+        text2: 'Failed to like product'
       });
     }
   };

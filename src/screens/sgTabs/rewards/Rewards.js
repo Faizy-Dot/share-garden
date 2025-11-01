@@ -154,7 +154,7 @@ export default function RewardsTabScreen({ navigation }) {
                             ? { color: colors.buttonColor } 
                             : { color: colors.redColor }
                     ]}>
-                        {item.type === 'EARNED' ? '+' : '-'}{item.amount}
+                        {item.type === 'EARNED' ? '+' : ''}{item.amount}
                     </Text>
                 </View>
             </View>

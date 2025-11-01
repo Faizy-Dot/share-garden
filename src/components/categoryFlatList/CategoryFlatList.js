@@ -118,7 +118,7 @@ export default function CategoryFlatList({ onCategorySelect, selectedCategory })
           }
         }}
         activeOpacity={0.8}
-        style={{ width: Metrix.HorizontalSize(73), height: Metrix.VerticalSize(130) }}
+        style={[styles.categoryItem, { width: Metrix.HorizontalSize(73), height: Metrix.VerticalSize(130) }]}
       >
         <View style={styles.category}>
           <IconComponent   />
@@ -154,6 +154,10 @@ const styles = StyleSheet.create({
     gap: Metrix.HorizontalSize(10),
     alignItems: "center",
   },
+  categoryItem: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
   category: {
     backgroundColor: "#F3F3F3",
     width: Metrix.HorizontalSize(64),
@@ -161,11 +165,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: Metrix.HorizontalSize(32),
+    alignSelf: "center",
   },
   categoryText: {
     textAlign: "center",
     marginTop: Metrix.VerticalSize(10),
     fontSize: Metrix.FontSmall,
     fontFamily: fonts.InterRegular,
+    width: "100%",
   },
 });

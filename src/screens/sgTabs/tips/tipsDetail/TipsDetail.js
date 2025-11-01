@@ -70,6 +70,8 @@ export default function TipsDetail({ route }) {
             const response = await axiosInstance.get(`/api/sgtips/${route.params.id}`);
             setSgtipDetail(response.data);
 
+            console.log('SG Tip Detail:', response.data);
+
             // Set initial stats
             if (response.data.stats) {
                 setStats({
@@ -304,7 +306,16 @@ export default function TipsDetail({ route }) {
     }, [])
 
     const handleStatsUpdate = (newStats) => {
+        const previousShares = stats.shares || 0;
         setStats(newStats);
+        
+        // If onShareUpdate callback is provided and shares increased, notify parent list
+        if (route.params?.onShareUpdate && newStats.shares > previousShares) {
+            const tipId = route.params.id || route.params.sgTipId || sgtipDetail?.id;
+            if (tipId) {
+                route.params.onShareUpdate(tipId, newStats.shares);
+            }
+        }
     };
 
     const handleActivityPress = (activity) => {
@@ -499,6 +510,7 @@ export default function TipsDetail({ route }) {
                             }}
                             pulseLikeKey={stats.likes}
                             pulseShareKey={stats.shares}
+                            onShareSuccess={fetchData}
                         />
 
                         <View style={styles.commentContainer}>
