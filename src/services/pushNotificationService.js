@@ -157,6 +157,22 @@ class PushNotificationService {
             console.log('⚠️ WARNING: Notification has no targetUserId, showing anyway');
         }
         
+        // Handle points-related notifications
+        if (data?.type === 'POINTS') {
+            // Update Redux points when receiving points notification
+            const store = require('../redux/store').default;
+            const currentUser = store.getState()?.login?.user;
+            
+            if (currentUser && data.updatedPoints !== undefined && data.updatedPoints !== null) {
+                const { updateUserPoints } = require('../redux/Actions/authActions/loginAction');
+                store.dispatch(updateUserPoints(data.updatedPoints));
+            } else if (currentUser && data.pointsAwarded) {
+                // Fallback to incrementing if only pointsAwarded is available
+                const { incrementUserPoints } = require('../redux/Actions/authActions/loginAction');
+                store.dispatch(incrementUserPoints(data.pointsAwarded));
+            }
+        }
+        
         if (data?.type === 'SGTIP_LIKED' || data?.type === 'SGTIP_SHARED') {
             // Show in-app notification for SGTip interactions
             Alert.alert(

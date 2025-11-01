@@ -10,7 +10,8 @@ import fonts from '../../../../config/Fonts';
 import colors from '../../../../config/Colors';
 import CustomButton from '../../../../components/Button/Button';
 import axiosInstance from '../../../../config/axios';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateUserPoints } from '../../../../redux/Actions/authActions/loginAction';
 import { BlackBitIcon, CallIcon, CashIcon, CrossIcon, HandShakeIcon, LikesIcon, NotificationIcon, ShareIcon, SpeakerIcon, TimeIcon } from '../../../../assets/svg';
 import { Modal } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -64,6 +65,7 @@ const ProductDetail = ({ route, navigation }) => {
   const { width } = Dimensions.get('window');
 
   const { user } = useSelector((state) => state.login);
+  const dispatch = useDispatch();
   
   // Debug user authentication status
   useEffect(() => {
@@ -135,6 +137,11 @@ const ProductDetail = ({ route, navigation }) => {
           shares: response.data.shareCount || 0,
           favorites: response.data.favoriteCount || 0
         });
+      }
+
+      // Update Redux points if userUpdatedPoints is included in response
+      if (response.data.userUpdatedPoints !== undefined && response.data.userUpdatedPoints !== null) {
+        dispatch(updateUserPoints(response.data.userUpdatedPoints));
       }
 
       console.log("Product Detail response", response.data);
@@ -393,16 +400,24 @@ const ProductDetail = ({ route, navigation }) => {
         url: webLink, // Add URL for better sharing on iOS
       });
 
-      if (result.action === Share.sharedAction) {
-        // Optionally increment share count on your backend
+      if (result.action === Share.sharedAction || result.action === 'shared') {
+        // Record share on backend
         try {
-          await axiosInstance.post(`/api/products/${productId}/shares`);
+          const response = await axiosInstance.post(`/api/products/${productId}/shares`);
+          
           // Update local stats
           const newStats = {
             ...productStats,
-            shares: productStats.shares + 1
+            shares: response.data.shareCount || productStats.shares + 1
           };
           setProductStats(newStats);
+
+          // Update Redux points if seller received points and current user is the seller
+          if (response.data.sellerUpdatedPoints !== undefined && 
+              response.data.sellerUpdatedPoints !== null && 
+              user?.id === displayData?.sellerId) {
+            dispatch(updateUserPoints(response.data.sellerUpdatedPoints));
+          }
         } catch (error) {
           if (error?.response?.status === 404) {
             // Endpoint does not exist, ignore

@@ -55,6 +55,18 @@ const loginSlice = createSlice({
     updateUserSubscription: (state, action) => {
       state.user = { ...state.user, subscription: action.payload }; // Update the user's subscription data
     },
+    updateUserPoints: (state, action) => {
+      // Update only the sgPoints field
+      if (state.user) {
+        state.user.sgPoints = action.payload;
+      }
+    },
+    incrementUserPoints: (state, action) => {
+      // Increment sgPoints by the specified amount
+      if (state.user) {
+        state.user.sgPoints = (state.user.sgPoints || 0) + action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -92,5 +104,5 @@ const loginSlice = createSlice({
   }
 });
 
-export const { clearError, logout, updateUserProfile, updateUserSubscription } = loginSlice.actions;
+export const { clearError, logout, updateUserProfile, updateUserSubscription, updateUserPoints, incrementUserPoints } = loginSlice.actions;
 export default loginSlice.reducer;

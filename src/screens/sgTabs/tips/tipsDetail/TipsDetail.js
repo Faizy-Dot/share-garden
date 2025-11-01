@@ -10,7 +10,8 @@ import { Images, Metrix } from '../../../../config';
 import fonts from '../../../../config/Fonts';
 import { ActivityIndicator } from 'react-native-paper';
 import { images } from '../../../../assets';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { incrementUserPoints, updateUserPoints } from '../../../../redux/Actions/authActions/loginAction';
 import RealTimeActivity from '../../../../components/RealTimeActivity/RealTimeActivity';
 import SGTipActions from '../../../../components/SGTipActions/SGTipActions';
 import SGTipActivityModal from '../../../../components/SGTipActivityModal/SGTipActivityModal';
@@ -52,6 +53,7 @@ export default function TipsDetail({ route }) {
 
 
     const { user } = useSelector((state) => state.login);
+    const dispatch = useDispatch();
     const realTimeActivityRef = useRef(null);
 
 
@@ -79,6 +81,11 @@ export default function TipsDetail({ route }) {
                     shares: response.data.stats.shares || 0,
                     comments: response.data.stats.comments || 0
                 });
+            }
+
+            // Update Redux points if userUpdatedPoints is included in response
+            if (response.data.userUpdatedPoints !== undefined && response.data.userUpdatedPoints !== null) {
+                dispatch(updateUserPoints(response.data.userUpdatedPoints));
             }
         } catch (error) {
             console.error('Failed to fetch SG Tip:', error?.response?.data || error.message);
@@ -254,6 +261,15 @@ export default function TipsDetail({ route }) {
             if (data.sgTipId === route.params.id) {
                 // Show notification if user is the author
                 if (data.sharedBy && user.id === sgtipDetail.author?.id) {
+                    // Update Redux points if author received points
+                    if (data.updatedPoints !== undefined && data.updatedPoints !== null) {
+                        // Use updatedPoints if available (more accurate)
+                        dispatch(updateUserPoints(data.updatedPoints));
+                    } else if (data.pointsEarned && data.pointsEarned > 0) {
+                        // Fallback to incrementing if updatedPoints not available
+                        dispatch(incrementUserPoints(data.pointsEarned));
+                    }
+                    
                     Toast.show({
                         type: 'success',
                         text1: 'Your SGTip Was Shared! 📤',

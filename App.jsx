@@ -16,6 +16,7 @@ import MerchantTabNavigtor from './src/screens/merchantScreens/merchantTabs/Merc
 // Stripe Provider - will be uncommented after installing the package
 import { StripeProvider } from '@stripe/stripe-react-native';
 import pushNotificationService from './src/services/pushNotificationService';
+import pointsSocketService from './src/services/pointsSocketService';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,23 @@ function AppNavigator() {
     if (user?.id) {
       pushNotificationService.initialize();
     }
+  }, [user?.id]);
+
+  // Initialize centralized points socket service when user is logged in
+  useEffect(() => {
+    if (user?.id) {
+      pointsSocketService.connect(user.id);
+    } else {
+      // Disconnect when user logs out
+      pointsSocketService.disconnect();
+    }
+
+    // Cleanup on unmount or when user changes
+    return () => {
+      if (!user?.id) {
+        pointsSocketService.disconnect();
+      }
+    };
   }, [user?.id]);
 
   const getInitialRoute = () => {

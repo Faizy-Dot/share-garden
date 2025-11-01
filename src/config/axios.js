@@ -2,7 +2,7 @@ import axios from 'axios';
 import store from '../redux/store';
 
 const axiosInstance = axios.create({
-    baseURL: 'https://api.sharegarden.ca',
+    baseURL: 'http://localhost:4500',
     timeout: 10000,
 });
 
