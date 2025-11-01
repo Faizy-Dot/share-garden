@@ -20,6 +20,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { CameraIcon } from '../../../assets/svg';
 import axiosInstance from '../../../config/axios';
 import { BASE_URL } from '../../../config/constants';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import ApiCaller from '../../../config/ApiCaller';
+import { getMessaging, getToken } from '@react-native-firebase/messaging';
+import { WEB_CLIENT_ID } from '../../auth/Login/GoogleAuthKey';
 
 
 export default function EditProfile({ navigation }) {
@@ -61,6 +65,13 @@ export default function EditProfile({ navigation }) {
 
     console.log("user from edit profile==>>>", user)
 
+    // Configure Google Sign-In
+    useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: WEB_CLIENT_ID,
+        });
+    }, []);
+
     // Add useEffect to initialize cities when component mounts
     useEffect(() => {
         if (user?.province) {
@@ -72,6 +83,141 @@ export default function EditProfile({ navigation }) {
             }
         }
     }, []);
+
+    // Function to get FCM token
+    const getFcmToken = async () => {
+        try {
+            // Request permission for iOS
+            if (Platform.OS === 'ios') {
+                const messaging = getMessaging();
+                const authStatus = await messaging.requestPermission();
+                const enabled =
+                    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+                    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+                if (!enabled) {
+                    console.log('Notification permission denied');
+                    return null;
+                }
+            }
+
+            // Get FCM token
+            const messaging = getMessaging();
+            const token = await getToken(messaging);
+            return token;
+        } catch (error) {
+            console.error('Error getting FCM token:', error);
+            return null;
+        }
+    };
+
+    // Handle Google connection/disconnection
+    const handleGoogleConnection = async () => {
+        const isConnected = user?.googleId;
+
+        if (isConnected) {
+            // Disconnect Google
+            Alert.alert(
+                'Disconnect Google',
+                'Are you sure you want to disconnect your Google account?',
+                [
+                    {
+                        text: 'Cancel',
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'Disconnect',
+                        style: 'destructive',
+                        onPress: async () => {
+                            try {
+                                setLoading(true);
+                                // Update user profile to remove googleId
+                                const response = await axiosInstance.put('/api/auth/profile', {
+                                    googleId: null
+                                });
+
+                                if (response.status === 200) {
+                                    // Update Redux store
+                                    const updatedUser = {
+                                        ...user,
+                                        googleId: null
+                                    };
+                                    dispatch(updateUserProfile(updatedUser));
+
+                                    Toast.show({
+                                        type: 'success',
+                                        text1: 'Success',
+                                        text2: 'Google account disconnected successfully',
+                                    });
+                                }
+                            } catch (error) {
+                                console.error('Error disconnecting Google:', error);
+                                Toast.show({
+                                    type: 'error',
+                                    text1: 'Error',
+                                    text2: 'Failed to disconnect Google account',
+                                });
+                            } finally {
+                                setLoading(false);
+                            }
+                        },
+                    },
+                ]
+            );
+        } else {
+            // Connect Google
+            try {
+                setLoading(true);
+                // Check if Google Play Services is available
+                await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+                // Get the user's Google credentials
+                const userInfo = await GoogleSignin.signIn();
+                console.log("Google User Info:", userInfo);
+
+                // Get FCM token
+                const deviceToken = await getFcmToken();
+
+                // Prepare data for your API
+                const userData = {
+                    token: userInfo.data.idToken,
+                    deviceToken: deviceToken,
+                    deviceType: Platform.OS.toLowerCase(),
+                };
+
+                // Call your API endpoint to connect Google
+                const response = await ApiCaller.Post('/api/auth/google', userData);
+
+                if (response && (response.status === 200 || response.status === 201)) {
+                    // Update Redux store with the response
+                    // The response.data contains user info including googleId
+                    const updatedUser = {
+                        ...user,
+                        ...response.data,
+                        googleId: response.data.googleId
+                    };
+                    dispatch(updateUserProfile(updatedUser));
+
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Success',
+                        text2: 'Google account connected successfully',
+                    });
+                } else {
+                    throw new Error(response?.data?.message || 'Failed to connect Google account');
+                }
+            } catch (error) {
+                console.error("Google Connection Error:", error);
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: error.message || 'Failed to connect Google account',
+                });
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
 
     // Add useEffect to update cities when province changes
     useEffect(() => {
@@ -546,9 +692,21 @@ export default function EditProfile({ navigation }) {
                                 <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular, marginTop: Metrix.VerticalSize(5), flex: 1 }}>Sign in with Facebook and discover your trusted connections to buyers</Text>
                             </View> */}
                             <View>
-                                <CustomButton width={"100%"} height={Metrix.VerticalSize(40)} backgroundColor={colors.white} borderColor={colors.black} borderWidth={1} borderRadius={Metrix.VerticalSize(3)} icon={<FontAwesome name="google" color="#F8443E" style={styles.socialButtonIcon} />}
-                                    title={"disconnect"}
-                                    color={colors.black} fontSize={Metrix.FontSmall} fontFamily={fonts.InterBold} />
+                                <CustomButton 
+                                    width={"100%"} 
+                                    height={Metrix.VerticalSize(40)} 
+                                    backgroundColor={colors.white} 
+                                    borderColor={colors.black} 
+                                    borderWidth={1} 
+                                    borderRadius={Metrix.VerticalSize(3)} 
+                                    icon={<FontAwesome name="google" color="#F8443E" style={styles.socialButtonIcon} />}
+                                    title={user?.googleId ? "Disconnect" : "Connect"}
+                                    onPress={handleGoogleConnection}
+                                    color={colors.black} 
+                                    fontSize={Metrix.FontSmall} 
+                                    fontFamily={fonts.InterBold} 
+                                    disabled={loading}
+                                />
                                 <Text style={{ fontSize: Metrix.FontExtraSmall, fontFamily: fonts.InterRegular, marginTop: Metrix.VerticalSize(5) }}>Sign in with Gmail and discover your trusted connections to buyers</Text>
                             </View>
                             {/* <View>

@@ -46,11 +46,16 @@ export default function RewardsTabScreen({ navigation }) {
         try {
             const response = await axiosInstance.get(`/api/reviews/user/${user.id}`);
             setReviewData({
-                averageRating: response.data.averageRating || 4.5,
-                totalReviews: response.data.totalReviews || 0
+                averageRating: response.data.averageRating ?? 0,
+                totalReviews: response.data.totalReviews ?? 0
             });
         } catch (error) {
             console.log('Error fetching user reviews:', error);
+            // Set default values when there's an error
+            setReviewData({
+                averageRating: 0,
+                totalReviews: 0
+            });
         }
     };
 
@@ -227,8 +232,14 @@ export default function RewardsTabScreen({ navigation }) {
                 <Text style={styles.sameText2}>{user.firstName} {user.lastName}</Text>
 
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-                    {renderStars()}
-                    <Text style={styles.ratingText}>{reviewData.averageRating.toFixed(1)}</Text>
+                    {reviewData.totalReviews > 0 ? (
+                        <>
+                            {renderStars()}
+                            <Text style={styles.ratingText}>{reviewData.averageRating.toFixed(1)}</Text>
+                        </>
+                    ) : (
+                        <Text style={styles.ratingText}>No ratings yet</Text>
+                    )}
                 </View>
 
                 <View style={{ gap: 3, alignItems: "center" }}>
