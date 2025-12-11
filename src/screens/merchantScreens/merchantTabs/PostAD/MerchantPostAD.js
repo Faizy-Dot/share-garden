@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Alert, Platform, PermissionsAndroid, TextInput, Switch, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert, Platform, PermissionsAndroid, TextInput, Switch, StyleSheet, ActivityIndicator } from 'react-native';
 import MerchantNavbar from '../../../../components/navBar/MerchantNavbar';
 import styles from './styles';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -12,7 +12,7 @@ import DropDownInput from '../../../../components/dropDown/DropDownInput.jsx';
 import fonts from '../../../../config/Fonts';
 import Icon from "react-native-vector-icons/MaterialIcons";
 import CustomButton from '../../../../components/Button/Button';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../../../config/axios';
 import Axios from 'axios';
@@ -21,6 +21,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import DatePicker from 'react-native-date-picker';
 
 export default function MerchantPostAD() {
+  const route = useRoute();
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -37,6 +38,9 @@ export default function MerchantPostAD() {
   const [discountType, setDiscountType] = useState(null);
   const [percentageValue, setPercentageValue] = useState('');
   const [fixedValue, setFixedValue] = useState('');
+  const [redemptionPoints, setRedemptionPoints] = useState('');
+  const [disclaimer, setDisclaimer] = useState('');
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const { user } = useSelector((state) => state.login)
   const navigation = useNavigation();
@@ -152,7 +156,49 @@ export default function MerchantPostAD() {
       }
       console.log('Fetching categories...');
       fetchCategories();
-    }, [user, navigation])
+
+      // Populate form from route params if they exist (when navigating back from preview)
+      const params = route.params;
+      if (params) {
+        if (params.image) setImage(params.image);
+        if (params.title) setTitle(params.title);
+        if (params.description) setDescription(params.description);
+        if (params.categoryId) setSelectedCategory(params.categoryId);
+        if (params.categoryName) setSelectedCategoryName(params.categoryName);
+        if (params.addCoupon !== undefined) setAddCoupon(params.addCoupon);
+        if (params.discountType) setDiscountType(params.discountType);
+        if (params.percentageValue) setPercentageValue(params.percentageValue);
+        if (params.fixedValue) setFixedValue(params.fixedValue);
+        if (params.couponCode) setCouponCode(params.couponCode);
+        if (params.redeemByOnline !== undefined) setCheckOnline(params.redeemByOnline);
+        if (params.redeemByInStore !== undefined) setCheckInStore(params.redeemByInStore);
+        if (params.expiryDate) {
+          const date = new Date(params.expiryDate);
+          if (!isNaN(date.getTime())) {
+            setExpiryDate(date);
+          }
+        }
+        if (params.redemptionPoints) setRedemptionPoints(params.redemptionPoints);
+        if (params.disclaimer) setDisclaimer(params.disclaimer);
+      } else {
+        // Reset form if no params (fresh visit or after successful publish)
+        setTitle('');
+        setDescription('');
+        setImage(null);
+        setSelectedCategory(null);
+        setSelectedCategoryName('');
+        setDiscountType(null);
+        setPercentageValue('');
+        setFixedValue('');
+        setAddCoupon(false);
+        setCheckOnline(false);
+        setCheckInStore(false);
+        setCouponCode('');
+        setExpiryDate(new Date());
+        setRedemptionPoints('');
+        setDisclaimer('');
+      }
+    }, [user, navigation, route.params])
   );
 
   const fetchCategories = async () => {
@@ -201,6 +247,8 @@ export default function MerchantPostAD() {
       });
     }
 
+    setIsPublishing(true);
+
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
@@ -227,8 +275,8 @@ export default function MerchantPostAD() {
       if (discountType === 'FIXED' && fixedValue) {
         formData.append('fixedAmountValue', String(fixedValue));
       }
-      // Optional: disclaimer if present (reuse description if no separate field exists)
-      formData.append('disclaimer', description || '');
+      // Optional: disclaimer if present (use disclaimer field if available, otherwise fallback to description)
+      formData.append('disclaimer', disclaimer || description || '');
     } else {
       formData.append('addCoupon', 'false');
     }
@@ -277,12 +325,6 @@ export default function MerchantPostAD() {
         console.log("response from second api==>>", publishData);
       }
 
-      Toast.show({
-        type: 'success',
-        text1: 'Ad Published',
-        text2: 'Your ad has been successfully posted!',
-      });
-
       // Reset form
       setTitle('');
       setDescription('');
@@ -297,11 +339,22 @@ export default function MerchantPostAD() {
       setCheckInStore(false);
       setCouponCode('');
       setExpiryDate(new Date());
+      setRedemptionPoints('');
+      setDisclaimer('');
 
-      // Navigate to MerchantItems screen
-      navigation.navigate('MerchantItems');
+      setIsPublishing(false);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Ad Published',
+        text2: 'Your ad has been successfully posted!',
+      });
+
+      // Navigate to MerchantItems tab (main screen) and reset navigation stack
+      navigation.getParent()?.navigate('MerchantItems');
     } catch (error) {
       console.error('Ad creation error:', error);
+      setIsPublishing(false);
       Toast.show({
         type: 'error',
         text1: 'Upload Failed',
@@ -317,6 +370,14 @@ export default function MerchantPostAD() {
 
   return (
     <View style={styles.merchantPostContainer}>
+      {isPublishing && (
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={colors.primary || '#F8443E'} />
+            <Text style={{ marginTop: 10, fontSize: 16 }}>Publishing your ad...</Text>
+          </View>
+        </View>
+      )}
       <MerchantNavbar title="Create an Ad" />
 
       <KeyboardAwareScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
@@ -475,7 +536,16 @@ export default function MerchantPostAD() {
             <View style={styles.redeemValueRow}>
               <Text style={styles.checkBoxText}>Redemption Value</Text>
               <View style={styles.redeemInputWrap}>
-                <TextInput style={[styles.inputs, styles.redeemInput]}  keyboardType="numeric" />
+                <TextInput 
+                  style={[styles.inputs, styles.redeemInput]} 
+                  keyboardType="numeric"
+                  value={redemptionPoints}
+                  onChangeText={(text) => {
+                    // Only allow numbers
+                    const numValue = text.replace(/[^0-9]/g, '');
+                    setRedemptionPoints(numValue);
+                  }}
+                />
                 <Text style={styles.checkBoxText}>Points</Text>
               </View>
             </View>
@@ -496,7 +566,13 @@ export default function MerchantPostAD() {
                 {expiryDate ? expiryDate.toLocaleDateString() : 'Expiry Date'}
               </Text>
             </TouchableOpacity>
-            <TextInput style={styles.inputs} placeholder='Disclaimer' />
+            <TextInput 
+              style={styles.inputs} 
+              placeholder='Disclaimer'
+              value={disclaimer}
+              onChangeText={setDisclaimer}
+              multiline
+            />
           </View>
         )}
 
@@ -531,6 +607,7 @@ export default function MerchantPostAD() {
                 image,
                 title,
                 description,
+                categoryId: selectedCategory,
                 categoryName: selectedCategoryName,
                 addCoupon,
                 discountType,
@@ -540,14 +617,20 @@ export default function MerchantPostAD() {
                 redeemByOnline: checkOnline,
                 redeemByInStore: checkInStore,
                 expiryDate: expiryDate ? new Date(expiryDate).toISOString() : null,
+                redemptionPoints,
+                disclaimer,
               })
             }
           />
-          <CustomButton flex={1} title={"PUBLISH"}
+          <CustomButton 
+            flex={1} 
+            title={isPublishing ? "PUBLISHING..." : "PUBLISH"}
             height={Metrix.VerticalSize(42)}
             borderRadius={4}
             fontSize={Metrix.FontSmall}
-            onPress={handlePublish} />
+            onPress={handlePublish}
+            disabled={isPublishing}
+          />
         </View>
       </KeyboardAwareScrollView>
 

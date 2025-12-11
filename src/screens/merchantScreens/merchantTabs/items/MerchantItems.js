@@ -93,13 +93,20 @@ export default function MerchantItems() {
 
   // Check if merchant is subscribed using utility function
   const checkMerchantSubscribed = () => isMerchantSubscribed(user);
+  
+  // Get subscription from Redux state or local state (prioritize Redux)
+  const activeSubscription = user?.subscription || currentSubscription;
 
   // Fetch subscription plans and current subscription when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
       fetchSubscriptionPlans();
       fetchCurrentSubscription();
-    }, [])
+      // Initialize currentSubscription from Redux state if available
+      if (user?.subscription) {
+        setCurrentSubscription(user.subscription);
+      }
+    }, [user?.subscription])
   );
 
   const fetchSubscriptionPlans = async () => {
@@ -231,7 +238,7 @@ export default function MerchantItems() {
       setCurrentSubscription(updatedSubscription);
       
       // Refresh subscription data
-      fetchCurrentSubscription();
+      await fetchCurrentSubscription();
       
     } catch (error) {
       console.error('Purchase error:', error);
@@ -244,8 +251,8 @@ export default function MerchantItems() {
     const renderPackgesData = ({ item, index }) => {
     const color = packageColors[item.name] || "#FEEDD2";
     const priceInDollars = formatCurrency(item.price, item.currency);
-    const isCurrentPlan = currentSubscription?.planName === item.name;
-    const hasActiveSubscription = currentSubscription && currentSubscription.status === 'active';
+    const isCurrentPlan = activeSubscription?.planName === item.name;
+    const hasActiveSubscription = activeSubscription && activeSubscription.status === 'active';
     
     return (
       <View 

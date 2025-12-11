@@ -1,4 +1,5 @@
-import { Image, Text, View } from "react-native"
+import { useState } from "react"
+import { Image, Text, View, ActivityIndicator } from "react-native"
 import styles from "./previewStyles"
 import MerchantNavbar from "../../../../components/navBar/MerchantNavbar"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
@@ -10,13 +11,16 @@ import { BlackEyeIcon, GreenBitIcon, PurchaseIcon, ShareIcon } from "../../../..
 import CustomButton from "../../../../components/Button/Button"
 import axiosInstance from "../../../../config/axios"
 import Toast from "react-native-toast-message"
+import { BASE_URL } from "../../../../config/constants"
 
 const PreviewMerchantAd = ({ route , navigation }) => {
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const { 
     image,
     title,
     description,
+    categoryId,
     categoryName,
     addCoupon,
     discountType,
@@ -26,12 +30,22 @@ const PreviewMerchantAd = ({ route , navigation }) => {
     redeemByOnline,
     redeemByInStore,
     expiryDate,
+    redemptionPoints,
+    disclaimer,
   } = route.params
 
   const { user } = useSelector((state) => state.login)
 
   return (
     <View style={styles.previewContainer}>
+      {isPublishing && (
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={colors.primary || '#F8443E'} />
+            <Text style={{ marginTop: 10, fontSize: 16 }}>Publishing your ad...</Text>
+          </View>
+        </View>
+      )}
       <MerchantNavbar title={"Ad Preview"} />
 
       <KeyboardAwareScrollView
@@ -89,7 +103,7 @@ const PreviewMerchantAd = ({ route , navigation }) => {
           <Text style={styles.grabTitle}>Grab this coupon</Text>
           <View style={styles.pointsContainer}>
             <GreenBitIcon width={40} height={40} />
-            <Text style={styles.pointsText}>1850</Text>
+            <Text style={styles.pointsText}>{redemptionPoints || '0'}</Text>
           </View>
         </View>
 
@@ -97,7 +111,7 @@ const PreviewMerchantAd = ({ route , navigation }) => {
           <Text style={styles.disclaimerBold}>
             Disclaimer:
             <Text style={styles.disclaimerRegular}>
-              {" "}Valid for one-time use only per user. Cannot be combined with other offers or discounts. Show this page to the merchant to avail this coupon in store.
+              {" "}{disclaimer || 'Valid for one-time use only per user. Cannot be combined with other offers or discounts. Show this page to the merchant to avail this coupon in store.'}
             </Text>
           </Text>
         </View>
@@ -118,6 +132,7 @@ const PreviewMerchantAd = ({ route , navigation }) => {
                 image,
                 title,
                 description,
+                categoryId,
                 categoryName,
                 addCoupon,
                 discountType,
@@ -127,22 +142,29 @@ const PreviewMerchantAd = ({ route , navigation }) => {
                 redeemByOnline,
                 redeemByInStore,
                 expiryDate,
+                redemptionPoints,
+                disclaimer,
               })
             }
           />
           <CustomButton
             flex={1}
-            title={"PUBLISH"}
+            title={isPublishing ? "PUBLISHING..." : "PUBLISH"}
             height={Metrix.VerticalSize(42)}
             fontSize={Metrix.FontSmall}
             borderRadius={4}
+            disabled={isPublishing}
             onPress={async () => {
+              setIsPublishing(true);
               try {
                 const formData = new FormData();
                 if (title) formData.append('title', title);
                 if (description) formData.append('description', description);
-                if (categoryName) {
-                  // categoryId is not passed; Preview screen doesn't have id. Inform user to go back if missing.
+                if (categoryId) {
+                  formData.append('categoryId', categoryId);
+                } else {
+                  Toast.show({ type: 'error', text1: 'Error', text2: 'Category is required. Please go back and select a category.' });
+                  return;
                 }
                 if (image) {
                   formData.append('images', { uri: image, type: 'image/jpeg', name: 'ad.jpg' });
@@ -157,21 +179,70 @@ const PreviewMerchantAd = ({ route , navigation }) => {
                   formData.append('couponTitle', title || 'Coupon');
                   if (discountType === 'PERCENTAGE' && percentageValue) formData.append('percentageValue', String(percentageValue));
                   if (discountType === 'FIXED' && fixedValue) formData.append('fixedAmountValue', String(fixedValue));
-                  formData.append('disclaimer', description || '');
+                  formData.append('disclaimer', disclaimer || description || '');
                 } else {
                   formData.append('addCoupon', 'false');
                 }
 
-                const res = await axiosInstance.post('/api/ads', formData);
-                if (res.status === 201) {
-                  try { await axiosInstance.patch(`/api/ads/${res.data.id}/publish`); } catch {}
-                  Toast.show({ type: 'success', text1: 'Ad Published', text2: 'Your ad has been posted.' });
-                  navigation.goBack();
+                // Get user token from Redux store
+                const token = user?.token;
+                if (!token) {
+                  throw new Error('No authentication token found');
+                }
+
+                // Use fetch instead of axios for FormData upload
+                const response = await fetch(`${BASE_URL}/api/ads`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    // Don't set Content-Type - let React Native set it automatically with boundary
+                  },
+                  body: formData,
+                });
+
+                const responseData = await response.json();
+
+                if (!response.ok) {
+                  throw new Error(responseData.message || `Server error: ${response.status}`);
+                }
+
+                if (response.status === 201) {
+                  // Use fetch for publish as well
+                  try {
+                    const publishResponse = await fetch(`${BASE_URL}/api/ads/${responseData.id}/publish`, {
+                      method: 'PATCH',
+                      headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                      },
+                    });
+                    
+                    if (!publishResponse.ok) {
+                      const publishError = await publishResponse.json();
+                      console.error('Publish error:', publishError);
+                    }
+                  } catch (publishErr) {
+                    console.error('Publish error:', publishErr);
+                  }
+                  
+                  setIsPublishing(false);
+                  Toast.show({ 
+                    type: 'success', 
+                    text1: 'Ad Published', 
+                    text2: 'Your ad has been successfully posted!' 
+                  });
+                  
+                  // Navigate to MerchantItems tab (main screen) and reset navigation stack
+                  // This will also clear the Post Ad and Preview screens
+                  navigation.getParent()?.navigate('MerchantItems');
                 } else {
-                  Toast.show({ type: 'error', text1: 'Error', text2: res.data?.message || 'Failed to publish ad' });
+                  setIsPublishing(false);
+                  Toast.show({ type: 'error', text1: 'Error', text2: responseData?.message || 'Failed to publish ad' });
                 }
               } catch (e) {
-                Toast.show({ type: 'error', text1: 'Error', text2: e.response?.data?.message || 'Failed to publish ad' });
+                console.error('Ad creation error:', e);
+                setIsPublishing(false);
+                Toast.show({ type: 'error', text1: 'Error', text2: e.message || 'Failed to publish ad' });
               }
             }}
           />
