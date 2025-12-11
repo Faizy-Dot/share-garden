@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../../../config/axios';
 import Axios from 'axios';
+import { BASE_URL } from '../../../../config/constants';
 import { useFocusEffect } from '@react-navigation/native';
 import DatePicker from 'react-native-date-picker';
 
@@ -233,16 +234,47 @@ export default function MerchantPostAD() {
     }
 
     try {
-      const response = await axiosInstance.post(
-        '/api/ads',
-        formData
-      );
+      // Get user token from Redux store
+      const token = user?.token;
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Use fetch instead of axios for FormData upload
+      const response = await fetch(`${BASE_URL}/api/ads`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // Don't set Content-Type - let React Native set it automatically with boundary
+        },
+        body: formData,
+      });
+
+      const responseData = await response.json();
       
-      console.log("response first api ==>>", response.data);
+      console.log("response first api ==>>", responseData);
+
+      if (!response.ok) {
+        throw new Error(responseData.message || `Server error: ${response.status}`);
+      }
 
       if(response.status === 201){
-        const responsePublish = await axiosInstance.patch(`/api/ads/${response.data.id}/publish`);
-        console.log("response from second api==>>", responsePublish.data);
+        // Use fetch for publish as well
+        const publishResponse = await fetch(`${BASE_URL}/api/ads/${responseData.id}/publish`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!publishResponse.ok) {
+          const publishError = await publishResponse.json();
+          throw new Error(publishError.message || 'Failed to publish ad');
+        }
+        
+        const publishData = await publishResponse.json();
+        console.log("response from second api==>>", publishData);
       }
 
       Toast.show({
@@ -269,11 +301,11 @@ export default function MerchantPostAD() {
       // Navigate to MerchantItems screen
       navigation.navigate('MerchantItems');
     } catch (error) {
-      console.error(error);
+      console.error('Ad creation error:', error);
       Toast.show({
         type: 'error',
         text1: 'Upload Failed',
-        text2: 'Please try again later',
+        text2: error.message || 'Please try again later',
       });
     }
   };
