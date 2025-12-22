@@ -334,7 +334,7 @@ const ProductDetail = ({ route, navigation }) => {
     const incrementProductView = async () => {
       try {
         // Only increment view if viewer is not the seller and hasn't been incremented yet
-        if (user?.id !== displayData?.seller?.id && !viewIncremented.current && displayData?.id) {
+        if (user?.id !== displayData?.sellerId && !viewIncremented.current && displayData?.id) {
           await axiosInstance.post(`/api/products/${displayData.id}/views`);
           viewIncremented.current = true; // Mark as incremented
         }
@@ -347,7 +347,7 @@ const ProductDetail = ({ route, navigation }) => {
     if (user && displayData?.id && !viewIncremented.current) {
       incrementProductView();
     }
-  }, [user?.id, displayData?.id]); // Only depend on user ID and product ID
+  }, [user?.id, displayData?.id, displayData?.sellerId]); // Only depend on user ID, product ID, and sellerId
 
   // Add function to handle like (one-time only)
   const handleLikePress = async () => {
@@ -364,11 +364,15 @@ const ProductDetail = ({ route, navigation }) => {
 
       if (response.data.isLiked) {
         setIsLiked(true);
-        const newStats = {
-          ...productStats,
-          likes: productStats.likes + 1
-        };
-        setProductStats(newStats);
+        
+        // Only increment like count in UI if it's not an owner like
+        if (!response.data.isOwnerLike) {
+          const newStats = {
+            ...productStats,
+            likes: productStats.likes + 1
+          };
+          setProductStats(newStats);
+        }
         
         Toast.show({
           type: 'success',
